@@ -1,6 +1,9 @@
 # List of source files containing translatable strings.
 
 # Source files
+data/ario.schemas.in
+data/ario.desktop.in.in
+data/cover-prefs.glade
 data/connection-prefs.glade
 data/cover-prefs.glade
 data/cover-progress.glade

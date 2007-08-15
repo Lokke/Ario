@@ -524,20 +524,21 @@ shell_coverdownloader_find_amazon_image (ShellCoverdownloader *shell_coverdownlo
         LOG_FUNCTION_START
         GArray *size;
         GList *data = NULL, *cover_uris = NULL;
+        int ret;
         GnomeVFSResult result;
 
         size = g_array_new (TRUE, TRUE, sizeof (int));
 
         /* If a cover is found on amazon, it is loaded in data(0) */
-        result = cover_load_amazon_covers (artist,
-                                           album,
-                                           &cover_uris,
-                                           &size,
-                                           &data,
-                                           GET_FIRST_COVER,
-                                           AMAZON_MEDIUM_COVER);
+        ret = cover_load_amazon_covers (artist,
+                                        album,
+                                        &cover_uris,
+                                        &size,
+                                        &data,
+                                        GET_FIRST_COVER,
+                                        AMAZON_MEDIUM_COVER);
         /* If the cover is not too big and not too small (blank amazon image), we save it */
-        if (result == GNOME_VFS_OK && cover_size_is_valid (g_array_index (size, int, 0))) {
+        if (ret == 0 && cover_size_is_valid (g_array_index (size, int, 0))) {
                 result = cover_save_cover (artist,
                                            album,
                                            g_list_nth_data (data, 0),

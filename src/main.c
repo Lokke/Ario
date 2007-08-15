@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <libgnomevfs/gnome-vfs.h>
+#include <curl/curl.h>
 
 #include "eel/eel-gconf-extensions.h"
 #include "shell.h"
@@ -71,6 +72,7 @@ main (int argc, char *argv[])
 
         util_init_stock_icons ();
         gnome_vfs_init ();
+        curl_global_init(0);
 
         eel_gconf_monitor_add ("/apps/ario");
 

@@ -22,11 +22,6 @@
 	<short>Host to connect to</short>
 	<long>Host to connect to.</long>
         </locale>
-
-        <locale name="fr">
-	<short>Hôte</short>
-	<long>Hôte</long>
-        </locale>
       </schema>
 
       <schema>
@@ -38,11 +33,6 @@
         <locale name="C">
 	<short>Port to connect to</short>
 	<long>Port to connect to.</long>
-        </locale>
-
-        <locale name="fr">
-	<short>Port</short>
-	<long>Port</long>
         </locale>
       </schema>
 
@@ -67,11 +57,6 @@
         <locale name="C">
 	<short>Define if Ario must autoconnect to mpd or not</short>
 	<long>Define if Ario must autoconnect to mpd or not.</long>
-        </locale>
-
-        <locale name="fr">
-	<short>Définit si Ario doit se connecter automatiquement à MPD ou pas</short>
-	
         </locale>
       </schema>
 
@@ -108,11 +93,6 @@
 	<locale name="C">
 	<short>Hide the covers in the albums treeviewn</short>
 	<long>When enabled, ario hide the covers in the albums treeview</long>
-	</locale>
-
-	<locale name="fr">
-	<short>Cacher les pochettes dans la liste d&apos;albums</short>
-	<long>Si activé, Ario cache les pochettes dans la liste d&apos;albums</long>
 	</locale>
       </schema>
 

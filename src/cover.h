@@ -53,7 +53,7 @@ typedef enum
         OVERWRITE_MODE_SKIP
 }CoverOverwriteMode;
 
-GnomeVFSResult               cover_load_amazon_covers   (const char *artist,
+int                          cover_load_amazon_covers   (const char *artist,
                                                          const char *album,
                                                          GList **cover_uris,
                                                          GArray **file_size,

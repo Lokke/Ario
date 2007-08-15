@@ -19,18 +19,22 @@
 
 
 
-char*                util_format_time                 (int time);
+char*                   util_format_time                (int time);
 
-char*                util_format_total_time                 (int time);
+char*                   util_format_total_time          (int time);
 
-gchar*                util_format_track                 (gchar *track);
+gchar*                  util_format_track               (gchar *track);
 
-gchar*                util_format_title                 (gchar *title);
+gchar*                  util_format_title               (gchar *title);
+ 
+void                    util_init_stock_icons           (void);
 
-void                util_init_stock_icons                (void);
+gint                    util_abs                        (gint a);
 
-gint                util_abs                        (gint a);
+const char*             util_dot_dir                    (void);
 
-const char *        util_dot_dir                        (void);
+gboolean                util_uri_exists                 (const char *uri);
 
-gboolean        util_uri_exists                 (const char *uri);
+void                    util_download_file              (const char *uri,
+                                                         int* size,
+                                                         char** data);

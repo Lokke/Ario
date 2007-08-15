@@ -20,14 +20,19 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <i18n.h>
 #include <libgnome/gnome-init.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
 #include <libgnomevfs/gnome-vfs-file-info.h>
 #include <libgnomevfs/gnome-vfs-ops.h>
 #include <libgnomevfs/gnome-vfs-directory.h>
+#include <curl/curl.h>
 #include "util.h"
 #include "debug.h"
+#include "eel/eel-gconf-extensions.h"
+#include "preferences.h"
 
 static char *dot_dir = NULL;
 
@@ -227,3 +232,87 @@ util_uri_exists (const char *uri)
 
         return ret;
 }
+
+typedef struct _download_struct{
+	char *data;
+	int size;
+}download_struct;
+
+#define MAX_SIZE 5*1024*1024
+
+static size_t
+util_write_data(void *buffer,
+                size_t size,
+                size_t nmemb,
+                download_struct *download_data)
+{
+	if(!size || !nmemb)
+		return 0;
+	if(download_data->data == NULL)
+	{
+		download_data->size = 0;
+	}
+	download_data->data = g_realloc(download_data->data,(gulong)(size*nmemb+download_data->size)+1);
+
+	memset(&(download_data->data)[download_data->size], '\0', (size*nmemb)+1);
+	memcpy(&(download_data->data)[download_data->size], buffer, size*nmemb);
+
+	download_data->size += size*nmemb;
+	if(download_data->size >= MAX_SIZE)
+	{
+		return 0;
+	}
+	return size*nmemb;
+}
+
+void
+util_download_file (const char *uri,
+                    int* size,
+                    char** data)
+{
+        LOG_FUNCTION_START
+        LOG_DBG("Download:%s\n", uri);
+        download_struct download_data;
+        gchar* address;
+        int port;
+        
+        CURL* curl = curl_easy_init();
+        if(!curl)
+                return;
+         
+         *size = 0;
+         *data = NULL;
+
+	download_data.size = 0;
+	download_data.data = NULL;
+	     
+	/* set uri */
+	curl_easy_setopt(curl, CURLOPT_URL, uri);
+	/* set callback data */
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &download_data);
+	/* set callback function */
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util_write_data);
+	/* set timeout */
+	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10);
+	/* set redirect */
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION ,1);
+	/* set NO SIGNAL */
+	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, TRUE);
+
+	if(eel_gconf_get_boolean (CONF_USE_PROXY)) {
+		address = eel_gconf_get_string (CONF_PROXY_ADDRESS);
+		port =  eel_gconf_get_integer (CONF_PROXY_PORT);
+		if(address) {
+			curl_easy_setopt(curl, CURLOPT_PROXY, address);
+			curl_easy_setopt(curl, CURLOPT_PROXYPORT, port);
+		} else {
+			LOG_DBG("Proxy enabled, but no proxy defined");
+		}
+	}
+
+	curl_easy_perform(curl);
+	
+	*size = download_data.size;
+	*data = download_data.data;
+}
+

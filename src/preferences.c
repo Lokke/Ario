@@ -92,10 +92,12 @@ struct PreferencesPrivate
         GtkWidget *updatedb_label;
         GtkWidget *updatedb_button;
 
-        GtkWidget *local_check;
         GtkWidget *covertree_check;
         GtkWidget *amazon_country;
-
+        GtkWidget *proxy_check;
+        GtkWidget *proxy_address_entry;
+        GtkWidget *proxy_port_spinbutton;
+        
         gboolean loading;
         gboolean sync_mpd;
 
@@ -311,7 +313,7 @@ preferences_append_server_config (Preferences *preferences,
                 glade_xml_get_widget (xml, "updatedb_label");
         preferences->priv->updatedb_button = 
                 glade_xml_get_widget (xml, "updatedb_button");
-
+                
         gtk_notebook_append_page (GTK_NOTEBOOK (preferences->priv->notebook),
                                   glade_xml_get_widget (xml, "vbox"),
                                   gtk_label_new (_("Server")));
@@ -334,13 +336,18 @@ preferences_append_cover_config (Preferences *preferences)
         xml = rb_glade_xml_new (GLADE_PATH "cover-prefs.glade",
                                 "covers_vbox",
                                 preferences);
-        preferences->priv->local_check =
-                glade_xml_get_widget (xml, "local_checkbutton");
+
         preferences->priv->covertree_check =
                 glade_xml_get_widget (xml, "covertree_checkbutton");
         preferences->priv->amazon_country =
                 glade_xml_get_widget (xml, "amazon_country_combobox");
-
+        preferences->priv->proxy_check =
+                glade_xml_get_widget (xml, "proxy_checkbutton");
+        preferences->priv->proxy_address_entry = 
+                glade_xml_get_widget (xml, "proxy_address_entry");
+        preferences->priv->proxy_port_spinbutton = 
+                glade_xml_get_widget (xml, "proxy_port_spinbutton");
+                
         list_store = gtk_list_store_new (1, G_TYPE_STRING);
 
         for (i = 0; amazon_countries[i] != NULL; i++) {
@@ -581,6 +588,26 @@ preferences_updatedb_button_cb (GtkWidget *widget,
         mpd_update_db (preferences->priv->mpd);
 }
 
+void
+preferences_proxy_address_changed_cb (GtkWidget *widget,
+                                     Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (!preferences->priv->loading)
+                eel_gconf_set_string (CONF_PROXY_ADDRESS,
+                                      gtk_entry_get_text (GTK_ENTRY (preferences->priv->proxy_address_entry)));
+}
+
+void
+preferences_proxy_port_changed_cb (GtkWidget *widget,
+                                   Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (!preferences->priv->loading)
+                eel_gconf_set_integer (CONF_PROXY_PORT,
+                                       (int) gtk_spin_button_get_value (GTK_SPIN_BUTTON (preferences->priv->proxy_port_spinbutton)));
+}
+
 gboolean
 preferences_update_mpd (Preferences *preferences)
 {
@@ -639,6 +666,20 @@ preferences_covertree_check_changed_cb (GtkCheckButton *butt,
 }
 
 void
+preferences_proxy_check_changed_cb (GtkCheckButton *butt,
+                                    Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        gboolean active;
+        active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->proxy_check));
+        eel_gconf_set_boolean (CONF_USE_PROXY,
+                               active);
+
+        gtk_widget_set_sensitive (preferences->priv->proxy_address_entry, active);
+        gtk_widget_set_sensitive (preferences->priv->proxy_port_spinbutton, active);
+}
+
+void
 preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
                                        Preferences *preferences)
 {
@@ -657,6 +698,8 @@ preferences_sync_cover (Preferences *preferences)
         LOG_FUNCTION_START
         int i;
         char *current_country;
+        char *proxy_address;
+        int proxy_port;
 
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (preferences->priv->covertree_check), 
                                       !eel_gconf_get_boolean (CONF_COVER_TREE_HIDDEN));
@@ -673,5 +716,18 @@ preferences_sync_cover (Preferences *preferences)
         }
 
         g_free (current_country);
+        
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (preferences->priv->proxy_check), 
+                                      eel_gconf_get_boolean (CONF_USE_PROXY));
+        
+        proxy_address = eel_gconf_get_string (CONF_PROXY_ADDRESS);
+        if (!proxy_address)
+                proxy_address = "192.168.0.1";
+        proxy_port = eel_gconf_get_integer (CONF_PROXY_PORT);
+        if (proxy_port == 0)
+                proxy_port = 8080;
+        
+        gtk_entry_set_text (GTK_ENTRY (preferences->priv->proxy_address_entry), proxy_address);
+        gtk_spin_button_set_value (GTK_SPIN_BUTTON (preferences->priv->proxy_port_spinbutton), (gdouble) proxy_port);
 }
 

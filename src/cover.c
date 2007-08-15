@@ -329,7 +329,7 @@ cover_make_amazon_xml_uri (const char *artist,
         return xml_uri;
 }
 
-GnomeVFSResult
+int
 cover_load_amazon_covers (const char *artist,
                              const char *album,
                              GList **cover_uris,
@@ -343,51 +343,50 @@ cover_load_amazon_covers (const char *artist,
         int xml_size;
         char *xml_data;
         GList *temp;
-        GnomeVFSResult result, result_temp;
         int temp_size;
         char *temp_contents;
+        int result;
 
         /* We construct the uri to make a request on the amazon WebServices */
         xml_uri = cover_make_amazon_xml_uri (artist,
                                                 album);
 
         if (!xml_uri)
-                return GNOME_VFS_ERROR_BAD_PARAMETERS;
+                return 1;
 
         /* We laod the xml file in xml_data */
-        result = gnome_vfs_read_entire_file (xml_uri,
-                                             &xml_size,
-                                             &xml_data);
+        util_download_file (xml_uri,
+                            &xml_size,
+                            &xml_data);
         g_free (xml_uri);
 
-        if (result != GNOME_VFS_OK) {
-                g_free (xml_data);
-                return result;
+        if (xml_size == 0) {
+                return 1;
         }
 
         /* We parse the xml file to extract the cover uris */
         *cover_uris = cover_parse_amazon_xml_file (xml_data,
-                                                      xml_size,
-                                                      operation,
-                                                      cover_size);
+                                                   xml_size,
+                                                   operation,
+                                                   cover_size);
 
         g_free (xml_data);
 
         /* By default, we return an error */
-        result = GNOME_VFS_ERROR_NOT_FOUND;
+        result = 1;
 
         for (temp = *cover_uris; temp; temp = temp->next) {
                 if (temp->data) {
                         /* For each cover uri, we load the image data in temp_contents */
-                        result_temp = gnome_vfs_read_entire_file (temp->data,
-                                                                  &temp_size,
-                                                                  &temp_contents);
-                        if (result_temp == GNOME_VFS_OK && cover_size_is_valid (temp_size)) {
+                        util_download_file (temp->data,
+                                            &temp_size,
+                                            &temp_contents);
+                        if (cover_size_is_valid (temp_size)) {
                                 /* If the cover is not too big and not too small (blank amazon image), we append it to file_contents */
                                 g_array_append_val (*file_size, temp_size);
                                 *file_contents = g_list_append (*file_contents, temp_contents);
-                                /* If at least one cover is found, we return GNOME_VFS_OK */
-                                result = result_temp;
+                                /* If at least one cover is found, we return OK */
+                                result = 0;
                         }
                 }
         }

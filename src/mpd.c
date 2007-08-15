@@ -32,6 +32,8 @@
 static void mpd_class_init (MpdClass *klass);
 static void mpd_init (Mpd *mpd);
 static void mpd_finalize (GObject *object);
+static void mpd_set_default (Mpd *mpd);
+void mpd_check_errors (Mpd *mpd);
 static void mpd_set_property (GObject *object,
                                          guint prop_id,
                                          const GValue *value,
@@ -527,6 +529,20 @@ mpd_update_db (Mpd *mpd)
         mpd_finishCommand (mpd->priv->connection);
 }
 
+void
+mpd_check_errors (Mpd *mpd)
+{
+        // desactivated to make the logs more readable
+        // LOG_FUNCTION_START
+        if (!mpd_is_connected(mpd))
+                return;
+
+        if  (mpd->priv->connection->error) {
+                LOG_DBG("Error nb: %d, Msg:%s\n", mpd->priv->connection->errorCode, mpd->priv->connection->errorStr);
+                mpd_disconnect(mpd);
+        }
+}
+
 gboolean
 mpd_is_connected (Mpd *mpd)
 {
@@ -638,6 +654,35 @@ mpd_get_connection (Mpd *mpd)
         return mpd->priv->connection;
 }
 
+void
+mpd_set_default (Mpd *mpd)
+{
+        LOG_FUNCTION_START
+        if (mpd->priv->song_id != 0)
+                g_object_set (G_OBJECT (mpd), "song_id", 0, NULL);
+
+        if (mpd->priv->state != MPD_STATUS_STATE_UNKNOWN)
+                g_object_set (G_OBJECT (mpd), "state", MPD_STATUS_STATE_UNKNOWN, NULL);
+
+        if (mpd->priv->volume != MPD_STATUS_NO_VOLUME)
+                g_object_set (G_OBJECT (mpd), "volume", MPD_STATUS_NO_VOLUME, NULL);
+
+        if (mpd->priv->elapsed != 0)
+                g_object_set (G_OBJECT (mpd), "elapsed", 0, NULL);
+
+        if (mpd->priv->playlist_id != -1)
+                g_object_set (G_OBJECT (mpd), "playlist_id", -1, NULL);
+
+        if (mpd->priv->random != FALSE)
+                g_object_set (G_OBJECT (mpd), "random", FALSE, NULL);
+
+        if (mpd->priv->repeat != FALSE)
+                g_object_set (G_OBJECT (mpd), "repeat", FALSE, NULL);
+
+        if (mpd->priv->dbtime != 0)
+                g_object_set (G_OBJECT (mpd), "dbtime", 0, NULL);
+}
+
 gboolean
 mpd_update_status (Mpd *mpd)
 {
@@ -645,30 +690,7 @@ mpd_update_status (Mpd *mpd)
         // LOG_FUNCTION_START
         /* check if there is a connection */
         if (!mpd_is_connected (mpd)) {
-                if (mpd->priv->song_id != 0)
-                        g_object_set (G_OBJECT (mpd), "song_id", 0, NULL);
-
-                if (mpd->priv->state != MPD_STATUS_STATE_UNKNOWN)
-                        g_object_set (G_OBJECT (mpd), "state", MPD_STATUS_STATE_UNKNOWN, NULL);
-
-                if (mpd->priv->volume != MPD_STATUS_NO_VOLUME)
-                        g_object_set (G_OBJECT (mpd), "volume", MPD_STATUS_NO_VOLUME, NULL);
-
-                if (mpd->priv->elapsed != 0)
-                        g_object_set (G_OBJECT (mpd), "elapsed", 0, NULL);
-
-                if (mpd->priv->playlist_id != -1)
-                        g_object_set (G_OBJECT (mpd), "playlist_id", -1, NULL);
-
-                if (mpd->priv->random != FALSE)
-                        g_object_set (G_OBJECT (mpd), "random", FALSE, NULL);
-
-                if (mpd->priv->repeat != FALSE)
-                        g_object_set (G_OBJECT (mpd), "repeat", FALSE, NULL);
-
-                if (mpd->priv->dbtime != 0)
-                        g_object_set (G_OBJECT (mpd), "dbtime", 0, NULL);
-
+                mpd_set_default (mpd);
                 return TRUE;
         }
 
@@ -684,6 +706,13 @@ mpd_update_status (Mpd *mpd)
         mpd->priv->stats = mpd_getStats (mpd->priv->connection);
 
         mpd_finishCommand (mpd->priv->connection);
+
+        mpd_check_errors(mpd);
+        /* check if there is a connection */
+        if (!mpd_is_connected (mpd)) {
+                mpd_set_default (mpd);
+                return TRUE;
+        }
 
         if (mpd->priv->song_id != mpd->priv->status->songid)
                 g_object_set (G_OBJECT (mpd), "song_id", mpd->priv->status->songid, NULL);

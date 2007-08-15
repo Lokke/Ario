@@ -424,7 +424,7 @@ shell_coverselect_get_amazon_covers_cb (GtkWidget *widget,
         LOG_FUNCTION_START
         gchar *artist;
         gchar *album;
-        GnomeVFSResult result;
+        int result;
 
         shell_coverselect_set_sensitive (shell_coverselect, FALSE);
 
@@ -443,12 +443,12 @@ shell_coverselect_get_amazon_covers_cb (GtkWidget *widget,
         shell_coverselect->priv->file_size = g_array_new (TRUE, TRUE, sizeof (int));
 
         result = cover_load_amazon_covers (artist,
-                                              album,
-                                              &shell_coverselect->priv->cover_uris,
-                                              &shell_coverselect->priv->file_size,
-                                              &shell_coverselect->priv->file_contents,
-                                              GET_ALL_COVERS,
-                                              shell_coverselect->priv->coversize);
+                                           album,
+                                           &shell_coverselect->priv->cover_uris,
+                                           &shell_coverselect->priv->file_size,
+                                           &shell_coverselect->priv->file_contents,
+                                           GET_ALL_COVERS,
+                                           shell_coverselect->priv->coversize);
         g_free (artist);
         g_free (album);
 
