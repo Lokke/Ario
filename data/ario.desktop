@@ -4,6 +4,7 @@ Name=Ario
 GenericName=Ario music player
 GenericName[fr]=Ario music player
 Comment=Client apllication to mpd
+Comment[fr]=Client pour MPD
 Exec=ario
 Icon=ario.png
 Terminal=false

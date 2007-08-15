@@ -10,6 +10,11 @@
 	<short>Position of main window pane</short>
 	<long>Position of main window pane.</long>
         </locale>
+
+        <locale name="fr">
+	<short>Position du panneau de la fenêtre principale</short>
+	<long>Position du panneau de la fenêtre principale.</long>
+        </locale>
       </schema>
 
       <schema>
@@ -56,6 +61,11 @@
 	<short>The timeout for the connection to mpd</short>
 	<long>The timeout for the connection to mpd.</long>
         </locale>
+
+        <locale name="fr">
+	<short>Timeout pour la connexion à mpd (en secondes)</short>
+	<long>Timeout pour la connexion à mpd (en secondes)</long>
+        </locale>
       </schema>
 
       <schema>
@@ -71,7 +81,7 @@
 
         <locale name="fr">
 	<short>Définit si Ario doit se connecter automatiquement à MPD ou pas</short>
-	
+	<long>Définit si Ario doit se connecter automatiquement à MPD ou pas</long>
         </locale>
       </schema>
 
@@ -85,6 +95,11 @@
 	<short>Define if Ario must use authentication to connect to mpd or not</short>
 	<long>Define if Ario must use authentication to connect to mpd or not.</long>
         </locale>
+
+        <locale name="fr">
+	<short>Définit si Ario doit s&apos;authentifier pour se connecter à MPD ou pas</short>
+	<long>Définit si Ario doit s&apos;authentifier pour se connecter à MPD ou pas</long>
+        </locale>
       </schema>
 
       <schema>
@@ -96,6 +111,11 @@
         <locale name="C">
 	<short>The password to connect to mpd</short>
 	<long>The password to connect to mpd.</long>
+        </locale>
+
+        <locale name="fr">
+	<short>Le mot de passe pour se connecter à mpd</short>
+	<long>Le mot de passe pour se connecter à mpd</long>
         </locale>
       </schema>
 
@@ -126,6 +146,11 @@
 	<short>The amazon country to use to get the covers</short>
 	<long>You can search for your cover on amazon.com .fr .de .uk or .ca to have more accurate results</long>
 	</locale>
+
+	<locale name="fr">
+	<short>Le pays d&apos;Amazon à utiliser pour récupérer les pochettes</short>
+	<long>Vous pouvez faire des recherches sur amazon.com .fr .de .uk ou .ca pour avoir des résultats plus précis</long>
+	</locale>
       </schema>
 
       <schema>
@@ -137,6 +162,11 @@
         <locale name="C">
 	<short>Main window width</short>
 	<long>Main window width.</long>
+        </locale>
+
+        <locale name="fr">
+	<short>Largeur de la fenêtre principale</short>
+	<long>Largeur de la fenêtre principale</long>
         </locale>
       </schema>
 
@@ -150,6 +180,11 @@
 	<short>Main window height</short>
 	<long>Main window height.</long>
         </locale>
+
+        <locale name="fr">
+	<short>Hauteur de la fenêtre principale</short>
+	<long>Hauteur de la fenêtre principale</long>
+        </locale>
       </schema>
 
       <schema>
@@ -161,6 +196,11 @@
         <locale name="C">
 	<short>Main window maximization state</short>
 	<long>If true, the main window is maximized.</long>
+        </locale>
+
+        <locale name="fr">
+	<short>État de maximisation de la fenêtre principale</short>
+	<long>Si vrai, la fenêtre principale est maximisée.</long>
         </locale>
       </schema>
       
@@ -174,6 +214,11 @@
 	<short>Define if Ario must use a proxy for remote connections</short>
 	<long>Define if Ario must use a proxy for remote connections.</long>
         </locale>
+
+        <locale name="fr">
+	<short>Définit si Ario doit utiliser un proxy pour les connexions distantes</short>
+	<long>Définit si Ario doit utiliser un proxy pour les connexions distantes</long>
+        </locale>
       </schema>
 
       <schema>
@@ -186,6 +231,11 @@
 	<short>Define the address of the proxy</short>
 	<long>Define the address of the proxy</long>
 	</locale>
+
+	<locale name="fr">
+	<short>Definit l&apos;addresse du proxy</short>
+	<long>Definit l&apos;addresse du proxy</long>
+	</locale>
       </schema>
 
       <schema>
@@ -197,6 +247,11 @@
         <locale name="C">
 	<short>Define the port of the proxy</short>
 	<long>Define the port of the proxy.</long>
+        </locale>
+
+        <locale name="fr">
+	<short>Definit le port du proxy</short>
+	<long>Definit le port du proxy</long>
         </locale>
       </schema>
 

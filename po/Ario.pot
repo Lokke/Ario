@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-05 00:08+0200\n"
+"POT-Creation-Date: 2007-08-15 17:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,323 +16,469 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/connection-prefs.glade:42
-msgid "_Autoconnect"
+#: ../data/ario.schemas.in.h:1
+msgid "Define if Ario must autoconnect to mpd or not"
 msgstr ""
 
-#: data/connection-prefs.glade:93
-msgid "Port:"
+#: ../data/ario.schemas.in.h:2
+msgid "Define if Ario must autoconnect to mpd or not."
 msgstr ""
 
-#: data/connection-prefs.glade:106
-msgid "Host:"
+#: ../data/ario.schemas.in.h:3
+msgid "Define if Ario must use a proxy for remote connections"
 msgstr ""
 
-#: data/connection-prefs.glade:120
-msgid "<b>Connection</b>"
+#: ../data/ario.schemas.in.h:4
+msgid "Define if Ario must use a proxy for remote connections."
 msgstr ""
 
-#: data/connection-prefs.glade:149
-msgid "_Use Authentication"
+#: ../data/ario.schemas.in.h:5
+msgid "Define if Ario must use authentication to connect to mpd or not"
 msgstr ""
 
-#: data/connection-prefs.glade:167
-msgid "Password:"
+#: ../data/ario.schemas.in.h:6
+msgid "Define if Ario must use authentication to connect to mpd or not."
 msgstr ""
 
-#: data/connection-prefs.glade:204
-msgid "<b>Authentication</b>"
+#: ../data/ario.schemas.in.h:7
+msgid "Define the address of the proxy"
 msgstr ""
 
-#: data/connection-prefs.glade:248
-msgid "_Disconnect"
+#: ../data/ario.schemas.in.h:8
+msgid "Define the port of the proxy"
 msgstr ""
 
-#: data/connection-prefs.glade:296
-msgid "_Connect"
+#: ../data/ario.schemas.in.h:9
+msgid "Define the port of the proxy."
 msgstr ""
 
-#: data/cover-prefs.glade:29
-msgid "Show the covers in the albums list"
+#: ../data/ario.schemas.in.h:10
+msgid "Hide the covers in the albums treeviewn"
 msgstr ""
 
-#: data/cover-prefs.glade:46
-msgid "Use Amazon."
+#: ../data/ario.schemas.in.h:11
+msgid "Host to connect to"
 msgstr ""
 
-#: data/cover-prefs.glade:76
+#: ../data/ario.schemas.in.h:12
+msgid "Host to connect to."
+msgstr ""
+
+#: ../data/ario.schemas.in.h:13
+msgid "If true, the main window is maximized."
+msgstr ""
+
+#: ../data/ario.schemas.in.h:14
+msgid "Main window height"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:15
+msgid "Main window height."
+msgstr ""
+
+#: ../data/ario.schemas.in.h:16
+msgid "Main window maximization state"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:17
+msgid "Main window width"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:18
+msgid "Main window width."
+msgstr ""
+
+#: ../data/ario.schemas.in.h:19
+msgid "Port to connect to"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:20
+msgid "Port to connect to."
+msgstr ""
+
+#: ../data/ario.schemas.in.h:21
+msgid "Position of main window pane"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:22
+msgid "Position of main window pane."
+msgstr ""
+
+#: ../data/ario.schemas.in.h:23
+msgid "The amazon country to use to get the covers"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:24
+msgid "The password to connect to mpd"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:25
+msgid "The password to connect to mpd."
+msgstr ""
+
+#: ../data/ario.schemas.in.h:26
+msgid "The timeout for the connection to mpd"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:27
+msgid "The timeout for the connection to mpd."
+msgstr ""
+
+#: ../data/ario.schemas.in.h:28
+msgid "When enabled, ario hide the covers in the albums treeview"
+msgstr ""
+
+#: ../data/ario.schemas.in.h:29
+msgid ""
+"You can search for your cover on amazon.com .fr .de .uk or .ca to have more "
+"accurate results"
+msgstr ""
+
+#: ../data/ario.desktop.in.in.h:1
+msgid "Ario music player"
+msgstr ""
+
+#: ../data/ario.desktop.in.in.h:2
+msgid "Client apllication to mpd"
+msgstr ""
+
+#: ../data/cover-prefs.glade.h:1
+msgid "192.168.0.1"
+msgstr ""
+
+#: ../data/cover-prefs.glade.h:2
 msgid "<b>Covers</b>"
 msgstr ""
 
-#: data/cover-progress.glade:63 data/cover-select.glade:242
-msgid "Artist : "
+#: ../data/cover-prefs.glade.h:3
+msgid "<b>Proxy</b>"
 msgstr ""
 
-#: data/cover-progress.glade:119 data/cover-select.glade:270
-msgid "Album : "
+#: ../data/cover-prefs.glade.h:4
+msgid "Proxy Address: "
 msgstr ""
 
-#: data/cover-progress.glade:186
+#: ../data/cover-prefs.glade.h:5
+msgid "Proxy Port: "
+msgstr ""
+
+#: ../data/cover-prefs.glade.h:6
+msgid "Show the covers in the albums list"
+msgstr ""
+
+#: ../data/cover-prefs.glade.h:7
+msgid "Use Amazon."
+msgstr ""
+
+#: ../data/cover-prefs.glade.h:8
+msgid "Use a proxy"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:1
+msgid "<b>Authentication</b>"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:2
+msgid "<b>Connection</b>"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:3
+msgid "Host:"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:4
+msgid "Password:"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:5
+msgid "Port:"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:6
+msgid "_Autoconnect"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:7
+msgid "_Connect"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:8
+msgid "_Disconnect"
+msgstr ""
+
+#: ../data/connection-prefs.glade.h:9
+msgid "_Use Authentication"
+msgstr ""
+
+#: ../data/cover-progress.glade.h:1
 msgid "<b>Downloading cover</b>"
 msgstr ""
 
-#: data/cover-select.glade:49
-msgid "<b>Artist : </b>"
+#: ../data/cover-progress.glade.h:2 ../data/cover-select.glade.h:4
+msgid "Album : "
 msgstr ""
 
-#: data/cover-select.glade:112
+#: ../data/cover-progress.glade.h:3 ../data/cover-select.glade.h:6
+msgid "Artist : "
+msgstr ""
+
+#: ../data/cover-select.glade.h:1
 msgid "<b>Album : </b>"
 msgstr ""
 
-#: data/cover-select.glade:373
-msgid "Small cover (Faster)"
+#: ../data/cover-select.glade.h:2
+msgid "<b>Artist : </b>"
 msgstr ""
 
-#: data/cover-select.glade:392
-msgid "Medium cover"
-msgstr ""
-
-#: data/cover-select.glade:412
-msgid "Large cover (Slower)"
-msgstr ""
-
-#: data/cover-select.glade:435
+#: ../data/cover-select.glade.h:3
 msgid "<b>Cover size</b>"
 msgstr ""
 
-#: data/cover-select.glade:525
+#: ../data/cover-select.glade.h:5
 msgid "Amazon search"
 msgstr ""
 
-#: data/cover-select.glade:609
+#: ../data/cover-select.glade.h:7
+msgid "Large cover (Slower)"
+msgstr ""
+
+#: ../data/cover-select.glade.h:8
 msgid "Local search"
 msgstr ""
 
-#: data/server-prefs.glade:47
-msgid "fade time (s):"
+#: ../data/cover-select.glade.h:9
+msgid "Medium cover"
 msgstr ""
 
-#: data/server-prefs.glade:60
-msgid "enable crossfade"
+#: ../data/cover-select.glade.h:10
+msgid "Small cover (Faster)"
 msgstr ""
 
-#: data/server-prefs.glade:76
+#: ../data/server-prefs.glade.h:1
 msgid "<b>Crossfade</b>"
 msgstr ""
 
-#: data/server-prefs.glade:106
-msgid "Last updated:"
-msgstr ""
-
-#: data/server-prefs.glade:116
-msgid "n/a"
-msgstr ""
-
-#: data/server-prefs.glade:158
-msgid "_Update"
-msgstr ""
-
-#: data/server-prefs.glade:185
+#: ../data/server-prefs.glade.h:2
 msgid "<b>Database</b>"
 msgstr ""
 
-#: src/browser.c:126 src/browser.c:129 src/browser.c:132
+#: ../data/server-prefs.glade.h:3
+msgid "Last updated:"
+msgstr ""
+
+#: ../data/server-prefs.glade.h:4
+msgid "_Update"
+msgstr ""
+
+#: ../data/server-prefs.glade.h:5
+msgid "enable crossfade"
+msgstr ""
+
+#: ../data/server-prefs.glade.h:6
+msgid "fade time (s):"
+msgstr ""
+
+#: ../data/server-prefs.glade.h:7
+msgid "n/a"
+msgstr ""
+
+#: ../src/browser.c:126 ../src/browser.c:129 ../src/browser.c:132
 msgid "_Add to playlist"
 msgstr ""
 
-#: src/browser.c:127 src/browser.c:130 src/browser.c:133
+#: ../src/browser.c:127 ../src/browser.c:130 ../src/browser.c:133
 msgid "Add to the playlist"
 msgstr ""
 
-#: src/browser.c:136 src/browser.c:143
+#: ../src/browser.c:136 ../src/browser.c:143
 msgid "Get the covers from _Amazon"
 msgstr ""
 
-#: src/browser.c:137 src/browser.c:144
+#: ../src/browser.c:137 ../src/browser.c:144
 msgid "Download the cover from Amazon"
 msgstr ""
 
-#: src/browser.c:139 src/browser.c:146
+#: ../src/browser.c:139 ../src/browser.c:146
 msgid "_Delete the covers"
 msgstr ""
 
-#: src/browser.c:140 src/browser.c:147
+#: ../src/browser.c:140 ../src/browser.c:147
 msgid "Delete the selected covers"
 msgstr ""
 
-#: src/browser.c:284 src/playlist.c:261
+#: ../src/browser.c:284 ../src/playlist.c:261
 msgid "Artist"
 msgstr ""
 
-#: src/browser.c:338 src/playlist.c:270
+#: ../src/browser.c:338 ../src/playlist.c:270
 msgid "Album"
 msgstr ""
 
-#: src/browser.c:347
+#: ../src/browser.c:347
 msgid "Cover"
 msgstr ""
 
-#: src/browser.c:412 src/playlist.c:243
+#: ../src/browser.c:412 ../src/playlist.c:243
 msgid "Track"
 msgstr ""
 
-#: src/browser.c:419 src/playlist.c:252
+#: ../src/browser.c:419 ../src/playlist.c:252
 msgid "Title"
 msgstr ""
 
-#: src/browser.c:1279
+#: ../src/browser.c:1279
 msgid ""
 "Are you sure that you want to remove all the covers of the selected artists?"
 msgstr ""
 
-#: src/browser.c:1346
+#: ../src/browser.c:1346
 msgid ""
 "Are you sure that you want to remove all the covers of the selected albums?"
 msgstr ""
 
-#: src/cover.c:430
+#: ../src/cover.c:438
 msgid "The cover already exists. Do you want to replace it?"
 msgstr ""
 
-#: src/eggtrayicon.c:120
+#: ../src/eggtrayicon.c:120
 msgid "Orientation"
 msgstr ""
 
-#: src/eggtrayicon.c:121
+#: ../src/eggtrayicon.c:121
 msgid "The orientation of the tray."
 msgstr ""
 
-#: src/header.c:112
+#: ../src/header.c:112
 msgid "_Play/Pause"
 msgstr ""
 
-#: src/header.c:113
+#: ../src/header.c:113
 msgid "Start playback"
 msgstr ""
 
-#: src/header.c:115
+#: ../src/header.c:115
 msgid "_Stop"
 msgstr ""
 
-#: src/header.c:116
+#: ../src/header.c:116
 msgid "Stop playback"
 msgstr ""
 
-#: src/header.c:118
+#: ../src/header.c:118
 msgid "_Next"
 msgstr ""
 
-#: src/header.c:119
+#: ../src/header.c:119
 msgid "Start playing the next song"
 msgstr ""
 
-#: src/header.c:121
+#: ../src/header.c:121
 msgid "P_revious"
 msgstr ""
 
-#: src/header.c:122
+#: ../src/header.c:122
 msgid "Start playing the previous song"
 msgstr ""
 
-#: src/header.c:138
+#: ../src/header.c:138
 #, c-format
 msgid "from %s by %s"
 msgstr ""
 
-#: src/header.c:237
+#: ../src/header.c:237
 msgid "Play previous song"
 msgstr ""
 
-#: src/header.c:257
+#: ../src/header.c:257
 msgid "Play/Pause the music"
 msgstr ""
 
-#: src/header.c:268
+#: ../src/header.c:268
 msgid "Stop the music"
 msgstr ""
 
-#: src/header.c:279
+#: ../src/header.c:279
 msgid "Play next song"
 msgstr ""
 
-#: src/header.c:335
+#: ../src/header.c:335
 msgid " of "
 msgstr ""
 
-#: src/header.c:362
+#: ../src/header.c:362
 msgid "Toggle random on/off"
 msgstr ""
 
-#: src/header.c:373
+#: ../src/header.c:373
 msgid "Toggle repeat on/off"
 msgstr ""
 
-#: src/header.c:484
+#: ../src/header.c:484
 msgid "Change the music volume"
 msgstr ""
 
-#: src/header.c:532 src/header.c:535 src/header.c:538 src/mpd.h:28
+#: ../src/header.c:532 ../src/header.c:535 ../src/header.c:538 ../src/mpd.h:28
 msgid "Unknown"
 msgstr ""
 
-#: src/mpd.c:470
+#: ../src/mpd.c:472
 msgid "Impossible to connect to mpd. Check the connection options."
 msgstr ""
 
-#: src/playlist.c:105
+#: ../src/playlist.c:105
 msgid "_Clear"
 msgstr ""
 
-#: src/playlist.c:106
+#: ../src/playlist.c:106
 msgid "Clear the playlist"
 msgstr ""
 
-#: src/playlist.c:108
+#: ../src/playlist.c:108
 msgid "_Remove"
 msgstr ""
 
-#: src/playlist.c:109
+#: ../src/playlist.c:109
 msgid "Remove the selected songs"
 msgstr ""
 
-#: src/playlist.c:279
+#: ../src/playlist.c:279
 msgid "Duration"
 msgstr ""
 
-#: src/preferences.c:184
+#: ../src/preferences.c:186
 msgid "Ario Preferences"
 msgstr ""
 
-#: src/preferences.c:287
+#: ../src/preferences.c:289
 msgid "Connection"
 msgstr ""
 
-#: src/preferences.c:317
+#: ../src/preferences.c:319
 msgid "Server"
 msgstr ""
 
-#: src/preferences.c:367
+#: ../src/preferences.c:374
 msgid "Covers"
 msgstr ""
 
-#: src/preferences.c:604
+#: ../src/preferences.c:631
 msgid "Not connected"
 msgstr ""
 
-#: src/preferences.c:609
+#: ../src/preferences.c:636
 msgid "Updating..."
 msgstr ""
 
-#: src/shell-coverdownloader.c:258 src/shell-coverselect.c:242
+#: ../src/shell-coverdownloader.c:256 ../src/shell-coverselect.c:240
 msgid "Music Player Cover Download"
 msgstr ""
 
-#: src/shell-coverdownloader.c:376
+#: ../src/shell-coverdownloader.c:374
 msgid "Download Finished!"
 msgstr ""
 
 #. We show the numbers of covers found and not found
-#: src/shell-coverdownloader.c:379
+#: ../src/shell-coverdownloader.c:377
 #, c-format
 msgid ""
 "%i covers found\n"
@@ -340,68 +486,68 @@ msgid ""
 "%i covers already exist"
 msgstr ""
 
-#: src/shell.c:95
+#: ../src/shell.c:95
 msgid "_File"
 msgstr ""
 
-#: src/shell.c:96
+#: ../src/shell.c:96
 msgid "_Edit"
 msgstr ""
 
-#: src/shell.c:97
+#: ../src/shell.c:97
 msgid "_Tool"
 msgstr ""
 
-#: src/shell.c:98
+#: ../src/shell.c:98
 msgid "_Help"
 msgstr ""
 
-#: src/shell.c:100
+#: ../src/shell.c:100
 msgid "_Quit"
 msgstr ""
 
-#: src/shell.c:101
+#: ../src/shell.c:101
 msgid "Quit"
 msgstr ""
 
-#: src/shell.c:103
+#: ../src/shell.c:103
 msgid "Prefere_nces"
 msgstr ""
 
-#: src/shell.c:104
+#: ../src/shell.c:104
 msgid "Edit music player preferences"
 msgstr ""
 
-#: src/shell.c:106
+#: ../src/shell.c:106
 msgid "Download album _covers"
 msgstr ""
 
-#: src/shell.c:107
+#: ../src/shell.c:107
 msgid "Download covers form amazon"
 msgstr ""
 
-#: src/shell.c:109
+#: ../src/shell.c:109
 msgid "_About"
 msgstr ""
 
-#: src/shell.c:110
+#: ../src/shell.c:110
 msgid "Show information about the music player"
 msgstr ""
 
-#: src/status-bar.c:204
+#: ../src/status-bar.c:204
 #, c-format
 msgid "%d Songs - %s"
 msgstr ""
 
-#: src/tray-icon.c:177 src/tray-icon.c:355
+#: ../src/tray-icon.c:177 ../src/tray-icon.c:355
 msgid "Not playing"
 msgstr ""
 
-#: src/tray-icon.c:303
+#: ../src/tray-icon.c:303
 msgid "Ario tray icon"
 msgstr ""
 
-#: src/tray-icon.c:349
+#: ../src/tray-icon.c:349
 #, c-format
 msgid ""
 "Artist: %s\n"
@@ -409,32 +555,32 @@ msgid ""
 "Title: %s"
 msgstr ""
 
-#: src/util.c:64
+#: ../src/util.c:69
 #, c-format
 msgid "%d seconds"
 msgstr ""
 
-#: src/util.c:67
+#: ../src/util.c:72
 #, c-format
 msgid "%d minutes, "
 msgstr ""
 
-#: src/util.c:75
+#: ../src/util.c:80
 #, c-format
 msgid "%d hours, "
 msgstr ""
 
-#: src/util.c:83
+#: ../src/util.c:88
 #, c-format
 msgid "%d days, "
 msgstr ""
 
 #. Translators - The + and - refer to increasing and decreasing the volume.
 #. ** I don't know if there are sensible alternatives in other languages
-#: src/volume.c:238
+#: ../src/volume.c:238
 msgid "+"
 msgstr ""
 
-#: src/volume.c:239
+#: ../src/volume.c:239
 msgid "-"
 msgstr ""

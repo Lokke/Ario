@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ario 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-15 13:13+0200\n"
-"PO-Revision-Date: 2007-06-05 00:09+0200\n"
+"POT-Creation-Date: 2007-08-15 17:55+0200\n"
+"PO-Revision-Date: 2007-08-15 18:47+0200\n"
 "Last-Translator: marc <>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -23,97 +23,119 @@ msgstr "Définit si Ario doit se connecter automatiquement à MPD ou pas"
 
 #: ../data/ario.schemas.in.h:2
 msgid "Define if Ario must autoconnect to mpd or not."
-msgstr ""
+msgstr "Définit si Ario doit se connecter automatiquement à MPD ou pas"
 
 #: ../data/ario.schemas.in.h:3
-msgid "Define if Ario must use authentication to connect to mpd or not"
-msgstr ""
+msgid "Define if Ario must use a proxy for remote connections"
+msgstr "Définit si Ario doit utiliser un proxy pour les connexions distantes"
 
 #: ../data/ario.schemas.in.h:4
-msgid "Define if Ario must use authentication to connect to mpd or not."
-msgstr ""
+msgid "Define if Ario must use a proxy for remote connections."
+msgstr "Définit si Ario doit utiliser un proxy pour les connexions distantes"
 
 #: ../data/ario.schemas.in.h:5
+msgid "Define if Ario must use authentication to connect to mpd or not"
+msgstr "Définit si Ario doit s'authentifier pour se connecter à MPD ou pas"
+
+#: ../data/ario.schemas.in.h:6
+msgid "Define if Ario must use authentication to connect to mpd or not."
+msgstr "Définit si Ario doit s'authentifier pour se connecter à MPD ou pas"
+
+#: ../data/ario.schemas.in.h:7
+msgid "Define the address of the proxy"
+msgstr "Definit l'addresse du proxy"
+
+#: ../data/ario.schemas.in.h:8
+msgid "Define the port of the proxy"
+msgstr "Definit le port du proxy"
+
+#: ../data/ario.schemas.in.h:9
+msgid "Define the port of the proxy."
+msgstr "Definit le port du proxy"
+
+#: ../data/ario.schemas.in.h:10
 msgid "Hide the covers in the albums treeviewn"
 msgstr "Cacher les pochettes dans la liste d'albums"
 
-#: ../data/ario.schemas.in.h:6
+#: ../data/ario.schemas.in.h:11
 msgid "Host to connect to"
 msgstr "Hôte"
 
-#: ../data/ario.schemas.in.h:7
+#: ../data/ario.schemas.in.h:12
 msgid "Host to connect to."
 msgstr "Hôte"
 
-#: ../data/ario.schemas.in.h:8
-msgid "If true, the main window is maximized."
-msgstr ""
-
-#: ../data/ario.schemas.in.h:9
-msgid "Main window height"
-msgstr ""
-
-#: ../data/ario.schemas.in.h:10
-msgid "Main window height."
-msgstr ""
-
-#: ../data/ario.schemas.in.h:11
-msgid "Main window maximization state"
-msgstr ""
-
-#: ../data/ario.schemas.in.h:12
-msgid "Main window width"
-msgstr ""
-
 #: ../data/ario.schemas.in.h:13
-msgid "Main window width."
-msgstr ""
+msgid "If true, the main window is maximized."
+msgstr "Si vrai, la fenêtre principale est maximisée."
 
 #: ../data/ario.schemas.in.h:14
+msgid "Main window height"
+msgstr "Hauteur de la fenêtre principale"
+
+#: ../data/ario.schemas.in.h:15
+msgid "Main window height."
+msgstr "Hauteur de la fenêtre principale"
+
+#: ../data/ario.schemas.in.h:16
+msgid "Main window maximization state"
+msgstr "État de maximisation de la fenêtre principale"
+
+#: ../data/ario.schemas.in.h:17
+msgid "Main window width"
+msgstr "Largeur de la fenêtre principale"
+
+#: ../data/ario.schemas.in.h:18
+msgid "Main window width."
+msgstr "Largeur de la fenêtre principale"
+
+#: ../data/ario.schemas.in.h:19
 msgid "Port to connect to"
 msgstr "Port"
 
-#: ../data/ario.schemas.in.h:15
+#: ../data/ario.schemas.in.h:20
 msgid "Port to connect to."
 msgstr "Port"
 
-#: ../data/ario.schemas.in.h:16
-msgid "Position of main window pane"
-msgstr ""
-
-#: ../data/ario.schemas.in.h:17
-msgid "Position of main window pane."
-msgstr ""
-
-#: ../data/ario.schemas.in.h:18
-msgid "The amazon country to use to get the covers"
-msgstr ""
-
-#: ../data/ario.schemas.in.h:19
-msgid "The password to connect to mpd"
-msgstr ""
-
-#: ../data/ario.schemas.in.h:20
-msgid "The password to connect to mpd."
-msgstr ""
-
 #: ../data/ario.schemas.in.h:21
-msgid "The timeout for the connection to mpd"
-msgstr ""
+msgid "Position of main window pane"
+msgstr "Position du panneau de la fenêtre principale"
 
 #: ../data/ario.schemas.in.h:22
-msgid "The timeout for the connection to mpd."
-msgstr ""
+msgid "Position of main window pane."
+msgstr "Position du panneau de la fenêtre principale."
 
 #: ../data/ario.schemas.in.h:23
+msgid "The amazon country to use to get the covers"
+msgstr "Le pays d'Amazon à utiliser pour récupérer les pochettes"
+
+#: ../data/ario.schemas.in.h:24
+msgid "The password to connect to mpd"
+msgstr "Le mot de passe pour se connecter à mpd"
+
+#: ../data/ario.schemas.in.h:25
+msgid "The password to connect to mpd."
+msgstr "Le mot de passe pour se connecter à mpd"
+
+#: ../data/ario.schemas.in.h:26
+msgid "The timeout for the connection to mpd"
+msgstr "Timeout pour la connexion à mpd (en secondes)"
+
+#: ../data/ario.schemas.in.h:27
+msgid "The timeout for the connection to mpd."
+msgstr "Timeout pour la connexion à mpd (en secondes)"
+
+#: ../data/ario.schemas.in.h:28
 msgid "When enabled, ario hide the covers in the albums treeview"
 msgstr "Si activé, Ario cache les pochettes dans la liste d'albums"
 
-#: ../data/ario.schemas.in.h:24
+#: ../data/ario.schemas.in.h:29
 msgid ""
 "You can search for your cover on amazon.com .fr .de .uk or .ca to have more "
 "accurate results"
 msgstr ""
+"Vous pouvez faire des recherches sur amazon.com .fr .de .uk ou .ca pour "
+"avoir des résultats plus précis"
 
 #: ../data/ario.desktop.in.in.h:1
 msgid "Ario music player"
@@ -121,19 +143,39 @@ msgstr "Ario music player"
 
 #: ../data/ario.desktop.in.in.h:2
 msgid "Client apllication to mpd"
-msgstr ""
+msgstr "Client pour MPD"
 
 #: ../data/cover-prefs.glade.h:1
+msgid "192.168.0.1"
+msgstr "192.168.0.1"
+
+#: ../data/cover-prefs.glade.h:2
 msgid "<b>Covers</b>"
 msgstr "<b>Pochettes</b>"
 
-#: ../data/cover-prefs.glade.h:2
+#: ../data/cover-prefs.glade.h:3
+msgid "<b>Proxy</b>"
+msgstr "<b>Proxy</b>"
+
+#: ../data/cover-prefs.glade.h:4
+msgid "Proxy Address: "
+msgstr "Adresse du proxy"
+
+#: ../data/cover-prefs.glade.h:5
+msgid "Proxy Port: "
+msgstr "Port du proxy"
+
+#: ../data/cover-prefs.glade.h:6
 msgid "Show the covers in the albums list"
 msgstr "Afficher les pochettes dans la liste d'albums"
 
-#: ../data/cover-prefs.glade.h:3
+#: ../data/cover-prefs.glade.h:7
 msgid "Use Amazon."
 msgstr "Utiliser Amazon."
+
+#: ../data/cover-prefs.glade.h:8
+msgid "Use a proxy"
+msgstr "Utiliser un proxy"
 
 #: ../data/connection-prefs.glade.h:1
 msgid "<b>Authentication</b>"
@@ -299,7 +341,7 @@ msgid ""
 msgstr ""
 "Êtes-vous sur de vouloir effacer les pochettes des albums sélectionnés?"
 
-#: ../src/cover.c:439
+#: ../src/cover.c:438
 msgid "The cover already exists. Do you want to replace it?"
 msgstr "La pochette existe déjà. Voulez-vous la remplacer?"
 
@@ -309,7 +351,7 @@ msgstr "Orientation"
 
 #: ../src/eggtrayicon.c:121
 msgid "The orientation of the tray."
-msgstr ""
+msgstr "Orientation de l'icône de notification"
 
 #: ../src/header.c:112
 msgid "_Play/Pause"
@@ -384,7 +426,7 @@ msgstr "Change le volume de la musique"
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: ../src/mpd.c:470
+#: ../src/mpd.c:472
 msgid "Impossible to connect to mpd. Check the connection options."
 msgstr "Impossible de se connecter à MPD. Vérifiez vos options de connexion."
 
@@ -408,33 +450,33 @@ msgstr "Enlever la chanson sélectionnée"
 msgid "Duration"
 msgstr "Durée"
 
-#: ../src/preferences.c:184
+#: ../src/preferences.c:186
 msgid "Ario Preferences"
-msgstr "Préfére_nces d'Ario"
+msgstr "Préférences d'Ario"
 
-#: ../src/preferences.c:287
+#: ../src/preferences.c:289
 msgid "Connection"
 msgstr "Connexion"
 
-#: ../src/preferences.c:317
+#: ../src/preferences.c:319
 msgid "Server"
 msgstr "Serveur"
 
-#: ../src/preferences.c:367
+#: ../src/preferences.c:374
 msgid "Covers"
 msgstr "Pochettes"
 
-#: ../src/preferences.c:604
+#: ../src/preferences.c:631
 msgid "Not connected"
 msgstr "Déconnecté"
 
-#: ../src/preferences.c:609
+#: ../src/preferences.c:636
 msgid "Updating..."
 msgstr "En cours de mise à jour..."
 
 #: ../src/shell-coverdownloader.c:256 ../src/shell-coverselect.c:240
 msgid "Music Player Cover Download"
-msgstr ""
+msgstr "Téléchargement de pochettes"
 
 #: ../src/shell-coverdownloader.c:374
 msgid "Download Finished!"
@@ -490,15 +532,15 @@ msgstr "Télécharger les pochettes"
 
 #: ../src/shell.c:107
 msgid "Download covers form amazon"
-msgstr ""
+msgstr "Télécharger des pochettes depuis amazon"
 
 #: ../src/shell.c:109
 msgid "_About"
-msgstr ""
+msgstr "_À propos"
 
 #: ../src/shell.c:110
 msgid "Show information about the music player"
-msgstr ""
+msgstr "Affichier des informations sur le lecteur de musique"
 
 #: ../src/status-bar.c:204
 #, c-format
@@ -507,11 +549,11 @@ msgstr "%d Titres - %s"
 
 #: ../src/tray-icon.c:177 ../src/tray-icon.c:355
 msgid "Not playing"
-msgstr ""
+msgstr "Ne joue pas"
 
 #: ../src/tray-icon.c:303
 msgid "Ario tray icon"
-msgstr ""
+msgstr "Ario - Icône de notification"
 
 #: ../src/tray-icon.c:349
 #, c-format
@@ -524,22 +566,22 @@ msgstr ""
 "Album: %s\n"
 "Titre: %s"
 
-#: ../src/util.c:64
+#: ../src/util.c:69
 #, c-format
 msgid "%d seconds"
 msgstr "%d secondes"
 
-#: ../src/util.c:67
+#: ../src/util.c:72
 #, c-format
 msgid "%d minutes, "
 msgstr "%d minutes, "
 
-#: ../src/util.c:75
+#: ../src/util.c:80
 #, c-format
 msgid "%d hours, "
 msgstr "%d heures, "
 
-#: ../src/util.c:83
+#: ../src/util.c:88
 #, c-format
 msgid "%d days, "
 msgstr "%d jours, "
@@ -553,3 +595,7 @@ msgstr "+"
 #: ../src/volume.c:239
 msgid "-"
 msgstr "-"
+
+#, fuzzy
+#~ msgid "Albu"
+#~ msgstr "Album"
