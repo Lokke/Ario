@@ -1,0 +1,440 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-06-05 00:08+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: data/connection-prefs.glade:42
+msgid "_Autoconnect"
+msgstr ""
+
+#: data/connection-prefs.glade:93
+msgid "Port:"
+msgstr ""
+
+#: data/connection-prefs.glade:106
+msgid "Host:"
+msgstr ""
+
+#: data/connection-prefs.glade:120
+msgid "<b>Connection</b>"
+msgstr ""
+
+#: data/connection-prefs.glade:149
+msgid "_Use Authentication"
+msgstr ""
+
+#: data/connection-prefs.glade:167
+msgid "Password:"
+msgstr ""
+
+#: data/connection-prefs.glade:204
+msgid "<b>Authentication</b>"
+msgstr ""
+
+#: data/connection-prefs.glade:248
+msgid "_Disconnect"
+msgstr ""
+
+#: data/connection-prefs.glade:296
+msgid "_Connect"
+msgstr ""
+
+#: data/cover-prefs.glade:29
+msgid "Show the covers in the albums list"
+msgstr ""
+
+#: data/cover-prefs.glade:46
+msgid "Use Amazon."
+msgstr ""
+
+#: data/cover-prefs.glade:76
+msgid "<b>Covers</b>"
+msgstr ""
+
+#: data/cover-progress.glade:63 data/cover-select.glade:242
+msgid "Artist : "
+msgstr ""
+
+#: data/cover-progress.glade:119 data/cover-select.glade:270
+msgid "Album : "
+msgstr ""
+
+#: data/cover-progress.glade:186
+msgid "<b>Downloading cover</b>"
+msgstr ""
+
+#: data/cover-select.glade:49
+msgid "<b>Artist : </b>"
+msgstr ""
+
+#: data/cover-select.glade:112
+msgid "<b>Album : </b>"
+msgstr ""
+
+#: data/cover-select.glade:373
+msgid "Small cover (Faster)"
+msgstr ""
+
+#: data/cover-select.glade:392
+msgid "Medium cover"
+msgstr ""
+
+#: data/cover-select.glade:412
+msgid "Large cover (Slower)"
+msgstr ""
+
+#: data/cover-select.glade:435
+msgid "<b>Cover size</b>"
+msgstr ""
+
+#: data/cover-select.glade:525
+msgid "Amazon search"
+msgstr ""
+
+#: data/cover-select.glade:609
+msgid "Local search"
+msgstr ""
+
+#: data/server-prefs.glade:47
+msgid "fade time (s):"
+msgstr ""
+
+#: data/server-prefs.glade:60
+msgid "enable crossfade"
+msgstr ""
+
+#: data/server-prefs.glade:76
+msgid "<b>Crossfade</b>"
+msgstr ""
+
+#: data/server-prefs.glade:106
+msgid "Last updated:"
+msgstr ""
+
+#: data/server-prefs.glade:116
+msgid "n/a"
+msgstr ""
+
+#: data/server-prefs.glade:158
+msgid "_Update"
+msgstr ""
+
+#: data/server-prefs.glade:185
+msgid "<b>Database</b>"
+msgstr ""
+
+#: src/browser.c:126 src/browser.c:129 src/browser.c:132
+msgid "_Add to playlist"
+msgstr ""
+
+#: src/browser.c:127 src/browser.c:130 src/browser.c:133
+msgid "Add to the playlist"
+msgstr ""
+
+#: src/browser.c:136 src/browser.c:143
+msgid "Get the covers from _Amazon"
+msgstr ""
+
+#: src/browser.c:137 src/browser.c:144
+msgid "Download the cover from Amazon"
+msgstr ""
+
+#: src/browser.c:139 src/browser.c:146
+msgid "_Delete the covers"
+msgstr ""
+
+#: src/browser.c:140 src/browser.c:147
+msgid "Delete the selected covers"
+msgstr ""
+
+#: src/browser.c:284 src/playlist.c:261
+msgid "Artist"
+msgstr ""
+
+#: src/browser.c:338 src/playlist.c:270
+msgid "Album"
+msgstr ""
+
+#: src/browser.c:347
+msgid "Cover"
+msgstr ""
+
+#: src/browser.c:412 src/playlist.c:243
+msgid "Track"
+msgstr ""
+
+#: src/browser.c:419 src/playlist.c:252
+msgid "Title"
+msgstr ""
+
+#: src/browser.c:1279
+msgid ""
+"Are you sure that you want to remove all the covers of the selected artists?"
+msgstr ""
+
+#: src/browser.c:1346
+msgid ""
+"Are you sure that you want to remove all the covers of the selected albums?"
+msgstr ""
+
+#: src/cover.c:430
+msgid "The cover already exists. Do you want to replace it?"
+msgstr ""
+
+#: src/eggtrayicon.c:120
+msgid "Orientation"
+msgstr ""
+
+#: src/eggtrayicon.c:121
+msgid "The orientation of the tray."
+msgstr ""
+
+#: src/header.c:112
+msgid "_Play/Pause"
+msgstr ""
+
+#: src/header.c:113
+msgid "Start playback"
+msgstr ""
+
+#: src/header.c:115
+msgid "_Stop"
+msgstr ""
+
+#: src/header.c:116
+msgid "Stop playback"
+msgstr ""
+
+#: src/header.c:118
+msgid "_Next"
+msgstr ""
+
+#: src/header.c:119
+msgid "Start playing the next song"
+msgstr ""
+
+#: src/header.c:121
+msgid "P_revious"
+msgstr ""
+
+#: src/header.c:122
+msgid "Start playing the previous song"
+msgstr ""
+
+#: src/header.c:138
+#, c-format
+msgid "from %s by %s"
+msgstr ""
+
+#: src/header.c:237
+msgid "Play previous song"
+msgstr ""
+
+#: src/header.c:257
+msgid "Play/Pause the music"
+msgstr ""
+
+#: src/header.c:268
+msgid "Stop the music"
+msgstr ""
+
+#: src/header.c:279
+msgid "Play next song"
+msgstr ""
+
+#: src/header.c:335
+msgid " of "
+msgstr ""
+
+#: src/header.c:362
+msgid "Toggle random on/off"
+msgstr ""
+
+#: src/header.c:373
+msgid "Toggle repeat on/off"
+msgstr ""
+
+#: src/header.c:484
+msgid "Change the music volume"
+msgstr ""
+
+#: src/header.c:532 src/header.c:535 src/header.c:538 src/mpd.h:28
+msgid "Unknown"
+msgstr ""
+
+#: src/mpd.c:470
+msgid "Impossible to connect to mpd. Check the connection options."
+msgstr ""
+
+#: src/playlist.c:105
+msgid "_Clear"
+msgstr ""
+
+#: src/playlist.c:106
+msgid "Clear the playlist"
+msgstr ""
+
+#: src/playlist.c:108
+msgid "_Remove"
+msgstr ""
+
+#: src/playlist.c:109
+msgid "Remove the selected songs"
+msgstr ""
+
+#: src/playlist.c:279
+msgid "Duration"
+msgstr ""
+
+#: src/preferences.c:184
+msgid "Ario Preferences"
+msgstr ""
+
+#: src/preferences.c:287
+msgid "Connection"
+msgstr ""
+
+#: src/preferences.c:317
+msgid "Server"
+msgstr ""
+
+#: src/preferences.c:367
+msgid "Covers"
+msgstr ""
+
+#: src/preferences.c:604
+msgid "Not connected"
+msgstr ""
+
+#: src/preferences.c:609
+msgid "Updating..."
+msgstr ""
+
+#: src/shell-coverdownloader.c:258 src/shell-coverselect.c:242
+msgid "Music Player Cover Download"
+msgstr ""
+
+#: src/shell-coverdownloader.c:376
+msgid "Download Finished!"
+msgstr ""
+
+#. We show the numbers of covers found and not found
+#: src/shell-coverdownloader.c:379
+#, c-format
+msgid ""
+"%i covers found\n"
+"%i covers not found\n"
+"%i covers already exist"
+msgstr ""
+
+#: src/shell.c:95
+msgid "_File"
+msgstr ""
+
+#: src/shell.c:96
+msgid "_Edit"
+msgstr ""
+
+#: src/shell.c:97
+msgid "_Tool"
+msgstr ""
+
+#: src/shell.c:98
+msgid "_Help"
+msgstr ""
+
+#: src/shell.c:100
+msgid "_Quit"
+msgstr ""
+
+#: src/shell.c:101
+msgid "Quit"
+msgstr ""
+
+#: src/shell.c:103
+msgid "Prefere_nces"
+msgstr ""
+
+#: src/shell.c:104
+msgid "Edit music player preferences"
+msgstr ""
+
+#: src/shell.c:106
+msgid "Download album _covers"
+msgstr ""
+
+#: src/shell.c:107
+msgid "Download covers form amazon"
+msgstr ""
+
+#: src/shell.c:109
+msgid "_About"
+msgstr ""
+
+#: src/shell.c:110
+msgid "Show information about the music player"
+msgstr ""
+
+#: src/status-bar.c:204
+#, c-format
+msgid "%d Songs - %s"
+msgstr ""
+
+#: src/tray-icon.c:177 src/tray-icon.c:355
+msgid "Not playing"
+msgstr ""
+
+#: src/tray-icon.c:303
+msgid "Ario tray icon"
+msgstr ""
+
+#: src/tray-icon.c:349
+#, c-format
+msgid ""
+"Artist: %s\n"
+"Album: %s\n"
+"Title: %s"
+msgstr ""
+
+#: src/util.c:64
+#, c-format
+msgid "%d seconds"
+msgstr ""
+
+#: src/util.c:67
+#, c-format
+msgid "%d minutes, "
+msgstr ""
+
+#: src/util.c:75
+#, c-format
+msgid "%d hours, "
+msgstr ""
+
+#: src/util.c:83
+#, c-format
+msgid "%d days, "
+msgstr ""
+
+#. Translators - The + and - refer to increasing and decreasing the volume.
+#. ** I don't know if there are sensible alternatives in other languages
+#: src/volume.c:238
+msgid "+"
+msgstr ""
+
+#: src/volume.c:239
+msgid "-"
+msgstr ""

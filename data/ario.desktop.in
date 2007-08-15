@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Ario
+GenericName=Ario music player
+Comment=Client apllication to mpd
+Exec=ario
+Icon=icon.png
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Application;AudioVideo;
+

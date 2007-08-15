@@ -1,0 +1,450 @@
+# French translation of Ario.
+# Copyright (C) 2007 THE Ario'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Ario package.
+# marc <>, 2007.
+# , fuzzy
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Ario 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-06-05 00:08+0200\n"
+"PO-Revision-Date: 2007-06-05 00:09+0200\n"
+"Last-Translator: marc <>\n"
+"Language-Team: French <gnomefr@traduc.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit"
+
+#: data/connection-prefs.glade:42
+msgid "_Autoconnect"
+msgstr "_Connexion automatique"
+
+#: data/connection-prefs.glade:93
+msgid "Port:"
+msgstr "Port:"
+
+#: data/connection-prefs.glade:106
+msgid "Host:"
+msgstr "Hôte:"
+
+#: data/connection-prefs.glade:120
+msgid "<b>Connection</b>"
+msgstr "<b>Connexion</b>"
+
+#: data/connection-prefs.glade:149
+msgid "_Use Authentication"
+msgstr "_Utiliser l'authentification"
+
+#: data/connection-prefs.glade:167
+msgid "Password:"
+msgstr "Mot de passe:"
+
+#: data/connection-prefs.glade:204
+msgid "<b>Authentication</b>"
+msgstr "<b>Authentification</b>"
+
+#: data/connection-prefs.glade:248
+msgid "_Disconnect"
+msgstr "_Déconnecter"
+
+#: data/connection-prefs.glade:296
+msgid "_Connect"
+msgstr "_Connecter"
+
+#: data/cover-prefs.glade:29
+msgid "Show the covers in the albums list"
+msgstr "Afficher les pochettes dans la liste d'albums"
+
+#: data/cover-prefs.glade:46
+msgid "Use Amazon."
+msgstr "Utiliser Amazon."
+
+#: data/cover-prefs.glade:76
+msgid "<b>Covers</b>"
+msgstr "<b>Pochettes</b>"
+
+#: data/cover-progress.glade:63 data/cover-select.glade:242
+msgid "Artist : "
+msgstr "Artiste : "
+
+#: data/cover-progress.glade:119 data/cover-select.glade:270
+msgid "Album : "
+msgstr "Album : "
+
+#: data/cover-progress.glade:186
+msgid "<b>Downloading cover</b>"
+msgstr "<b>Télécharger les pochettes</b>"
+
+#: data/cover-select.glade:49
+msgid "<b>Artist : </b>"
+msgstr "<b>Artiste : </b>"
+
+#: data/cover-select.glade:112
+msgid "<b>Album : </b>"
+msgstr "<b>Album : </b>"
+
+#: data/cover-select.glade:373
+msgid "Small cover (Faster)"
+msgstr "Petite pochette (Plus rapide)"
+
+#: data/cover-select.glade:392
+msgid "Medium cover"
+msgstr "Pochette moyenne"
+
+#: data/cover-select.glade:412
+msgid "Large cover (Slower)"
+msgstr "Grande pochette (plus lent)"
+
+#: data/cover-select.glade:435
+msgid "<b>Cover size</b>"
+msgstr "<b>Taille de la pochette</b>"
+
+#: data/cover-select.glade:525
+msgid "Amazon search"
+msgstr "Recherche sur amazon"
+
+#: data/cover-select.glade:609
+msgid "Local search"
+msgstr "Recherche locale"
+
+#: data/server-prefs.glade:47
+msgid "fade time (s):"
+msgstr "Durée du fondu (s):"
+
+#: data/server-prefs.glade:60
+msgid "enable crossfade"
+msgstr "Activer le fondu"
+
+#: data/server-prefs.glade:76
+msgid "<b>Crossfade</b>"
+msgstr "<b>Fondu</b>"
+
+#: data/server-prefs.glade:106
+msgid "Last updated:"
+msgstr "Dernière mise à jour:"
+
+#: data/server-prefs.glade:116
+msgid "n/a"
+msgstr "n/a"
+
+#: data/server-prefs.glade:158
+msgid "_Update"
+msgstr "_Mettre à jour"
+
+#: data/server-prefs.glade:185
+msgid "<b>Database</b>"
+msgstr "<b>Base de données</b>"
+
+#: src/browser.c:126 src/browser.c:129 src/browser.c:132
+msgid "_Add to playlist"
+msgstr "_Ajouter à la playlist"
+
+#: src/browser.c:127 src/browser.c:130 src/browser.c:133
+msgid "Add to the playlist"
+msgstr "_Ajouter à la playlist"
+
+#: src/browser.c:136 src/browser.c:143
+msgid "Get the covers from _Amazon"
+msgstr "Obtenir les pochettes depuis Amazon"
+
+#: src/browser.c:137 src/browser.c:144
+msgid "Download the cover from Amazon"
+msgstr "Télécharger la pochette depuis amazon"
+
+#: src/browser.c:139 src/browser.c:146
+msgid "_Delete the covers"
+msgstr "_Supprimer les pochettes"
+
+#: src/browser.c:140 src/browser.c:147
+msgid "Delete the selected covers"
+msgstr "Supprimer les pochettes sélectionnées"
+
+#: src/browser.c:284 src/playlist.c:261
+msgid "Artist"
+msgstr "Artiste"
+
+#: src/browser.c:338 src/playlist.c:270
+msgid "Album"
+msgstr "Album"
+
+#: src/browser.c:347
+msgid "Cover"
+msgstr "Pochette"
+
+#: src/browser.c:412 src/playlist.c:243
+msgid "Track"
+msgstr "Piste"
+
+#: src/browser.c:419 src/playlist.c:252
+msgid "Title"
+msgstr "Titre"
+
+#: src/browser.c:1279
+msgid ""
+"Are you sure that you want to remove all the covers of the selected artists?"
+msgstr ""
+"Êtes-vous sur de vouloir effacer les pochettes des artites sélectionnés?"
+
+#: src/browser.c:1346
+msgid ""
+"Are you sure that you want to remove all the covers of the selected albums?"
+msgstr ""
+"Êtes-vous sur de vouloir effacer les pochettes des albums sélectionnés?"
+
+#: src/cover.c:430
+msgid "The cover already exists. Do you want to replace it?"
+msgstr "La pochette existe déjà. Voulez-vous la remplacer?"
+
+#: src/eggtrayicon.c:120
+msgid "Orientation"
+msgstr "Orientation"
+
+#: src/eggtrayicon.c:121
+msgid "The orientation of the tray."
+msgstr ""
+
+#: src/header.c:112
+msgid "_Play/Pause"
+msgstr "_Play/Pause"
+
+#: src/header.c:113
+msgid "Start playback"
+msgstr "Jouer"
+
+#: src/header.c:115
+msgid "_Stop"
+msgstr "_Stop"
+
+#: src/header.c:116
+msgid "Stop playback"
+msgstr "Stop"
+
+#: src/header.c:118
+msgid "_Next"
+msgstr "_Suivant"
+
+#: src/header.c:119
+msgid "Start playing the next song"
+msgstr "Jouer la chanson suivante"
+
+#: src/header.c:121
+msgid "P_revious"
+msgstr "_Précédent"
+
+#: src/header.c:122
+msgid "Start playing the previous song"
+msgstr "Jouer la chanson précédente"
+
+#: src/header.c:138
+#, c-format
+msgid "from %s by %s"
+msgstr "de %s par %s"
+
+#: src/header.c:237
+msgid "Play previous song"
+msgstr "Jouer la chanson précédente"
+
+#: src/header.c:257
+msgid "Play/Pause the music"
+msgstr "Play/pause la musique"
+
+#: src/header.c:268
+msgid "Stop the music"
+msgstr "Stop la musique"
+
+#: src/header.c:279
+msgid "Play next song"
+msgstr "Jouer la chanson suivante"
+
+#: src/header.c:335
+msgid " of "
+msgstr " sur "
+
+#: src/header.c:362
+msgid "Toggle random on/off"
+msgstr "Activer/désactiver le random"
+
+#: src/header.c:373
+msgid "Toggle repeat on/off"
+msgstr "Activer/désactiver le repeat"
+
+#: src/header.c:484
+msgid "Change the music volume"
+msgstr "Change le volume de la musique"
+
+#: src/header.c:532 src/header.c:535 src/header.c:538 src/mpd.h:28
+msgid "Unknown"
+msgstr "Inconnu"
+
+#: src/mpd.c:470
+msgid "Impossible to connect to mpd. Check the connection options."
+msgstr "Impossible de se connecter à MPD. Vérifiez vos options de connexion."
+
+#: src/playlist.c:105
+msgid "_Clear"
+msgstr "_Effacer"
+
+#: src/playlist.c:106
+msgid "Clear the playlist"
+msgstr "Effacer la playlist"
+
+#: src/playlist.c:108
+msgid "_Remove"
+msgstr "_Retirer"
+
+#: src/playlist.c:109
+msgid "Remove the selected songs"
+msgstr "Enlever la chanson sélectionnée"
+
+#: src/playlist.c:279
+msgid "Duration"
+msgstr "Durée"
+
+#: src/preferences.c:184
+msgid "Ario Preferences"
+msgstr "Préfére_nces d'Ario"
+
+#: src/preferences.c:287
+msgid "Connection"
+msgstr "Connexion"
+
+#: src/preferences.c:317
+msgid "Server"
+msgstr "Serveur"
+
+#: src/preferences.c:367
+msgid "Covers"
+msgstr "Pochettes"
+
+#: src/preferences.c:604
+msgid "Not connected"
+msgstr "Déconnecté"
+
+#: src/preferences.c:609
+msgid "Updating..."
+msgstr "En cours de mise à jour..."
+
+#: src/shell-coverdownloader.c:258 src/shell-coverselect.c:242
+msgid "Music Player Cover Download"
+msgstr ""
+
+#: src/shell-coverdownloader.c:376
+msgid "Download Finished!"
+msgstr "Téléchargement terminé"
+
+#. We show the numbers of covers found and not found
+#: src/shell-coverdownloader.c:379
+#, c-format
+msgid ""
+"%i covers found\n"
+"%i covers not found\n"
+"%i covers already exist"
+msgstr ""
+"%i pochettes trouvées\n"
+"%i pochettes introuvables\n"
+"%i pochettes déjà existantes"
+
+#: src/shell.c:95
+msgid "_File"
+msgstr "_Fichier"
+
+#: src/shell.c:96
+msgid "_Edit"
+msgstr "É_dition"
+
+#: src/shell.c:97
+msgid "_Tool"
+msgstr "_Outils"
+
+#: src/shell.c:98
+msgid "_Help"
+msgstr "_Aide"
+
+#: src/shell.c:100
+msgid "_Quit"
+msgstr "_Quitter"
+
+#: src/shell.c:101
+msgid "Quit"
+msgstr "_Quitter"
+
+#: src/shell.c:103
+msgid "Prefere_nces"
+msgstr "Préfére_nces"
+
+#: src/shell.c:104
+msgid "Edit music player preferences"
+msgstr "Modifier les préférences"
+
+#: src/shell.c:106
+msgid "Download album _covers"
+msgstr "Télécharger les pochettes"
+
+#: src/shell.c:107
+msgid "Download covers form amazon"
+msgstr ""
+
+#: src/shell.c:109
+msgid "_About"
+msgstr ""
+
+#: src/shell.c:110
+msgid "Show information about the music player"
+msgstr ""
+
+#: src/status-bar.c:204
+#, c-format
+msgid "%d Songs - %s"
+msgstr "%d Titres - %s"
+
+#: src/tray-icon.c:177 src/tray-icon.c:355
+msgid "Not playing"
+msgstr ""
+
+#: src/tray-icon.c:303
+msgid "Ario tray icon"
+msgstr ""
+
+#: src/tray-icon.c:349
+#, c-format
+msgid ""
+"Artist: %s\n"
+"Album: %s\n"
+"Title: %s"
+msgstr ""
+"Artiste: %s\n"
+"Album: %s\n"
+"Titre: %s"
+
+#: src/util.c:64
+#, c-format
+msgid "%d seconds"
+msgstr "%d secondes"
+
+#: src/util.c:67
+#, c-format
+msgid "%d minutes, "
+msgstr "%d minutes, "
+
+#: src/util.c:75
+#, c-format
+msgid "%d hours, "
+msgstr "%d heures, "
+
+#: src/util.c:83
+#, c-format
+msgid "%d days, "
+msgstr "%d jours, "
+
+#. Translators - The + and - refer to increasing and decreasing the volume.
+#. ** I don't know if there are sensible alternatives in other languages
+#: src/volume.c:238
+msgid "+"
+msgstr "+"
+
+#: src/volume.c:239
+msgid "-"
+msgstr "-"
+

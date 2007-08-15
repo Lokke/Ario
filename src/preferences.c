@@ -1,0 +1,677 @@
+/*
+ *  Copyright (C) 2005 Marc Pavot <marc.pavot@gmail.com>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2, or (at your option)
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ */
+
+#include <config.h>
+#include <i18n.h>
+#include <gtk/gtk.h>
+#include <glade/glade.h>
+#include <string.h>
+#include <time.h>
+
+#include "preferences.h"
+#include "rb-glade-helpers.h"
+#include "eel/eel-gconf-extensions.h"
+#include "libmpdclient.h"
+#include "debug.h"
+
+static void preferences_class_init (PreferencesClass *klass);
+static void preferences_init (Preferences *preferences);
+static void preferences_finalize (GObject *object);
+static gboolean preferences_window_delete_cb (GtkWidget *window,
+                                                       GdkEventAny *event,
+                                                       Preferences *preferences);
+static void preferences_response_cb (GtkDialog *dialog,
+                                              int response_id,
+                                              Preferences *preferences);
+static void preferences_sync (Preferences *preferences);
+static void preferences_sync_cover (Preferences *preferences);
+static void preferences_set_property (GObject *object,
+                                      guint prop_id,
+                                      const GValue *value,
+                                      GParamSpec *pspec);
+static void preferences_get_property (GObject *object,
+                                      guint prop_id,
+                                      GValue *value,
+                                      GParamSpec *pspec);
+static void preferences_show_cb (GtkWidget *widget,
+                                 Preferences *preferences);
+void preferences_covertree_check_changed_cb (GtkCheckButton *butt,
+                                             Preferences *preferences);
+void preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
+                                            Preferences *preferences);
+
+static const char *amazon_countries[] = {
+        "com",
+        "fr",
+        "de",
+        "uk",
+        "ca",
+        "jp",
+        NULL
+};
+
+enum
+{
+        PROP_0,
+        PROP_MPD
+};
+
+struct PreferencesPrivate
+{
+        GtkWidget *notebook;
+
+        Mpd *mpd;
+
+        GtkWidget *host_entry;
+        GtkWidget *port_spinbutton;
+        GtkWidget *authentication_checkbutton;
+        GtkWidget *password_entry;
+        GtkWidget *autoconnect_checkbutton;
+        GtkWidget *disconnect_button;
+        GtkWidget *connect_button;
+
+
+        GtkWidget *crossfade_checkbutton;
+        GtkWidget *crossfadetime_spinbutton;
+        GtkWidget *updatedb_label;
+        GtkWidget *updatedb_button;
+
+        GtkWidget *local_check;
+        GtkWidget *covertree_check;
+        GtkWidget *amazon_country;
+
+        gboolean loading;
+        gboolean sync_mpd;
+
+        gboolean destroy;
+};
+
+static GObjectClass *parent_class = NULL;
+
+GType
+preferences_get_type (void)
+{
+        LOG_FUNCTION_START
+        static GType preferences_type = 0;
+
+        if (preferences_type == 0)
+        {
+                static const GTypeInfo our_info =
+                {
+                        sizeof (PreferencesClass),
+                        NULL,
+                        NULL,
+                        (GClassInitFunc) preferences_class_init,
+                        NULL,
+                        NULL,
+                        sizeof (Preferences),
+                        0,
+                        (GInstanceInitFunc) preferences_init
+                };
+
+                preferences_type = g_type_register_static (GTK_TYPE_DIALOG,
+                                                           "Preferences",
+                                                           &our_info, 0);
+        }
+
+        return preferences_type;
+}
+
+static void
+preferences_class_init (PreferencesClass *klass)
+{
+        LOG_FUNCTION_START
+        GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+        parent_class = g_type_class_peek_parent (klass);
+
+        object_class->finalize = preferences_finalize;
+        object_class->set_property = preferences_set_property;
+        object_class->get_property = preferences_get_property;
+
+        g_object_class_install_property (object_class,
+                                         PROP_MPD,
+                                         g_param_spec_object ("mpd",
+                                                              "mpd",
+                                                              "mpd",
+                                                              TYPE_MPD,
+                                                              G_PARAM_READWRITE));
+}
+
+static void
+preferences_init (Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        preferences->priv = g_new0 (PreferencesPrivate, 1);
+        preferences->priv->loading = FALSE;
+
+        g_signal_connect_object (G_OBJECT (preferences),
+                                 "delete_event",
+                                 G_CALLBACK (preferences_window_delete_cb),
+                                 preferences, 0);
+        g_signal_connect_object (G_OBJECT (preferences),
+                                 "response",
+                                 G_CALLBACK (preferences_response_cb),
+                                 preferences, 0);
+        g_signal_connect_object (G_OBJECT (preferences),
+                                 "show",
+                                 G_CALLBACK (preferences_show_cb),
+                                 preferences, 0);
+
+        gtk_dialog_add_button (GTK_DIALOG (preferences),
+                               GTK_STOCK_CLOSE,
+                               GTK_RESPONSE_CLOSE);
+
+        gtk_dialog_set_default_response (GTK_DIALOG (preferences),
+                                         GTK_RESPONSE_CLOSE);
+
+        gtk_window_set_title (GTK_WINDOW (preferences), _("Ario Preferences"));
+        gtk_window_set_resizable (GTK_WINDOW (preferences), FALSE);
+
+        preferences->priv->notebook = GTK_WIDGET (gtk_notebook_new ());
+        gtk_container_set_border_width (GTK_CONTAINER (preferences->priv->notebook), 5);
+
+        gtk_container_add (GTK_CONTAINER (GTK_DIALOG (preferences)->vbox),
+                           preferences->priv->notebook);
+
+        gtk_container_set_border_width (GTK_CONTAINER (preferences), 5);
+        gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (preferences)->vbox), 2);
+        gtk_dialog_set_has_separator (GTK_DIALOG (preferences), FALSE);
+
+        preferences->priv->destroy = FALSE;
+}
+
+static void
+preferences_finalize (GObject *object)
+{
+        LOG_FUNCTION_START
+        Preferences *preferences;
+
+        g_return_if_fail (object != NULL);
+        g_return_if_fail (IS_PREFERENCES (object));
+
+        preferences = PREFERENCES (object);
+
+        g_return_if_fail (preferences->priv != NULL);
+
+        g_free (preferences->priv);
+
+        G_OBJECT_CLASS (parent_class)->finalize (object);
+}
+
+static void
+preferences_set_property (GObject *object,
+                             guint prop_id,
+                             const GValue *value,
+                             GParamSpec *pspec)
+{
+        LOG_FUNCTION_START
+        Preferences *preferences = PREFERENCES (object);
+        
+        switch (prop_id) {
+        case PROP_MPD:
+                preferences->priv->mpd = g_value_get_object (value);
+                break;
+        default:
+                G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+                break;
+        }
+}
+
+static void 
+preferences_get_property (GObject *object,
+                        guint prop_id,
+                        GValue *value,
+                        GParamSpec *pspec)
+{
+        LOG_FUNCTION_START
+        Preferences *preferences = PREFERENCES (object);
+
+        switch (prop_id) {
+        case PROP_MPD:
+                g_value_set_object (value, preferences->priv->mpd);
+                break;
+        default:
+                G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+                break;
+        }
+}
+
+static void
+preferences_append_connection_config (Preferences *preferences,
+                                      Mpd *mpd)
+{
+        LOG_FUNCTION_START
+        GladeXML *xml;
+
+        g_return_if_fail (IS_PREFERENCES (preferences));
+        g_return_if_fail (IS_MPD (mpd));
+
+        xml = rb_glade_xml_new (GLADE_PATH "connection-prefs.glade",
+                                "vbox",
+                                preferences);
+
+        preferences->priv->host_entry = 
+                glade_xml_get_widget (xml, "host_entry");
+        preferences->priv->port_spinbutton = 
+                glade_xml_get_widget (xml, "port_spinbutton");
+        preferences->priv->authentication_checkbutton = 
+                glade_xml_get_widget (xml, "authentication_checkbutton");
+        preferences->priv->password_entry = 
+                glade_xml_get_widget (xml, "password_entry");
+        preferences->priv->autoconnect_checkbutton = 
+                glade_xml_get_widget (xml, "autoconnect_checkbutton");
+        preferences->priv->disconnect_button = 
+                glade_xml_get_widget (xml, "disconnect_button");
+        preferences->priv->connect_button = 
+                glade_xml_get_widget (xml, "connect_button");
+
+        gtk_notebook_append_page (GTK_NOTEBOOK (preferences->priv->notebook),
+                                  glade_xml_get_widget (xml, "vbox"),
+                                  gtk_label_new (_("Connection")));
+
+        g_object_unref (G_OBJECT (xml));
+}
+
+static void
+preferences_append_server_config (Preferences *preferences,
+                                  Mpd *mpd)
+{
+        LOG_FUNCTION_START
+        GladeXML *xml;
+
+        g_return_if_fail (IS_PREFERENCES (preferences));
+        g_return_if_fail (IS_MPD (mpd));
+
+        xml = rb_glade_xml_new (GLADE_PATH "server-prefs.glade",
+                                "vbox",
+                                preferences);
+
+        preferences->priv->crossfade_checkbutton = 
+                glade_xml_get_widget (xml, "crossfade_checkbutton");
+        preferences->priv->crossfadetime_spinbutton = 
+                glade_xml_get_widget (xml, "crossfadetime_spinbutton");
+        preferences->priv->updatedb_label = 
+                glade_xml_get_widget (xml, "updatedb_label");
+        preferences->priv->updatedb_button = 
+                glade_xml_get_widget (xml, "updatedb_button");
+
+        gtk_notebook_append_page (GTK_NOTEBOOK (preferences->priv->notebook),
+                                  glade_xml_get_widget (xml, "vbox"),
+                                  gtk_label_new (_("Server")));
+
+        g_object_unref (G_OBJECT (xml));
+}
+
+static void
+preferences_append_cover_config (Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        GladeXML *xml;
+        GtkListStore *list_store;
+        GtkCellRenderer *renderer;
+        GtkTreeIter iter;
+        int i;
+
+        g_return_if_fail (IS_PREFERENCES (preferences));
+
+        xml = rb_glade_xml_new (GLADE_PATH "cover-prefs.glade",
+                                "covers_vbox",
+                                preferences);
+        preferences->priv->local_check =
+                glade_xml_get_widget (xml, "local_checkbutton");
+        preferences->priv->covertree_check =
+                glade_xml_get_widget (xml, "covertree_checkbutton");
+        preferences->priv->amazon_country =
+                glade_xml_get_widget (xml, "amazon_country_combobox");
+
+        list_store = gtk_list_store_new (1, G_TYPE_STRING);
+
+        for (i = 0; amazon_countries[i] != NULL; i++) {
+                gtk_list_store_append (list_store, &iter);
+                gtk_list_store_set (list_store, &iter,
+                                    0, amazon_countries[i],
+                                    -1);
+        }
+
+        gtk_combo_box_set_model (GTK_COMBO_BOX (preferences->priv->amazon_country),
+                                 GTK_TREE_MODEL (list_store));
+        g_object_unref (list_store);
+
+        renderer = gtk_cell_renderer_text_new ();
+        gtk_cell_layout_clear (GTK_CELL_LAYOUT (preferences->priv->amazon_country));
+        gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (preferences->priv->amazon_country), renderer, TRUE);
+        gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (preferences->priv->amazon_country), renderer,
+                                        "text", 0, NULL);
+        
+        preferences_sync_cover (preferences);
+
+        gtk_notebook_append_page (GTK_NOTEBOOK (preferences->priv->notebook),
+                                  glade_xml_get_widget (xml, "covers_vbox"),
+                                  gtk_label_new (_("Covers")));
+
+        g_object_unref (G_OBJECT (xml));
+}
+
+GtkWidget *
+preferences_new (Mpd *mpd)
+{
+        LOG_FUNCTION_START
+        Preferences *preferences;
+
+        preferences = g_object_new (TYPE_PREFERENCES,
+                                   "mpd", mpd,
+                                   NULL);
+
+        g_return_val_if_fail (preferences->priv != NULL, NULL);
+
+        preferences_append_connection_config (preferences,
+                                              mpd);
+
+        preferences_append_server_config (preferences,
+                                          mpd);
+
+        preferences_append_cover_config (preferences);
+
+        preferences_sync (preferences);
+        preferences_update_mpd (preferences);
+
+        g_timeout_add (1000, (GSourceFunc) preferences_update_mpd, preferences);
+
+        return GTK_WIDGET (preferences);
+}
+
+static gboolean
+preferences_window_delete_cb (GtkWidget *window,
+                                       GdkEventAny *event,
+                                       Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        preferences->priv->destroy = TRUE;
+        gtk_widget_hide (GTK_WIDGET (preferences));
+
+        return TRUE;
+}
+
+static void
+preferences_response_cb (GtkDialog *dialog,
+                                  int response_id,
+                                  Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (response_id == GTK_RESPONSE_CLOSE) {
+                preferences->priv->destroy = TRUE;
+                gtk_widget_hide (GTK_WIDGET (preferences));
+        }
+}
+
+static void
+preferences_sync (Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        gchar *host;
+        gint port;
+        gboolean autoconnect;
+        gboolean authentication;
+        gchar *password;
+
+        preferences->priv->loading = TRUE;
+
+        host = eel_gconf_get_string (CONF_HOST);
+        port = eel_gconf_get_integer (CONF_PORT);
+        autoconnect = eel_gconf_get_boolean (CONF_AUTOCONNECT);
+        authentication = eel_gconf_get_boolean (CONF_AUTH);
+        password = eel_gconf_get_string (CONF_PASSWORD);
+
+        if (mpd_is_connected (preferences->priv->mpd)) {
+                gtk_widget_set_sensitive (preferences->priv->connect_button, FALSE);
+                gtk_widget_set_sensitive (preferences->priv->disconnect_button, TRUE);
+        } else {
+                gtk_widget_set_sensitive (preferences->priv->connect_button, TRUE);
+                gtk_widget_set_sensitive (preferences->priv->disconnect_button, FALSE);
+        }
+
+        gtk_entry_set_text (GTK_ENTRY (preferences->priv->host_entry), host);
+        gtk_entry_set_text (GTK_ENTRY (preferences->priv->password_entry), password);
+        g_free (host);
+        g_free (password);
+
+        gtk_spin_button_set_value (GTK_SPIN_BUTTON (preferences->priv->port_spinbutton), (gdouble) port);
+
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (preferences->priv->autoconnect_checkbutton), autoconnect);
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (preferences->priv->authentication_checkbutton), authentication);
+
+        preferences->priv->loading = FALSE;
+}
+
+void
+preferences_host_changed_cb (GtkWidget *widget,
+                             Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (!preferences->priv->loading)
+                eel_gconf_set_string (CONF_HOST,
+                                      gtk_entry_get_text (GTK_ENTRY (preferences->priv->host_entry)));
+}
+
+void
+preferences_port_changed_cb (GtkWidget *widget,
+                             Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (!preferences->priv->loading)
+                eel_gconf_set_integer (CONF_PORT,
+                                       (int) gtk_spin_button_get_value (GTK_SPIN_BUTTON (preferences->priv->port_spinbutton)));
+}
+
+void
+preferences_autoconnect_changed_cb (GtkWidget *widget,
+                                    Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (!preferences->priv->loading)
+                eel_gconf_set_boolean (CONF_AUTOCONNECT,
+                                       gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->autoconnect_checkbutton)));
+}
+
+void
+preferences_authentication_changed_cb (GtkWidget *widget,
+                                       Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        gboolean active;
+
+        active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->authentication_checkbutton));
+        if (!preferences->priv->loading)
+                eel_gconf_set_boolean (CONF_AUTH,
+                                       active);
+
+        gtk_widget_set_sensitive (preferences->priv->password_entry, active);
+}
+
+void
+preferences_password_changed_cb (GtkWidget *widget,
+                                 Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (!preferences->priv->loading)
+                eel_gconf_set_string (CONF_PASSWORD,
+                                      gtk_entry_get_text (GTK_ENTRY (preferences->priv->password_entry)));
+}
+
+void
+preferences_connect_cb (GtkWidget *widget,
+                        Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        mpd_connect (preferences->priv->mpd);
+        preferences_sync (preferences);
+}
+
+void
+preferences_disconnect_cb (GtkWidget *widget,
+                           Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        mpd_disconnect (preferences->priv->mpd);
+        preferences_sync (preferences);
+}
+
+static void
+preferences_show_cb (GtkWidget *widget,
+                     Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        preferences_sync (preferences);
+}
+
+void
+preferences_crossfadetime_changed_cb (GtkWidget *widget,
+                                      Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (!preferences->priv->sync_mpd && !preferences->priv->loading) {
+                mpd_set_crossfadetime (preferences->priv->mpd,
+                                       gtk_spin_button_get_value (GTK_SPIN_BUTTON (preferences->priv->crossfadetime_spinbutton)));
+
+                mpd_update_status (preferences->priv->mpd);
+                preferences_update_mpd (preferences);
+        }
+}
+
+void
+preferences_crossfade_changed_cb (GtkWidget *widget,
+                                  Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        if (!preferences->priv->sync_mpd && !preferences->priv->loading) {
+                if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->crossfade_checkbutton)))
+                        mpd_set_crossfadetime (preferences->priv->mpd,
+                                               1);
+                else
+                        mpd_set_crossfadetime (preferences->priv->mpd,
+                                               0);
+
+                mpd_update_status (preferences->priv->mpd);
+                preferences_update_mpd (preferences);
+        }
+}
+
+void
+preferences_updatedb_button_cb (GtkWidget *widget,
+                                Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        mpd_update_db (preferences->priv->mpd);
+}
+
+gboolean
+preferences_update_mpd (Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        int crossfadetime;
+        int state;
+        gboolean updating;
+        long last_update;
+        gchar *last_update_char;
+
+        if (preferences->priv->destroy) {
+                gtk_widget_destroy (GTK_WIDGET (preferences));
+                return FALSE;
+        }
+
+        state = mpd_get_current_state (preferences->priv->mpd);
+        updating = mpd_get_updating (preferences->priv->mpd);
+
+        if (state == MPD_STATUS_STATE_UNKNOWN) {
+                crossfadetime = 0;
+                last_update_char = _("Not connected");
+        } else {
+                crossfadetime = mpd_get_crossfadetime (preferences->priv->mpd);
+
+                if (updating) {
+                        last_update_char = _("Updating...");
+                } else {
+                        last_update = (long) mpd_get_last_update (preferences->priv->mpd);
+                        last_update_char = ctime (&last_update);
+                        /* Remove the new line */
+                        last_update_char[strlen (last_update_char)-1] = '\0';
+                }
+        }
+
+        preferences->priv->sync_mpd = TRUE;
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (preferences->priv->crossfade_checkbutton), (crossfadetime != 0));
+        gtk_widget_set_sensitive (preferences->priv->crossfadetime_spinbutton, (crossfadetime != 0));
+        gtk_spin_button_set_value (GTK_SPIN_BUTTON (preferences->priv->crossfadetime_spinbutton), (gdouble) crossfadetime);
+
+        gtk_widget_set_sensitive (preferences->priv->updatedb_button, (!updating && state != MPD_STATUS_STATE_UNKNOWN));
+
+        preferences->priv->sync_mpd = FALSE;
+        
+        gtk_label_set_label (GTK_LABEL (preferences->priv->updatedb_label), last_update_char);
+
+        return TRUE;
+}
+
+void
+preferences_covertree_check_changed_cb (GtkCheckButton *butt,
+                                        Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        eel_gconf_set_boolean (CONF_COVER_TREE_HIDDEN,
+                               !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->covertree_check)));
+}
+
+void
+preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
+                                       Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        int i;
+
+        i = gtk_combo_box_get_active (GTK_COMBO_BOX (preferences->priv->amazon_country));
+
+        eel_gconf_set_string (CONF_COVER_AMAZON_COUNTRY, 
+                              amazon_countries[i]);
+}
+
+static void
+preferences_sync_cover (Preferences *preferences)
+{
+        LOG_FUNCTION_START
+        int i;
+        char *current_country;
+
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (preferences->priv->covertree_check), 
+                                      !eel_gconf_get_boolean (CONF_COVER_TREE_HIDDEN));
+
+        current_country = eel_gconf_get_string (CONF_COVER_AMAZON_COUNTRY);
+        if (!current_country)
+                current_country = "com";
+        for (i = 0; amazon_countries[i] != NULL; i++) {
+                if (!strcmp (amazon_countries[i], current_country)) {
+                        gtk_combo_box_set_active (GTK_COMBO_BOX (preferences->priv->amazon_country), i);
+                        break;
+                }
+                gtk_combo_box_set_active (GTK_COMBO_BOX (preferences->priv->amazon_country), 0);
+        }
+
+        g_free (current_country);
+}
+
