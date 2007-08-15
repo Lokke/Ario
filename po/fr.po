@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ario 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-15 17:55+0200\n"
+"POT-Creation-Date: 2007-08-15 23:47+0200\n"
 "PO-Revision-Date: 2007-08-15 18:47+0200\n"
 "Last-Translator: marc <>\n"
 "Language-Team: French\n"
@@ -54,7 +54,7 @@ msgid "Define the port of the proxy."
 msgstr "Definit le port du proxy"
 
 #: ../data/ario.schemas.in.h:10
-msgid "Hide the covers in the albums treeviewn"
+msgid "Hide the covers in the albums treeview"
 msgstr "Cacher les pochettes dans la liste d'albums"
 
 #: ../data/ario.schemas.in.h:11
@@ -596,6 +596,3 @@ msgstr "+"
 msgid "-"
 msgstr "-"
 
-#, fuzzy
-#~ msgid "Albu"
-#~ msgstr "Album"

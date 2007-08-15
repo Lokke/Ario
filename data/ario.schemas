@@ -126,7 +126,7 @@
 	<type>bool</type>
 	<default>0</default>
 	<locale name="C">
-	<short>Hide the covers in the albums treeviewn</short>
+	<short>Hide the covers in the albums treeview</short>
 	<long>When enabled, ario hide the covers in the albums treeview</long>
 	</locale>
 

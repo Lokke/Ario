@@ -523,6 +523,7 @@ uninstall-am: uninstall-appiconDATA uninstall-artDATA \
 @GCONF_SCHEMAS_INSTALL_TRUE@	                        GCONF_CONFIG_SOURCE=$(GCONF_SCHEMA_CONFIG_SOURCE) $(GCONFTOOL) --makefile-install-rule $(top_builddir)/data/$$p ; \
 @GCONF_SCHEMAS_INSTALL_TRUE@	                done \
 @GCONF_SCHEMAS_INSTALL_TRUE@	        fi
+@GCONF_SCHEMAS_INSTALL_TRUE@	        killall -HUP gconfd-2;
 @GCONF_SCHEMAS_INSTALL_FALSE@install-data-local:
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
