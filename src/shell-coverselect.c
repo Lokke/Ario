@@ -498,6 +498,7 @@ shell_coverselect_show_covers (ShellCoverselect *shell_coverselect)
 
         tree_path = gtk_tree_path_new_from_indices (0, -1);
         gtk_tree_selection_select_path (gtk_tree_view_get_selection (GTK_TREE_VIEW (shell_coverselect->priv->listview)), tree_path);
+        gtk_tree_path_free(tree_path);
 }
 
 static void 

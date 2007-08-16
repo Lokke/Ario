@@ -619,7 +619,7 @@ browser_fill_artists (Browser *browser)
                                     temp->data, -1);
                 temp = g_list_next (temp);
         }
-
+        g_list_foreach(artists, (GFunc) g_free, NULL);
         g_list_free (artists);
 
         gtk_tree_selection_unselect_all (browser->priv->artists_selection);

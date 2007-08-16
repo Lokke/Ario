@@ -273,7 +273,7 @@ util_download_file (const char *uri,
         LOG_FUNCTION_START
         LOG_DBG("Download:%s\n", uri);
         download_struct download_data;
-        gchar* address;
+        gchar* address = NULL;
         int port;
         
         CURL* curl = curl_easy_init();
@@ -314,5 +314,8 @@ util_download_file (const char *uri,
 	
 	*size = download_data.size;
 	*data = download_data.data;
+	
+	g_free(address);
+	curl_easy_cleanup(curl);
 }
 

@@ -840,6 +840,7 @@ mpd_get_current_playlist_total_time (Mpd *mpd)
                 song = ent->info.song;
                 if (song->time != MPD_SONG_NO_TIME)
                         total_time = total_time + song->time;
+                mpd_freeInfoEntity(ent);
         }
 
         return total_time;

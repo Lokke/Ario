@@ -722,12 +722,13 @@ preferences_sync_cover (Preferences *preferences)
         
         proxy_address = eel_gconf_get_string (CONF_PROXY_ADDRESS);
         if (!proxy_address)
-                proxy_address = "192.168.0.1";
+                proxy_address = g_strdup("192.168.0.1");
         proxy_port = eel_gconf_get_integer (CONF_PROXY_PORT);
         if (proxy_port == 0)
                 proxy_port = 8080;
         
         gtk_entry_set_text (GTK_ENTRY (preferences->priv->proxy_address_entry), proxy_address);
         gtk_spin_button_set_value (GTK_SPIN_BUTTON (preferences->priv->proxy_port_spinbutton), (gdouble) proxy_port);
+        g_free(proxy_address);
 }
 
