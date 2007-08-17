@@ -1,22 +1,22 @@
 /* libmpdclient
-   (c)2003-2004 by Warren Dukes (shank@mercury.chem.pitt.edu)
+   (c)2003-2006 by Warren Dukes (warren.dukes@gmail.com)
    This project's homepage is: http://www.musicpd.org
-  
+
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-                                                                                
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-                                                                                
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-                                                                                
+
    - Neither the name of the Music Player Daemon nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-                                                                                
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -28,82 +28,77 @@
    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 */
 
-/** \defgroup libmpdclient Libmpdclient low level functions
- * Libmpdclient library that libmpd wraps.
- */
-/*@{*/
 #ifndef LIBMPDCLIENT_H
 #define LIBMPDCLIENT_H
 
-
 #ifdef WIN32
-        #define __W32API_USE_DLLIMPORT__ 1
+#  define __W32API_USE_DLLIMPORT__ 1
 #endif
 
 #include <sys/time.h>
 #include <stdarg.h>
-#define MPD_BUFFER_MAX_LENGTH        50000
-#define MPD_WELCOME_MESSAGE        "OK MPD "
+#define MPD_BUFFER_MAX_LENGTH	50000
+#define MPD_ERRORSTR_MAX_LENGTH	1000
+#define MPD_WELCOME_MESSAGE	"OK MPD "
 
-#define MPD_ERROR_TIMEOUT        10 /* timeout trying to talk to mpd */
-#define MPD_ERROR_SYSTEM        11 /* system error */
-#define MPD_ERROR_UNKHOST        12 /* unknown host */
-#define MPD_ERROR_CONNPORT        13 /* problems connecting to port on host */
-#define MPD_ERROR_NOTMPD        14 /* mpd not running on port at host */
-#define MPD_ERROR_NORESPONSE        15 /* no response on attempting to connect */
-#define MPD_ERROR_SENDING        16 /* error sending command */
-#define MPD_ERROR_CONNCLOSED        17 /* connection closed by mpd */
-#define MPD_ERROR_ACK                18 /* ACK returned! */
-#define MPD_ERROR_BUFFEROVERRUN        19 /* Buffer was overrun! */
+#define MPD_ERROR_TIMEOUT	10 /* timeout trying to talk to mpd */
+#define MPD_ERROR_SYSTEM	11 /* system error */
+#define MPD_ERROR_UNKHOST	12 /* unknown host */
+#define MPD_ERROR_CONNPORT	13 /* problems connecting to port on host */
+#define MPD_ERROR_NOTMPD	14 /* mpd not running on port at host */
+#define MPD_ERROR_NORESPONSE	15 /* no response on attempting to connect */
+#define MPD_ERROR_SENDING	16 /* error sending command */
+#define MPD_ERROR_CONNCLOSED	17 /* connection closed by mpd */
+#define MPD_ERROR_ACK		18 /* ACK returned! */
+#define MPD_ERROR_BUFFEROVERRUN	19 /* Buffer was overrun! */
 
-#define MPD_ACK_ERROR_UNK        -1
-#define MPD_ERROR_AT_UNK        -1
+#define MPD_ACK_ERROR_UNK	-1
+#define MPD_ERROR_AT_UNK	-1
 
-#define MPD_ACK_ERROR_NOT_LIST                        1
-#define MPD_ACK_ERROR_ARG                        2
-#define MPD_ACK_ERROR_PASSWORD                        3
-#define MPD_ACK_ERROR_PERMISSION                4
-#define MPD_ACK_ERROR_UNKNOWN_CMD                5
+#define MPD_ACK_ERROR_NOT_LIST			1
+#define MPD_ACK_ERROR_ARG			2
+#define MPD_ACK_ERROR_PASSWORD			3
+#define MPD_ACK_ERROR_PERMISSION		4
+#define MPD_ACK_ERROR_UNKNOWN_CMD		5
 
-#define MPD_ACK_ERROR_NO_EXIST                        50
-#define MPD_ACK_ERROR_PLAYLIST_MAX                51
-#define MPD_ACK_ERROR_SYSTEM                        52
-#define MPD_ACK_ERROR_PLAYLIST_LOAD                53
-#define MPD_ACK_ERROR_UPDATE_ALREADY                54
-#define MPD_ACK_ERROR_PLAYER_SYNC                55
-#define MPD_ACK_ERROR_EXIST                        56
+#define MPD_ACK_ERROR_NO_EXIST			50
+#define MPD_ACK_ERROR_PLAYLIST_MAX		51
+#define MPD_ACK_ERROR_SYSTEM			52
+#define MPD_ACK_ERROR_PLAYLIST_LOAD		53
+#define MPD_ACK_ERROR_UPDATE_ALREADY		54
+#define MPD_ACK_ERROR_PLAYER_SYNC		55
+#define MPD_ACK_ERROR_EXIST			56
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 typedef enum mpd_TagItems
 {
-        MPD_TAG_ITEM_ARTIST,
-        MPD_TAG_ITEM_ALBUM,
-        MPD_TAG_ITEM_TITLE,
-        MPD_TAG_ITEM_TRACK,
-        MPD_TAG_ITEM_NAME,
-        MPD_TAG_ITEM_GENRE,
-        MPD_TAG_ITEM_DATE,
-        MPD_TAG_ITEM_COMPOSER,
-        MPD_TAG_ITEM_PERFORMER,
-        MPD_TAG_ITEM_COMMENT,
-        MPD_TAG_ITEM_FILENAME,
-        MPD_TAG_NUM_OF_ITEM_TYPES
-}mpd_TagItems;
-
+	MPD_TAG_ITEM_ARTIST,
+	MPD_TAG_ITEM_ALBUM,
+	MPD_TAG_ITEM_TITLE,
+	MPD_TAG_ITEM_TRACK,
+	MPD_TAG_ITEM_NAME,
+	MPD_TAG_ITEM_GENRE,
+	MPD_TAG_ITEM_DATE,
+	MPD_TAG_ITEM_COMPOSER,
+	MPD_TAG_ITEM_PERFORMER,
+	MPD_TAG_ITEM_COMMENT,
+	MPD_TAG_ITEM_DISC,
+	MPD_TAG_ITEM_FILENAME,
+	MPD_TAG_ITEM_ANY,
+	MPD_TAG_NUM_OF_ITEM_TYPES
+} mpd_TagItems;
 
 extern char * mpdTagItemKeys[MPD_TAG_NUM_OF_ITEM_TYPES];
 
 /* internal stuff don't touch this struct */
 typedef struct _mpd_ReturnElement {
-        char * name;
-        char * value;
+	char * name;
+	char * value;
 } mpd_ReturnElement;
 
 /* mpd_Connection
@@ -111,26 +106,26 @@ typedef struct _mpd_ReturnElement {
  * use error, and errorStr to detect errors
  */
 typedef struct _mpd_Connection {
-        /* use this to check the version of mpd */
-        int version[3];
-        /* IMPORTANT, you want to get the error messages from here */
-        char errorStr[MPD_BUFFER_MAX_LENGTH+1];
-        int errorCode;
-        int errorAt;
-        /* this will be set to MPD_ERROR_* if there is an error, 0 if not */
-        int error;
-        /* DON'T TOUCH any of the rest of this stuff */
-        int sock; 
-        char buffer[MPD_BUFFER_MAX_LENGTH+1];
-        int buflen;
-        int bufstart;
-        int doneProcessing;
-        int listOks;
-        int doneListOk;
-        int commandList;
-        mpd_ReturnElement * returnElement;
-        struct timeval timeout;
-        char *request;
+	/* use this to check the version of mpd */
+	int version[3];
+	/* IMPORTANT, you want to get the error messages from here */
+	char errorStr[MPD_ERRORSTR_MAX_LENGTH+1];
+	int errorCode;
+	int errorAt;
+	/* this will be set to MPD_ERROR_* if there is an error, 0 if not */
+	int error;
+	/* DON'T TOUCH any of the rest of this stuff */
+	int sock;
+	char buffer[MPD_BUFFER_MAX_LENGTH+1];
+	int buflen;
+	int bufstart;
+	int doneProcessing;
+	int listOks;
+	int doneListOk;
+	int commandList;
+	mpd_ReturnElement * returnElement;
+	struct timeval timeout;
+	char *request;
 } mpd_Connection;
 
 /* mpd_newConnection
@@ -156,57 +151,57 @@ void mpd_clearError(mpd_Connection * connection);
 /* STATUS STUFF */
 
 /* use these with status.state to determine what state the player is in */
-#define MPD_STATUS_STATE_UNKNOWN        0
-#define MPD_STATUS_STATE_STOP                1
-#define MPD_STATUS_STATE_PLAY                2
-#define MPD_STATUS_STATE_PAUSE                3
+#define MPD_STATUS_STATE_UNKNOWN	0
+#define MPD_STATUS_STATE_STOP		1
+#define MPD_STATUS_STATE_PLAY		2
+#define MPD_STATUS_STATE_PAUSE		3
 
 /* us this with status.volume to determine if mpd has volume support */
-#define MPD_STATUS_NO_VOLUME                -1
+#define MPD_STATUS_NO_VOLUME		-1
 
 /* mpd_Status
  * holds info return from status command
  */
 typedef struct mpd_Status {
-        /* 0-100, or MPD_STATUS_NO_VOLUME when there is no volume support */
-        int volume;
-        /* 1 if repeat is on, 0 otherwise */
-        int repeat;
-        /* 1 if random is on, 0 otherwise */
-        int random;
-        /* playlist length */
-        int playlistLength;
-        /* playlist, use this to determine when the playlist has changed */
-        long long playlist;
-        /* use with MPD_STATUS_STATE_* to determine state of player */
-        int state;
-        /* crossfade setting in seconds */
-        int crossfade;
-        /* if a song is currently selected (always the case when state is
-         * PLAY or PAUSE), this is the position of the currently
-         * playing song in the playlist, beginning with 0
-         */
-        int song;
-        /* Song ID of the currently selected song */
-        int songid;
-        /* time in seconds that have elapsed in the currently playing/paused
-         * song
-         */
-        int elapsedTime;
-        /* length in seconds of the currently playing/paused song */
-        int totalTime;
-        /* current bit rate in kbs */
-        int bitRate;
-        /* audio sample rate */
-        unsigned int sampleRate;
-        /* audio bits */
-        int bits;
-        /* audio channels */
-        int channels;
-        /* 1 if mpd is updating, 0 otherwise */
-        int updatingDb;
-        /* error */
-        char * error;
+	/* 0-100, or MPD_STATUS_NO_VOLUME when there is no volume support */
+	int volume;
+	/* 1 if repeat is on, 0 otherwise */
+	int repeat;
+	/* 1 if random is on, 0 otherwise */
+	int random;
+	/* playlist length */
+	int playlistLength;
+	/* playlist, use this to determine when the playlist has changed */
+	long long playlist;
+	/* use with MPD_STATUS_STATE_* to determine state of player */
+	int state;
+	/* crossfade setting in seconds */
+	int crossfade;
+	/* if a song is currently selected (always the case when state is
+	 * PLAY or PAUSE), this is the position of the currently
+	 * playing song in the playlist, beginning with 0
+	 */
+	int song;
+	/* Song ID of the currently selected song */
+	int songid;
+	/* time in seconds that have elapsed in the currently playing/paused
+	 * song
+	 */
+	int elapsedTime;
+	/* length in seconds of the currently playing/paused song */
+	int totalTime;
+	/* current bit rate in kbs */
+	int bitRate;
+	/* audio sample rate */
+	unsigned int sampleRate;
+	/* audio bits */
+	int bits;
+	/* audio channels */
+	int channels;
+	/* 1 if mpd is updating, 0 otherwise */
+	int updatingDb;
+	/* error */
+	char * error;
 } mpd_Status;
 
 void mpd_sendStatusCommand(mpd_Connection * connection);
@@ -223,14 +218,19 @@ mpd_Status * mpd_getStatus(mpd_Connection * connection);
 void mpd_freeStatus(mpd_Status * status);
 
 typedef struct _mpd_Stats {
-        int numberOfArtists;
-        int numberOfAlbums;
-        int numberOfSongs;
-        unsigned long uptime;
-        unsigned long dbUpdateTime;
-        unsigned long playTime;
-        unsigned long dbPlayTime;
+	int numberOfArtists;
+	int numberOfAlbums;
+	int numberOfSongs;
+	unsigned long uptime;
+	unsigned long dbUpdateTime;
+	unsigned long playTime;
+	unsigned long dbPlayTime;
 } mpd_Stats;
+
+typedef struct _mpd_SearchStats {
+	int numberOfSongs;
+	unsigned long playTime;
+} mpd_SearchStats;
 
 void mpd_sendStatsCommand(mpd_Connection * connection);
 
@@ -238,43 +238,55 @@ mpd_Stats * mpd_getStats(mpd_Connection * connection);
 
 void mpd_freeStats(mpd_Stats * stats);
 
+mpd_SearchStats * mpd_getSearchStats(mpd_Connection * connection);
+
+void mpd_freeSearchStats(mpd_SearchStats * stats);
+
 /* SONG STUFF */
 
-#define MPD_SONG_NO_TIME        -1
-#define MPD_SONG_NO_NUM                -1
-#define MPD_SONG_NO_ID                -1
+#define MPD_SONG_NO_TIME	-1
+#define MPD_SONG_NO_NUM		-1
+#define MPD_SONG_NO_ID		-1
 
 /* mpd_Song
  * for storing song info returned by mpd
  */
 typedef struct _mpd_Song {
-        /* filename of song */
-        char * file;
-        /* artist, maybe NULL if there is no tag */
-        char * artist;
-        /* title, maybe NULL if there is no tag */
-        char * title;
-        /* album, maybe NULL if there is no tag */
-        char * album;
-        /* track, maybe NULL if there is no tag */
-        char * track;
-        /* name, maybe NULL if there is no tag; it's the name of the current
-         * song, f.e. the icyName of the stream */
-        char * name;
-        /* date */
-        char *date;
+	/* filename of song */
+	char * file;
+	/* artist, maybe NULL if there is no tag */
+	char * artist;
+	/* title, maybe NULL if there is no tag */
+	char * title;
+	/* album, maybe NULL if there is no tag */
+	char * album;
+	/* track, maybe NULL if there is no tag */
+	char * track;
+	/* name, maybe NULL if there is no tag; it's the name of the current
+	 * song, f.e. the icyName of the stream */
+	char * name;
+	/* date */
+	char *date;
 
-        /* added by qball */
-        char *genre;
-        char *composer;
+	/* added by qball */
+	/* Genre */
+	char *genre;
+	/* Composer */
+	char *composer;
+	/* Performer */
+	char *performer;
+	/* Disc */
+	char *disc;
+	/* Comment */
+	char *comment;
 
-        /* length of song in seconds, check that it is not MPD_SONG_NO_TIME  */
-        int time;
-        /* if plchanges/playlistinfo/playlistid used, is the position of the 
-         * song in the playlist */
-        int pos;
-        /* song id for a song in the playlist */
-        int id;
+	/* length of song in seconds, check that it is not MPD_SONG_NO_TIME  */
+	int time;
+	/* if plchanges/playlistinfo/playlistid used, is the position of the
+	 * song in the playlist */
+	int pos;
+	/* song id for a song in the playlist */
+	int id;
 } mpd_Song;
 
 /* mpd_newSong
@@ -285,7 +297,7 @@ typedef struct _mpd_Song {
  * use mpd_freeSong to free the memory for the mpd_Song, it will also
  * free memory for file, artist, etc, so don't do it yourself
  */
-mpd_Song * mpd_newSong();
+mpd_Song * mpd_newSong(void);
 
 /* mpd_freeSong
  * use to free memory allocated by mpd_newSong
@@ -304,14 +316,14 @@ mpd_Song * mpd_songDup(mpd_Song * song);
  * used to store info fro directory (right now that just the path)
  */
 typedef struct _mpd_Directory {
-        char * path;
+	char * path;
 } mpd_Directory;
 
 /* mpd_newDirectory
  * allocates memory for a new directory
  * use mpd_freeDirectory to free this memory
  */
-mpd_Directory * mpd_newDirectory ();
+mpd_Directory * mpd_newDirectory(void);
 
 /* mpd_freeDirectory
  * used to free memory allocated with mpd_newDirectory, and it frees
@@ -330,14 +342,14 @@ mpd_Directory * mpd_directoryDup(mpd_Directory * directory);
  * stores info about playlist file returned by lsinfo
  */
 typedef struct _mpd_PlaylistFile {
-        char * path;
+	char * path;
 } mpd_PlaylistFile;
 
 /* mpd_newPlaylistFile
  * allocates memory for new mpd_PlaylistFile, path is set to NULL
  * free this memory with mpd_freePlaylistFile
  */
-mpd_PlaylistFile * mpd_newPlaylistFile();
+mpd_PlaylistFile * mpd_newPlaylistFile(void);
 
 /* mpd_freePlaylist
  * free memory allocated for freePlaylistFile, will also free
@@ -355,27 +367,27 @@ mpd_PlaylistFile * mpd_playlistFileDup(mpd_PlaylistFile * playlist);
 /* the type of entity returned from one of the commands that generates info
  * use in conjunction with mpd_InfoEntity.type
  */
-#define MPD_INFO_ENTITY_TYPE_DIRECTORY                0
-#define MPD_INFO_ENTITY_TYPE_SONG                1
-#define MPD_INFO_ENTITY_TYPE_PLAYLISTFILE        2
+#define MPD_INFO_ENTITY_TYPE_DIRECTORY		0
+#define MPD_INFO_ENTITY_TYPE_SONG		1
+#define MPD_INFO_ENTITY_TYPE_PLAYLISTFILE	2
 
 /* mpd_InfoEntity
  * stores info on stuff returned info commands
  */
 typedef struct mpd_InfoEntity {
-        /* the type of entity, use with MPD_INFO_ENTITY_TYPE_* to determine
-         * what this entity is (song, directory, etc...)
-         */
-        int type;
-        /* the actual data you want, mpd_Song, mpd_Directory, etc */
-        union {
-                mpd_Directory * directory;
-                mpd_Song * song;
-                mpd_PlaylistFile * playlistFile;
-        } info;
+	/* the type of entity, use with MPD_INFO_ENTITY_TYPE_* to determine
+	 * what this entity is (song, directory, etc...)
+	 */
+	int type;
+	/* the actual data you want, mpd_Song, mpd_Directory, etc */
+	union {
+		mpd_Directory * directory;
+		mpd_Song * song;
+		mpd_PlaylistFile * playlistFile;
+	} info;
 } mpd_InfoEntity;
 
-mpd_InfoEntity * mpd_newInfoEntity();
+mpd_InfoEntity * mpd_newInfoEntity(void);
 
 void mpd_freeInfoEntity(mpd_InfoEntity * entity);
 
@@ -397,7 +409,15 @@ void mpd_sendPlaylistIdCommand(mpd_Connection * connection, int songId);
 /* use this to get the changes in the playlist since version _playlist_ */
 void mpd_sendPlChangesCommand(mpd_Connection * connection, long long playlist);
 
-/* recursivel fetches all songs/dir/playlists in "dir* (no metadata is 
+/**
+ * @param connection: A valid and connected mpd_Connection.
+ * @param playlist: The playlist version you want the diff with.
+ * A more bandwidth efficient version of the mpd_sendPlChangesCommand.
+ * It only returns the pos+id of the changes song.
+ */
+void mpd_sendPlChangesPosIdCommand(mpd_Connection * connection, long long playlist);
+
+/* recursivel fetches all songs/dir/playlists in "dir* (no metadata is
  * returned) */
 void mpd_sendListallCommand(mpd_Connection * connection, const char * dir);
 
@@ -407,41 +427,39 @@ void mpd_sendListallInfoCommand(mpd_Connection * connection, const char * dir);
 /* non-recursive version of ListallInfo */
 void mpd_sendLsInfoCommand(mpd_Connection * connection, const char * dir);
 
-#define MPD_TABLE_ARTIST        0
-#define MPD_TABLE_ALBUM                1
-#define MPD_TABLE_TITLE                2
-#define MPD_TABLE_FILENAME        3
+#define MPD_TABLE_ARTIST	MPD_TAG_ITEM_ARTIST
+#define MPD_TABLE_ALBUM		MPD_TAG_ITEM_ALBUM
+#define MPD_TABLE_TITLE		MPD_TAG_ITEM_TITLE
+#define MPD_TABLE_FILENAME	MPD_TAG_ITEM_FILENAME
 
-void mpd_sendSearchCommand(mpd_Connection * connection, int table, 
-                const char * str);
+void mpd_sendSearchCommand(mpd_Connection * connection, int table,
+		const char * str);
 
-void mpd_sendFindCommand(mpd_Connection * connection, int table, 
-                const char * str);
+void mpd_sendFindCommand(mpd_Connection * connection, int table,
+		const char * str);
 
 /* LIST TAG COMMANDS */
 
-/* use this function fetch next artist entry, be sure to free the returned 
+/* use this function fetch next artist entry, be sure to free the returned
  * string.  NULL means there are no more.  Best used with sendListArtists
  */
-
 char * mpd_getNextArtist(mpd_Connection * connection);
 
 char * mpd_getNextAlbum(mpd_Connection * connection);
 
-char * mpd_getNextTag(mpd_Connection *connection, int table);
+char * mpd_getNextTag(mpd_Connection *connection, int type);
 
 /* list artist or albums by artist, arg1 should be set to the artist if
  * listing albums by a artist, otherwise NULL for listing all artists or albums
  */
-void mpd_sendListCommand(mpd_Connection * connection, int table, 
-                const char * arg1);
-
-void mpd_sendListTagCommand(mpd_Connection * connection, int table,...);
-void mpd_sendVListTagCommand(mpd_Connection * connection,int ret_table, va_list arglist);
+void mpd_sendListCommand(mpd_Connection * connection, int table,
+		const char * arg1);
 
 /* SIMPLE COMMANDS */
 
 void mpd_sendAddCommand(mpd_Connection * connection, const char * file);
+
+int mpd_sendAddIdCommand(mpd_Connection *connection, const char *file);
 
 void mpd_sendDeleteCommand(mpd_Connection * connection, int songNum);
 
@@ -453,12 +471,15 @@ void mpd_sendLoadCommand(mpd_Connection * connection, const char * name);
 
 void mpd_sendRmCommand(mpd_Connection * connection, const char * name);
 
+void mpd_sendRenameCommand(mpd_Connection *connection, const char *from,
+                           const char *to);
+
 void mpd_sendShuffleCommand(mpd_Connection * connection);
 
 void mpd_sendClearCommand(mpd_Connection * connection);
 
 /* use this to start playing at the beginning, useful when in random mode */
-#define MPD_PLAY_AT_BEGINNING        -1
+#define MPD_PLAY_AT_BEGINNING	-1
 
 void mpd_sendPlayCommand(mpd_Connection * connection, int songNum);
 
@@ -514,15 +535,15 @@ void mpd_sendCommandListOkBegin(mpd_Connection * connection);
 
 void mpd_sendCommandListEnd(mpd_Connection * connection);
 
-/* advance to the next listOk 
+/* advance to the next listOk
  * returns 0 if advanced to the next list_OK,
  * returns -1 if it advanced to an OK or ACK */
 int mpd_nextListOkCommand(mpd_Connection * connection);
 
 typedef struct _mpd_OutputEntity {
-        int id;
-        char * name;
-        int enabled;
+	int id;
+	char * name;
+	int enabled;
 } mpd_OutputEntity;
 
 void mpd_sendOutputsCommand(mpd_Connection * connection);
@@ -537,13 +558,14 @@ void mpd_freeOutputElement(mpd_OutputEntity * output);
 
 /**
  * @param connection a #mpd_Connection
- * 
+ *
  * Queries mpd for the allowed commands
  */
 void mpd_sendCommandsCommand(mpd_Connection * connection);
+
 /**
  * @param connection a #mpd_Connection
- * 
+ *
  * Queries mpd for the not allowed commands
  */
 void mpd_sendNotCommandsCommand(mpd_Connection * connection);
@@ -557,35 +579,62 @@ void mpd_sendNotCommandsCommand(mpd_Connection * connection);
  */
 char *mpd_getNextCommand(mpd_Connection *connection);
 
+void mpd_sendUrlHandlersCommand(mpd_Connection * connection);
+
+char *mpd_getNextHandler(mpd_Connection * connection);
+
+void mpd_sendTagTypesCommand(mpd_Connection * connection);
+
+char *mpd_getNextTagType(mpd_Connection * connection);
+
+/**
+ * @param connection a MpdConnection
+ * @param path	the path to the playlist.
+ *
+ * List the content, with full metadata, of a stored playlist.
+ *
+ */
+void mpd_sendListPlaylistInfoCommand(mpd_Connection *connection, char *path);
+
+/**
+ * @param connection a MpdConnection
+ * @param path	the path to the playlist.
+ *
+ * List the content of a stored playlist.
+ *
+ */
+void mpd_sendListPlaylistCommand(mpd_Connection *connection, char *path);
 
 /**
  * @param connection a #mpd_Connection
  * @param exact if to match exact
  *
- * starts a search, use mpd_addConstraintSearch to add 
+ * starts a search, use mpd_addConstraintSearch to add
  * a constraint to the search, and mpd_commitSearch to do the actual search
  */
-void mpd_startSearch(mpd_Connection * connection,int exact);
+void mpd_startSearch(mpd_Connection *connection, int exact);
+
 /**
  * @param connection a #mpd_Connection
- * @param field
+ * @param type
  * @param name
- *
  */
-void mpd_addConstraintSearch(mpd_Connection *connection, int field, char *name);
+void mpd_addConstraintSearch(mpd_Connection *connection, int type, const char *name);
+
 /**
  * @param connection a #mpd_Connection
- *
  */
 void mpd_commitSearch(mpd_Connection *connection);
 
 /**
  * @param connection a #mpd_Connection
- * @param field The field to search
+ * @param type The type to search for
  *
  * starts a search for fields... f.e. get a list of artists would be:
+ * @code
  * mpd_startFieldSearch(connection, MPD_TAG_ITEM_ARTIST);
  * mpd_commitSearch(connection);
+ * @endcode
  *
  * or get a list of artist in genre "jazz" would be:
  * @code
@@ -595,14 +644,27 @@ void mpd_commitSearch(mpd_Connection *connection);
  * @endcode
  *
  * mpd_startSearch will return  a list of songs (and you need mpd_getNextInfoEntity)
- * this one will return a list of only one field (the field specified with field) and you need
+ * this one will return a list of only one field (the one specified with type) and you need
  * mpd_getNextTag to get the results
  */
-void mpd_startFieldSearch(mpd_Connection * connection,int field);
+void mpd_startFieldSearch(mpd_Connection *connection, int type);
 
-#ifdef _cplusplus
+void mpd_startPlaylistSearch(mpd_Connection *connection, int exact);
+
+void mpd_startStatsSearch(mpd_Connection *connection);
+
+void mpd_sendPlaylistClearCommand(mpd_Connection *connection, char *path);
+
+void mpd_sendPlaylistAddCommand(mpd_Connection *connection,
+                                char *playlist, char *path);
+
+void mpd_sendPlaylistMoveCommand(mpd_Connection *connection,
+                                 char *playlist, int from, int to);
+
+void mpd_sendPlaylistDeleteCommand(mpd_Connection *connection,
+                                   char *playlist, int pos);
+#ifdef __cplusplus
 }
 #endif
 
 #endif
-/*@}*/

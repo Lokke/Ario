@@ -8,6 +8,7 @@ ario_SOURCES = \
 	browser.h\
 	mpd.c\
 	mpd.h\
+	libmpdclient.c\
 	libmpdclient.h\
 	header.c\
 	header.h\

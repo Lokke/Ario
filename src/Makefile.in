@@ -36,7 +36,8 @@ bin_PROGRAMS = ario$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/intltool.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -46,8 +47,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_ario_OBJECTS = main.$(OBJEXT) shell.$(OBJEXT) browser.$(OBJEXT) \
-	mpd.$(OBJEXT) header.$(OBJEXT) eggtrayicon.$(OBJEXT) \
-	tray-icon.$(OBJEXT) playlist.$(OBJEXT) \
+	mpd.$(OBJEXT) libmpdclient.$(OBJEXT) header.$(OBJEXT) \
+	eggtrayicon.$(OBJEXT) tray-icon.$(OBJEXT) playlist.$(OBJEXT) \
 	rb-glade-helpers.$(OBJEXT) util.$(OBJEXT) \
 	preferences.$(OBJEXT) cover.$(OBJEXT) volume.$(OBJEXT) \
 	shell-coverdownloader.$(OBJEXT) shell-coverselect.$(OBJEXT) \
@@ -217,6 +218,7 @@ ario_SOURCES = \
 	browser.h\
 	mpd.c\
 	mpd.h\
+	libmpdclient.c\
 	libmpdclient.h\
 	header.c\
 	header.h\
@@ -317,6 +319,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cover.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eggtrayicon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/header.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmpdclient.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/playlist.Po@am__quote@
