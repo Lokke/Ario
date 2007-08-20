@@ -26,10 +26,20 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package])
 AM_GLIB_GNU_GETTEXT
 
-
 dnl Gconf
 AC_PATH_PROG(GCONFTOOL, gconftool-2)
 AM_GCONF_SOURCE_2
+
+dnl Debugging information
+AC_ARG_ENABLE(debug,
+	      AC_HELP_STRING([--enable-debug],
+			     [Add runtime debugging information (slower)]))
+if test x"$enable_debug" = xyes; then
+   AC_DEFINE(DEBUG, 1, [Add runtime debugging information (slower)])
+fi
+
+
+
 
 AC_OUTPUT([
 Makefile

@@ -20,16 +20,16 @@
 #ifndef __DEBUG_H
 #define __DEBUG_H
 
-//#define DEBUG
+#include <config.h>
 
 #ifdef DEBUG
 #define LOG_DBG(x,args...) {printf("[debug](%s:%d) %s : ", __FILE__, __LINE__, __FUNCTION__); printf(x, ##args);printf("\n");}
 #define LOG_FUNCTION_START      LOG_DBG("Function start")
 #define LOG_FUNCTION_END        LOG_DBG("Function end")
 #else
-#define LOG_DBG(x,args...)    
-#define LOG_FUNCTION_START       
-#define LOG_FUNCTION_END         
+#define LOG_DBG(x,args...)
+#define LOG_FUNCTION_START
+#define LOG_FUNCTION_END
 #endif
 
 #endif /* __DEBUG_H */
