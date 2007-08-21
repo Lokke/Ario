@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ario 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-15 23:47+0200\n"
+"POT-Creation-Date: 2007-08-21 20:28+0200\n"
 "PO-Revision-Date: 2007-08-15 18:47+0200\n"
 "Last-Translator: marc <>\n"
 "Language-Team: French\n"
@@ -595,4 +595,3 @@ msgstr "+"
 #: ../src/volume.c:239
 msgid "-"
 msgstr "-"
-
