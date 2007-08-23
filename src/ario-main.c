@@ -21,13 +21,11 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
-#include <libgnomevfs/gnome-vfs.h>
 #include <curl/curl.h>
-
-#include "eel/eel-gconf-extensions.h"
-#include "shell.h"
-#include "util.h"
-#include "debug.h"
+#include "eel-gconf-extensions.h"
+#include "ario-shell.h"
+#include "ario-util.h"
+#include "ario-debug.h"
 
 /*
  * Standard gettext macros.
@@ -56,9 +54,9 @@
 int
 main (int argc, char *argv[])
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
 
-        Shell *shell;
+        ArioShell *shell;
 
 #ifdef ENABLE_NLS
         setlocale (LC_ALL, "");
@@ -70,14 +68,13 @@ main (int argc, char *argv[])
         gtk_set_locale ();
         gtk_init (&argc, &argv);
 
-        util_init_stock_icons ();
-        gnome_vfs_init ();
+        ario_util_init_stock_icons ();
         curl_global_init(0);
 
         eel_gconf_monitor_add ("/apps/ario");
 
-        shell = shell_new ();
-        shell_construct (shell);
+        shell = ario_shell_new ();
+        ario_shell_construct (shell);
 
         gtk_main ();
 

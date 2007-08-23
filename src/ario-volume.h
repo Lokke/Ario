@@ -17,39 +17,39 @@
  *
  */
 
-#ifndef __VOLUME_H
-#define __VOLUME_H
+#ifndef __ARIO_VOLUME_H
+#define __ARIO_VOLUME_H
 
 #include <gtk/gtkbutton.h>
-#include "mpd.h"
+#include "ario-mpd.h"
 
 G_BEGIN_DECLS
 
-#define TYPE_VOLUME         (volume_get_type ())
-#define VOLUME(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_VOLUME, Volume))
-#define VOLUME_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), TYPE_VOLUME, VolumeClass))
-#define IS_VOLUME(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_VOLUME))
-#define IS_VOLUME_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_VOLUME))
-#define VOLUME_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_VOLUME, VolumeClass))
+#define TYPE_ARIO_VOLUME         (ario_volume_get_type ())
+#define ARIO_VOLUME(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_ARIO_VOLUME, ArioVolume))
+#define ARIO_VOLUME_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), TYPE_ARIO_VOLUME, ArioVolumeClass))
+#define IS_ARIO_VOLUME(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_ARIO_VOLUME))
+#define IS_ARIO_VOLUME_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_ARIO_VOLUME))
+#define ARIO_VOLUME_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_ARIO_VOLUME, ArioVolumeClass))
 
-typedef struct VolumePrivate VolumePrivate;
+typedef struct ArioVolumePrivate ArioVolumePrivate;
 
 typedef struct
 {
         GtkEventBox parent;
 
-        VolumePrivate *priv;
-} Volume;
+        ArioVolumePrivate *priv;
+} ArioVolume;
 
 typedef struct
 {
         GtkEventBoxClass parent;
-} VolumeClass;
+} ArioVolumeClass;
 
-GType                volume_get_type                (void);
+GType           ario_volume_get_type    (void);
 
-Volume *        volume_new                (Mpd *mpd);
+ArioVolume *    ario_volume_new         (ArioMpd *mpd);
 
 G_END_DECLS
 
-#endif /* __VOLUME_H */
+#endif /* __ARIO_VOLUME_H */

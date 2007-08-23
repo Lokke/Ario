@@ -46,13 +46,15 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_ario_OBJECTS = main.$(OBJEXT) shell.$(OBJEXT) browser.$(OBJEXT) \
-	mpd.$(OBJEXT) libmpdclient.$(OBJEXT) header.$(OBJEXT) \
-	eggtrayicon.$(OBJEXT) tray-icon.$(OBJEXT) playlist.$(OBJEXT) \
-	rb-glade-helpers.$(OBJEXT) util.$(OBJEXT) \
-	preferences.$(OBJEXT) cover.$(OBJEXT) volume.$(OBJEXT) \
-	shell-coverdownloader.$(OBJEXT) shell-coverselect.$(OBJEXT) \
-	status-bar.$(OBJEXT)
+am_ario_OBJECTS = ario-main.$(OBJEXT) ario-shell.$(OBJEXT) \
+	ario-browser.$(OBJEXT) ario-mpd.$(OBJEXT) \
+	libmpdclient.$(OBJEXT) ario-header.$(OBJEXT) \
+	eggtrayicon.$(OBJEXT) eel-gconf-extensions.$(OBJEXT) \
+	ario-tray-icon.$(OBJEXT) ario-playlist.$(OBJEXT) \
+	rb-glade-helpers.$(OBJEXT) ario-util.$(OBJEXT) \
+	ario-preferences.$(OBJEXT) ario-cover.$(OBJEXT) \
+	ario-volume.$(OBJEXT) ario-shell-coverdownloader.$(OBJEXT) \
+	ario-shell-coverselect.$(OBJEXT) ario-status-bar.$(OBJEXT)
 ario_OBJECTS = $(am_ario_OBJECTS)
 am__DEPENDENCIES_1 =
 ario_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -211,39 +213,41 @@ target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ario_SOURCES = \
-	main.c\
-	shell.c\
-	shell.h\
-	browser.c\
-	browser.h\
-	mpd.c\
-	mpd.h\
+	ario-main.c\
+	ario-shell.c\
+	ario-shell.h\
+	ario-browser.c\
+	ario-browser.h\
+	ario-mpd.c\
+	ario-mpd.h\
 	libmpdclient.c\
 	libmpdclient.h\
-	header.c\
-	header.h\
+	ario-header.c\
+	ario-header.h\
 	eggtrayicon.c\
 	eggtrayicon.h\
-	tray-icon.c\
-	tray-icon.h\
-	playlist.c\
-	playlist.h\
+	eel-gconf-extensions.c\
+	eel-gconf-extensions.h\
+	ario-tray-icon.c\
+	ario-tray-icon.h\
+	ario-playlist.c\
+	ario-playlist.h\
 	rb-glade-helpers.c\
 	rb-glade-helpers.h\
-	util.c\
-	util.h\
-	preferences.c\
-	preferences.h\
-	cover.c\
-	cover.h\
-	volume.c\
-	volume.h\
-	shell-coverdownloader.c\
-	shell-coverdownloader.h\
-	shell-coverselect.c\
-	shell-coverselect.h\
-	status-bar.c\
-	status-bar.h
+	ario-util.c\
+	ario-util.h\
+	ario-preferences.c\
+	ario-preferences.h\
+	ario-cover.c\
+	ario-cover.h\
+	ario-volume.c\
+	ario-volume.h\
+	ario-shell-coverdownloader.c\
+	ario-shell-coverdownloader.h\
+	ario-shell-coverselect.c\
+	ario-shell-coverselect.h\
+	ario-status-bar.c\
+	ario-status-bar.h
 
 ario_LDADD = $(DEPS_LIBS)
 AM_CPPFLAGS = $(DEPS_CFLAGS) \
@@ -315,23 +319,24 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/browser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cover.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-browser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-cover.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-header.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-mpd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-playlist.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-preferences.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-shell-coverdownloader.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-shell-coverselect.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-shell.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-status-bar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-tray-icon.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-util.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-volume.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eel-gconf-extensions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eggtrayicon.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/header.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmpdclient.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/playlist.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/preferences.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rb-glade-helpers.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shell-coverdownloader.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shell-coverselect.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shell.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/status-bar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tray-icon.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/volume.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

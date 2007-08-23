@@ -25,40 +25,40 @@
 #include <gtk/gtkuimanager.h>
 
 #include "eggtrayicon.h"
-#include "mpd.h"
+#include "ario-mpd.h"
 
-#ifndef __TRAY_ICON_H
-#define __TRAY_ICON_H
+#ifndef __ARIO_TRAY_ICON_H
+#define __ARIO_TRAY_ICON_H
 
 G_BEGIN_DECLS
 
-#define TYPE_TRAY_ICON         (tray_icon_get_type ())
-#define TRAY_ICON(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_TRAY_ICON, TrayIcon))
-#define TRAY_ICON_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), TYPE_TRAY_ICON, TrayIconClass))
-#define IS_TRAY_ICON(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_TRAY_ICON))
-#define IS_TRAY_ICON_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_TRAY_ICON))
-#define TRAY_ICON_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_TRAY_ICON, TrayIconClass))
+#define TYPE_ARIO_TRAY_ICON         (ario_tray_icon_get_type ())
+#define ARIO_TRAY_ICON(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_ARIO_TRAY_ICON, ArioTrayIcon))
+#define ARIO_TRAY_ICON_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), TYPE_ARIO_TRAY_ICON, ArioTrayIconClass))
+#define IS_ARIO_TRAY_ICON(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_ARIO_TRAY_ICON))
+#define IS_ARIO_TRAY_ICON_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_ARIO_TRAY_ICON))
+#define ARIO_TRAY_ICON_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_ARIO_TRAY_ICON, ArioTrayIconClass))
 
-typedef struct TrayIconPrivate TrayIconPrivate;
+typedef struct ArioTrayIconPrivate ArioTrayIconPrivate;
 
 typedef struct
 {
         EggTrayIcon parent;
 
-        TrayIconPrivate *priv;
-} TrayIcon;
+        ArioTrayIconPrivate *priv;
+} ArioTrayIcon;
 
 typedef struct
 {
         EggTrayIconClass parent_class;
-} TrayIconClass;
+} ArioTrayIconClass;
 
-GType                   tray_icon_get_type           (void);
+GType                   ario_tray_icon_get_type         (void);
 
-TrayIcon *              tray_icon_new                (GtkUIManager *mgr,
-                                                      GtkWindow *window,
-                                                      Mpd *mpd);
+ArioTrayIcon *          ario_tray_icon_new              (GtkUIManager *mgr,
+                                                         GtkWindow *window,
+                                                         ArioMpd *mpd);
 
 G_END_DECLS
 
-#endif /* __TRAY_ICON_H */
+#endif /* __ARIO_TRAY_ICON_H */

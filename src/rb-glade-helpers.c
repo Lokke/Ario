@@ -36,6 +36,9 @@ rb_glade_xml_new (const char *file,
         GladeXML *xml;
 
         xml = glade_xml_new (file, root, NULL);
+        
+        if (!g_module_supported())
+                g_warning("g_module not supported");
 
         glade_xml_signal_autoconnect_full (xml,
                                            (GladeXMLConnectFunc) glade_signal_connect_func,

@@ -42,7 +42,7 @@
                         <property name="label" translatable="yes">_Autoconnect</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
-                        <signal name="toggled" handler="preferences_autoconnect_changed_cb"/>
+                        <signal name="toggled" handler="ario_preferences_autoconnect_changed_cb"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -60,7 +60,7 @@
                         <property name="max_length">256</property>
                         <property name="invisible_char">*</property>
                         <property name="text">localhost</property>
-                        <signal name="changed" handler="preferences_host_changed_cb"/>
+                        <signal name="changed" handler="ario_preferences_host_changed_cb"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -76,7 +76,7 @@
                         <property name="climb_rate">1</property>
                         <property name="snap_to_ticks">True</property>
                         <property name="numeric">True</property>
-                        <signal name="value_changed" handler="preferences_port_changed_cb"/>
+                        <signal name="value_changed" handler="ario_preferences_port_changed_cb"/>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -149,7 +149,7 @@
                         <property name="label" translatable="yes">_Use Authentication</property>
                         <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
-                        <signal name="toggled" handler="preferences_authentication_changed_cb"/>
+                        <signal name="toggled" handler="ario_preferences_authentication_changed_cb"/>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -181,7 +181,7 @@
                             <property name="max_length">255</property>
                             <property name="visibility">False</property>
                             <property name="invisible_char">*</property>
-                            <signal name="changed" handler="preferences_password_changed_cb"/>
+                            <signal name="changed" handler="ario_preferences_password_changed_cb"/>
                           </widget>
                           <packing>
                             <property name="expand">False</property>
@@ -222,7 +222,7 @@
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
-                <signal name="clicked" handler="preferences_disconnect_cb"/>
+                <signal name="clicked" handler="ario_preferences_disconnect_cb"/>
                 <child>
                   <widget class="GtkAlignment" id="alignment7">
                     <property name="visible">True</property>
@@ -270,7 +270,7 @@
               <widget class="GtkButton" id="connect_button">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <signal name="clicked" handler="preferences_connect_cb"/>
+                <signal name="clicked" handler="ario_preferences_connect_cb"/>
                 <child>
                   <widget class="GtkAlignment" id="alignment9">
                     <property name="visible">True</property>

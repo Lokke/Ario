@@ -23,40 +23,40 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <config.h>
-#include <i18n.h>
-#include <libgnome/gnome-url.h>
 
-#include "volume.h"
-#include "debug.h"
+#include "ario-i18n.h"
+#include "ario-volume.h"
+#include "ario-debug.h"
 #include "libmpdclient.h"
 
-static void volume_class_init (VolumeClass *klass);
-static void volume_init (Volume *link);
-static void volume_set_property (GObject *object,
-                                guint prop_id,
-                                const GValue *value,
-                                GParamSpec *pspec);
-static void volume_get_property (GObject *object,
-                                 guint prop_id,
-                                 GValue *value,
-                                 GParamSpec *pspec);
-static void volume_finalize (GObject *object);
-static void volume_sync_volume (Volume *volume);
-static void clicked_cb (GtkButton *button, Volume *volume);
-static gboolean scroll_cb (GtkWidget *widget, GdkEvent *event, Volume *volume);
+static void ario_volume_class_init (ArioVolumeClass *klass);
+static void ario_volume_init (ArioVolume *link);
+static void ario_volume_set_property (GObject *object,
+                                      guint prop_id,
+                                      const GValue *value,
+                                      GParamSpec *pspec);
+static void ario_volume_get_property (GObject *object,
+                                      guint prop_id,
+                                      GValue *value,
+                                      GParamSpec *pspec);
+static void ario_volume_finalize (GObject *object);
+static void ario_volume_sync_volume (ArioVolume *volume);
+static void clicked_cb (GtkButton *button, ArioVolume *volume);
+static gboolean scroll_cb (GtkWidget *widget, GdkEvent *event, ArioVolume *volume);
 static gboolean scale_button_release_event_cb (GtkWidget *widget,
-                                               GdkEventButton *event, Volume *volume);
+                                               GdkEventButton *event, ArioVolume *volume);
 static gboolean scale_button_event_cb (GtkWidget *widget, GdkEventButton *event,
-                                       Volume *volume);
+                                       ArioVolume *volume);
 static gboolean scale_key_press_event_cb (GtkWidget *widget, GdkEventKey *event,
-                                          Volume *volume);
-static void mixer_value_changed_cb (GtkAdjustment *adj, Volume *volume);
-static void volume_changed_cb (Mpd *mpd,
-                               Volume *volume);
+                                          ArioVolume *volume);
+static void mixer_value_changed_cb (GtkAdjustment *adj,
+                                    ArioVolume *volume);
+static void ario_volume_changed_cb (ArioMpd *mpd,
+                                    ArioVolume *volume);
 
-#define VOLUME_MAX 100
+#define ARIO_VOLUME_MAX 100
 
-struct VolumePrivate
+struct ArioVolumePrivate
 {
         GtkWidget *button;
 
@@ -72,7 +72,7 @@ struct VolumePrivate
 
         guint notify_id;
 
-        Mpd *mpd;
+        ArioMpd *mpd;
 };
 
 enum
@@ -84,66 +84,66 @@ enum
 static GtkEventBoxClass *parent_class = NULL;
 
 GType
-volume_get_type (void)
+ario_volume_get_type (void)
 {
-        LOG_FUNCTION_START
-        static GType volume_type = 0;
+        ARIO_LOG_FUNCTION_START
+        static GType ario_volume_type = 0;
 
-        if (volume_type == 0)
+        if (ario_volume_type == 0)
         {
                 static const GTypeInfo our_info =
                 {
-                        sizeof (VolumeClass),
+                        sizeof (ArioVolumeClass),
                         NULL,
                         NULL,
-                        (GClassInitFunc) volume_class_init,
+                        (GClassInitFunc) ario_volume_class_init,
                         NULL,
                         NULL,
-                        sizeof (Volume),
+                        sizeof (ArioVolume),
                         0,
-                        (GInstanceInitFunc) volume_init
+                        (GInstanceInitFunc) ario_volume_init
                 };
 
-                volume_type = g_type_register_static (GTK_TYPE_EVENT_BOX,
-                                                       "Volume",
+                ario_volume_type = g_type_register_static (GTK_TYPE_EVENT_BOX,
+                                                       "ArioVolume",
                                                        &our_info, 0);
         }
 
-        return volume_type;
+        return ario_volume_type;
 }
 
 static void
-volume_class_init (VolumeClass *klass)
+ario_volume_class_init (ArioVolumeClass *klass)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
         parent_class = g_type_class_peek_parent (klass);
 
-        object_class->set_property = volume_set_property;
-        object_class->get_property = volume_get_property;
-        object_class->finalize = volume_finalize;
+        object_class->set_property = ario_volume_set_property;
+        object_class->get_property = ario_volume_get_property;
+        object_class->finalize = ario_volume_finalize;
 
         g_object_class_install_property (object_class,
                                          PROP_MPD,
                                          g_param_spec_object ("mpd",
                                                               "mpd",
                                                               "mpd",
-                                                              TYPE_MPD,
+                                                              TYPE_ARIO_MPD,
                                                               G_PARAM_READWRITE));
 }
 
 static void
-volume_init (Volume *volume)
+ario_volume_init (ArioVolume *volume)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GtkWidget *frame;
         GtkWidget *inner_frame;
         GtkWidget *pluslabel, *minuslabel;
         GtkWidget *event;
         GtkWidget *box;
 
-        volume->priv = g_new0 (VolumePrivate, 1);
+        volume->priv = g_new0 (ArioVolumePrivate, 1);
 
         volume->priv->button = gtk_button_new ();
 
@@ -175,9 +175,9 @@ volume_init (Volume *volume)
 
         volume->priv->adj = GTK_ADJUSTMENT (gtk_adjustment_new (50,
                                                                 0.0,
-                                                                (gdouble) VOLUME_MAX,
-                                                                (gdouble) VOLUME_MAX/20,
-                                                                (gdouble) VOLUME_MAX/10,
+                                                                (gdouble) ARIO_VOLUME_MAX,
+                                                                (gdouble) ARIO_VOLUME_MAX/20,
+                                                                (gdouble) ARIO_VOLUME_MAX/10,
                                                                 0.0));
         g_signal_connect_object (volume->priv->adj,
                                  "value-changed",
@@ -247,13 +247,13 @@ volume_init (Volume *volume)
 }
 
 static void
-volume_set_property (GObject *object,
-                     guint prop_id,
-                     const GValue *value,
-                     GParamSpec *pspec)
+ario_volume_set_property (GObject *object,
+                          guint prop_id,
+                          const GValue *value,
+                          GParamSpec *pspec)
 {
-        LOG_FUNCTION_START
-        Volume *volume = VOLUME (object);
+        ARIO_LOG_FUNCTION_START
+        ArioVolume *volume = ARIO_VOLUME (object);
         
         switch (prop_id) {
         case PROP_MPD:
@@ -266,13 +266,13 @@ volume_set_property (GObject *object,
 }
 
 static void 
-volume_get_property (GObject *object,
-                     guint prop_id,
-                     GValue *value,
-                     GParamSpec *pspec)
+ario_volume_get_property (GObject *object,
+                          guint prop_id,
+                          GValue *value,
+                          GParamSpec *pspec)
 {
-        LOG_FUNCTION_START
-        Volume *volume = VOLUME (object);
+        ARIO_LOG_FUNCTION_START
+        ArioVolume *volume = ARIO_VOLUME (object);
 
         switch (prop_id) {
         case PROP_MPD:
@@ -285,15 +285,15 @@ volume_get_property (GObject *object,
 }
 
 static void
-volume_finalize (GObject *object)
+ario_volume_finalize (GObject *object)
 {
-        LOG_FUNCTION_START
-        Volume *volume;
+        ARIO_LOG_FUNCTION_START
+        ArioVolume *volume;
 
         g_return_if_fail (object != NULL);
-        g_return_if_fail (IS_VOLUME (object));
+        g_return_if_fail (IS_ARIO_VOLUME (object));
 
-        volume = VOLUME (object);
+        volume = ARIO_VOLUME (object);
 
         g_return_if_fail (volume->priv != NULL);
 
@@ -303,23 +303,23 @@ volume_finalize (GObject *object)
 }
 
 static void
-volume_changed_cb (Mpd *mpd,
-                   Volume *volume)
+ario_volume_changed_cb (ArioMpd *mpd,
+                        ArioVolume *volume)
 {
-        LOG_FUNCTION_START
-        volume_sync_volume (volume);
+        ARIO_LOG_FUNCTION_START
+        ario_volume_sync_volume (volume);
 }
 
-Volume *
-volume_new (Mpd *mpd)
+ArioVolume *
+ario_volume_new (ArioMpd *mpd)
 {
-        LOG_FUNCTION_START
-        Volume *volume;
+        ARIO_LOG_FUNCTION_START
+        ArioVolume *volume;
 
-        volume = VOLUME (g_object_new (TYPE_VOLUME, "mpd", mpd, NULL));
+        volume = ARIO_VOLUME (g_object_new (TYPE_ARIO_VOLUME, "mpd", mpd, NULL));
 
         g_signal_connect_object (G_OBJECT (mpd),
-                                 "volume_changed", G_CALLBACK (volume_changed_cb),
+                                 "volume_changed", G_CALLBACK (ario_volume_changed_cb),
                                  volume, 0);
 
         g_return_val_if_fail (volume->priv != NULL, NULL);
@@ -328,13 +328,13 @@ volume_new (Mpd *mpd)
 }
 
 static void
-volume_sync_volume (Volume *volume)
+ario_volume_sync_volume (ArioVolume *volume)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gint vol;
         GtkWidget *image;
 
-        vol = mpd_get_current_volume (volume->priv->mpd);
+        vol = ario_mpd_get_current_volume (volume->priv->mpd);
 
         if (vol == -1)
                 return;
@@ -344,9 +344,9 @@ volume_sync_volume (Volume *volume)
 
         if (vol <= 0)
                 image = volume->priv->zero_image;
-        else if (vol <= (VOLUME_MAX / 3.0))
+        else if (vol <= (ARIO_VOLUME_MAX / 3.0))
                 image = volume->priv->min_image;
-        else if (vol <= 2.0 * (VOLUME_MAX / 3.0))
+        else if (vol <= 2.0 * (ARIO_VOLUME_MAX / 3.0))
                 image = volume->priv->medium_image;
         else
                 image = volume->priv->max_image;
@@ -358,9 +358,10 @@ volume_sync_volume (Volume *volume)
 }
 
 static void
-clicked_cb (GtkButton *button, Volume *volume)
+clicked_cb (GtkButton *button,
+            ArioVolume *volume)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GtkRequisition  req;
         GdkGrabStatus pointer, keyboard;
         gint x, y;
@@ -369,8 +370,8 @@ clicked_cb (GtkButton *button, Volume *volume)
         gint spacing = 5;
         gint max_y;
 
-        gint volume_slider_x;
-        gint volume_slider_y;
+        gint ario_volume_slider_x;
+        gint ario_volume_slider_y;
         
 
 /*         if (GTK_WIDGET_VISIBLE (GTK_WIDGET (volume->priv->window))) */
@@ -393,19 +394,19 @@ clicked_cb (GtkButton *button, Volume *volume)
         gtk_widget_show_all (volume->priv->window);
         gdk_drawable_get_size (gtk_widget_get_parent_window (GTK_BIN (volume->priv->window)->child), &window_width, &window_height);
         
-        volume_slider_x = x + (button_width - window_width) / 2;
+        ario_volume_slider_x = x + (button_width - window_width) / 2;
         
         if (y + button_width + window_height + spacing < max_y) {
                 /* if volume slider will fit on the screen, display it under
                  * the volume button
                  */
-                volume_slider_y = y + button_width + spacing;
+                ario_volume_slider_y = y + button_width + spacing;
         } else {
                 /* otherwise display it above the volume button */
-                volume_slider_y = y - window_height - spacing;
+                ario_volume_slider_y = y - window_height - spacing;
         }
         
-        gtk_window_move (GTK_WINDOW (volume->priv->window), volume_slider_x, volume_slider_y);
+        gtk_window_move (GTK_WINDOW (volume->priv->window), ario_volume_slider_x, ario_volume_slider_y);
 
         /*
          * Grab focus and pointer.
@@ -445,10 +446,10 @@ clicked_cb (GtkButton *button, Volume *volume)
 }
 
 static gboolean
-scroll_cb (GtkWidget *widget, GdkEvent *event, Volume *volume)
+scroll_cb (GtkWidget *widget, GdkEvent *event, ArioVolume *volume)
 {
-        LOG_FUNCTION_START
-        gint vol = mpd_get_current_volume (volume->priv->mpd);
+        ARIO_LOG_FUNCTION_START
+        gint vol = ario_mpd_get_current_volume (volume->priv->mpd);
 
         switch (event->scroll.direction) {
         case GDK_SCROLL_UP:
@@ -466,16 +467,16 @@ scroll_cb (GtkWidget *widget, GdkEvent *event, Volume *volume)
                 break;
         }
 
-        mpd_set_current_volume (volume->priv->mpd, vol);
+        ario_mpd_set_current_volume (volume->priv->mpd, vol);
 
         return FALSE;
 }
 
 
 static void
-volume_popup_hide (Volume *volume)
+ario_volume_popup_hide (ArioVolume *volume)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gtk_grab_remove (volume->priv->window);
         gdk_pointer_ungrab (GDK_CURRENT_TIME);
         gdk_keyboard_ungrab (GDK_CURRENT_TIME);
@@ -486,24 +487,24 @@ volume_popup_hide (Volume *volume)
 }
 
 static gboolean
-scale_button_release_event_cb (GtkWidget *widget, GdkEventButton *event, Volume *volume)
+scale_button_release_event_cb (GtkWidget *widget, GdkEventButton *event, ArioVolume *volume)
 {
-        LOG_FUNCTION_START
-        volume_popup_hide (volume);
+        ARIO_LOG_FUNCTION_START
+        ario_volume_popup_hide (volume);
         return FALSE;
 }
 
 static gboolean
-scale_button_event_cb (GtkWidget *widget, GdkEventButton *event, Volume *volume)
+scale_button_event_cb (GtkWidget *widget, GdkEventButton *event, ArioVolume *volume)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         return TRUE;
 }
 
 static gboolean
-scale_key_press_event_cb (GtkWidget *widget, GdkEventKey *event, Volume *volume)
+scale_key_press_event_cb (GtkWidget *widget, GdkEventKey *event, ArioVolume *volume)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         switch (event->keyval) {
         case GDK_KP_Enter:
         case GDK_ISO_Enter:
@@ -511,7 +512,7 @@ scale_key_press_event_cb (GtkWidget *widget, GdkEventKey *event, Volume *volume)
         case GDK_Return:
         case GDK_space:
         case GDK_KP_Space:
-                volume_popup_hide (volume);
+                ario_volume_popup_hide (volume);
                 return TRUE;
         default:
                 break;
@@ -521,10 +522,10 @@ scale_key_press_event_cb (GtkWidget *widget, GdkEventKey *event, Volume *volume)
 }
 
 static void
-mixer_value_changed_cb (GtkAdjustment *adj, Volume *volume)
+mixer_value_changed_cb (GtkAdjustment *adj, ArioVolume *volume)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gint vol = (gint) gtk_adjustment_get_value (volume->priv->adj);
 
-        mpd_set_current_volume (volume->priv->mpd, vol);
+        ario_mpd_set_current_volume (volume->priv->mpd, vol);
 }

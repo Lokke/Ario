@@ -1,39 +1,41 @@
 bin_PROGRAMS = ario
 
 ario_SOURCES = \
-	main.c\
-	shell.c\
-	shell.h\
-	browser.c\
-	browser.h\
-	mpd.c\
-	mpd.h\
+	ario-main.c\
+	ario-shell.c\
+	ario-shell.h\
+	ario-browser.c\
+	ario-browser.h\
+	ario-mpd.c\
+	ario-mpd.h\
 	libmpdclient.c\
 	libmpdclient.h\
-	header.c\
-	header.h\
+	ario-header.c\
+	ario-header.h\
 	eggtrayicon.c\
 	eggtrayicon.h\
-	tray-icon.c\
-	tray-icon.h\
-	playlist.c\
-	playlist.h\
+	eel-gconf-extensions.c\
+	eel-gconf-extensions.h\
+	ario-tray-icon.c\
+	ario-tray-icon.h\
+	ario-playlist.c\
+	ario-playlist.h\
 	rb-glade-helpers.c\
 	rb-glade-helpers.h\
-	util.c\
-	util.h\
-	preferences.c\
-	preferences.h\
-	cover.c\
-	cover.h\
-	volume.c\
-	volume.h\
-	shell-coverdownloader.c\
-	shell-coverdownloader.h\
-	shell-coverselect.c\
-	shell-coverselect.h\
-	status-bar.c\
-	status-bar.h
+	ario-util.c\
+	ario-util.h\
+	ario-preferences.c\
+	ario-preferences.h\
+	ario-cover.c\
+	ario-cover.h\
+	ario-volume.c\
+	ario-volume.h\
+	ario-shell-coverdownloader.c\
+	ario-shell-coverdownloader.h\
+	ario-shell-coverselect.c\
+	ario-shell-coverselect.h\
+	ario-status-bar.c\
+	ario-status-bar.h
 
 ario_LDADD = $(DEPS_LIBS)
 

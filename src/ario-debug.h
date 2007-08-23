@@ -17,19 +17,19 @@
  *
  */
 
-#ifndef __DEBUG_H
-#define __DEBUG_H
+#ifndef __ARIO_DEBUG_H
+#define __ARIO_DEBUG_H
 
 #include <config.h>
 
 #ifdef DEBUG
-#define LOG_DBG(x,args...) {printf("[debug](%s:%d) %s : ", __FILE__, __LINE__, __FUNCTION__); printf(x, ##args);printf("\n");}
-#define LOG_FUNCTION_START      LOG_DBG("Function start")
-#define LOG_FUNCTION_END        LOG_DBG("Function end")
+#define ARIO_LOG_DBG(x,args...) {printf("[debug](%s:%d) %s : ", __FILE__, __LINE__, __FUNCTION__); printf(x, ##args);printf("\n");}
+#define ARIO_LOG_FUNCTION_START      ARIO_LOG_DBG("Function start")
+#define ARIO_LOG_FUNCTION_END        ARIO_LOG_DBG("Function end")
 #else
-#define LOG_DBG(x,args...)
-#define LOG_FUNCTION_START
-#define LOG_FUNCTION_END
+#define ARIO_LOG_DBG(x,args...)
+#define ARIO_LOG_FUNCTION_START
+#define ARIO_LOG_FUNCTION_END
 #endif
 
-#endif /* __DEBUG_H */
+#endif /* __ARIO_DEBUG_H */

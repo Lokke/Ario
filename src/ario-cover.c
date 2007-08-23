@@ -20,18 +20,17 @@
 #include <glib.h>
 #include <gtk/gtkdialog.h>
 #include <gtk/gtkmessagedialog.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <i18n.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <string.h>
 
-#include "cover.h"
-#include "mpd.h"
-#include "util.h"
-#include "preferences.h"
-#include "eel/eel-gconf-extensions.h"
-#include "debug.h"
+#include "eel-gconf-extensions.h"
+#include "ario-i18n.h"
+#include "ario-cover.h"
+#include "ario-mpd.h"
+#include "ario-util.h"
+#include "ario-preferences.h"
+#include "ario-debug.h"
 
 #define AMAZON_URI  "http://xml.amazon.%s/onca/xml3?t=webservices-20&dev-t=%s&KeywordSearch=%s&mode=%s&locale=%s&type=lite&page=1&f=xml"
 
@@ -39,28 +38,28 @@
 #define COVER_MEDIUM "ImageUrlMedium"
 #define COVER_LARGE "ImageUrlLarge"
 
-static GnomeVFSResult cover_create_cover_dir (void);
-static char* cover_make_amazon_xml_uri (const char *artist, 
-                                        const char *album);
+static void ario_cover_create_ario_cover_dir (void);
+static char* ario_cover_make_amazon_xml_uri (const char *artist, 
+                                             const char *album);
 
-static GList* cover_parse_amazon_xml_file (char *xmldata,
-                                            int size,
-                                            CoverAmazonOperation operation,
-                                            CoverAmazonCoversSize cover_size);
+static GList* ario_cover_parse_amazon_xml_file (char *xmldata,
+                                                int size,
+                                                ArioCoverAmazonOperation operation,
+                                                ArioCoverAmazonCoversSize ario_cover_size);
 
 gchar *
-cover_make_cover_path (const gchar *artist,
-                          const gchar *album,
-                          CoverHomeCoversSize cover_size)
+ario_cover_make_ario_cover_path (const gchar *artist,
+                                 const gchar *album,
+                                 ArioCoverHomeCoversSize ario_cover_size)
 {
-        LOG_FUNCTION_START
-        char *cover_path, *tmp;
+        ARIO_LOG_FUNCTION_START
+        char *ario_cover_path, *tmp;
         char *filename;
         const char *to_strip = "#/";
 
         /* There are 2 different files : a small one for the labums list
          * and a normal one for the album-cover widget */
-        if (cover_size == SMALL_COVER)
+        if (ario_cover_size == SMALL_COVER)
                 filename = g_strdup_printf ("SMALL%s-%s.jpg", artist, album);
         else
                 filename = g_strdup_printf ("%s-%s.jpg", artist, album);
@@ -72,124 +71,88 @@ cover_make_cover_path (const gchar *artist,
         }
 
         /* The returned path is ~/.gnome2/ario/covers/filename */
-        cover_path = g_build_filename (util_dot_dir (), "covers", filename, NULL);
+        ario_cover_path = g_build_filename (ario_util_config_dir (), "covers", filename, NULL);
         g_free (filename);
 
-        return cover_path;
+        return ario_cover_path;
 }
 
 gboolean
-cover_cover_exists (const gchar *artist,
-                       const gchar *album)
+ario_cover_ario_cover_exists (const gchar *artist,
+                              const gchar *album)
 {
-        LOG_FUNCTION_START
-        gchar *cover_path, *small_cover_path;
+        ARIO_LOG_FUNCTION_START
+        gchar *ario_cover_path, *small_ario_cover_path;
         gboolean result;
 
         /* The path for the normal cover */
-        cover_path = cover_make_cover_path (artist,
+        ario_cover_path = ario_cover_make_ario_cover_path (artist,
                                             album,
                                             NORMAL_COVER);
 
         /* The path for the small cover */
-        small_cover_path = cover_make_cover_path (artist,
+        small_ario_cover_path = ario_cover_make_ario_cover_path (artist,
                                                   album,
                                                   SMALL_COVER);
 
         /* We consider that the cover exists only if the normal and small covers exist */
-        result = (util_uri_exists (cover_path) && util_uri_exists (small_cover_path));
+        result = (ario_util_uri_exists (ario_cover_path) && ario_util_uri_exists (small_ario_cover_path));
 
-        g_free (cover_path);
-        g_free (small_cover_path);
+        g_free (ario_cover_path);
+        g_free (small_ario_cover_path);
 
         return result;
 }
 
-static char *
-strnrepl (char *s, int size, const char *old, const char *new)
+void
+ario_cover_create_ario_cover_dir (void)
 {
-        LOG_FUNCTION_START
-        char *ptr = s;
-        int left = strlen (s);
-        int avail = size - (left+1);
-        int oldlen = strlen (old);
-        int newlen = strlen (new);
-        int diff = newlen - oldlen;
+        ARIO_LOG_FUNCTION_START
+        gchar *ario_cover_dir;
 
-        while (left >= oldlen) {
-                if (strncmp (ptr, old, oldlen) != 0) {
-                        left--;
-                        ptr++;
-                        continue;
-                }
-                if (diff > avail)
-                        break;
-                if (diff != 0)
-                        memmove (ptr+newlen, ptr+oldlen, left);
-                strncpy (ptr, new, newlen);
-                ptr += newlen;
-                left -= oldlen;
-        }
-        return s;
-}
-
-static GnomeVFSResult
-cover_create_cover_dir (void)
-{
-        LOG_FUNCTION_START
-        gchar *cover_dir;
-        GnomeVFSResult result;
-
-        /* The cover_dir is ~/.gnome2/ario/covers/ */
-        cover_dir = g_build_filename (util_dot_dir (), "covers", NULL);
+        /* The ario_cover_dir is ~/.gnome2/ario/covers/ */
+        ario_cover_dir = g_build_filename (ario_util_config_dir (), "covers", NULL);
 
         /* If the cover directory doesn't exist, we create it with permission 744 */
-        if (!util_uri_exists (cover_dir))
-                 result = gnome_vfs_make_directory (cover_dir, GNOME_VFS_PERM_USER_ALL
-                                                               | GNOME_VFS_PERM_GROUP_READ
-                                                               | GNOME_VFS_PERM_OTHER_READ);
-        else
-                result = GNOME_VFS_OK;
-
-        g_free (cover_dir);
-        return result;
+        if (!ario_util_uri_exists (ario_cover_dir))
+                ario_util_mkdir (ario_cover_dir);
 }
 
 gboolean
-cover_size_is_valid (int size)
+ario_cover_size_is_valid (int size)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         /* return true if the cover isn't too big or too small (blank amazon image) */
         return (size < 1024 * 200 && size > 900);
 }
 
 static GList *
-cover_parse_amazon_xml_file (char *xmldata,
-                                int size,
-                                CoverAmazonOperation operation,
-                                CoverAmazonCoversSize cover_size)
+ario_cover_parse_amazon_xml_file (char *xmldata,
+                                  int size,
+                                  ArioCoverAmazonOperation operation,
+                                  ArioCoverAmazonCoversSize ario_cover_size)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         xmlDocPtr doc;
         xmlNodePtr cur;
         xmlChar *key;
-        GList *cover_uris = NULL;
-        char *cover_size_text;
+        GList *ario_cover_uris = NULL;
+        char *ario_cover_size_text;
 
         /* Amazon provides 3 different covers sizes. By default, we use the medium one */
-        switch (cover_size)
+        switch (ario_cover_size)
         {
         case AMAZON_SMALL_COVER:
-                cover_size_text = COVER_SMALL;
+                ario_cover_size_text = COVER_SMALL;
                 break;
         case AMAZON_MEDIUM_COVER:
-                cover_size_text = COVER_MEDIUM;
+                ario_cover_size_text = COVER_MEDIUM;
                 break;
         case AMAZON_LARGE_COVER:
-                cover_size_text = COVER_LARGE;
+                ario_cover_size_text = COVER_LARGE;
                 break;
         default:
-                cover_size_text = COVER_MEDIUM;
+                ario_cover_size_text = COVER_MEDIUM;
                 break;
         }
 
@@ -217,14 +180,14 @@ cover_parse_amazon_xml_file (char *xmldata,
                         xmlNodePtr cur2;
                         cur2 = cur->xmlChildrenNode;
                         while (cur2 != NULL) {
-                                if ((!xmlStrcmp (cur2->name, (const xmlChar *) cover_size_text))) {
+                                if ((!xmlStrcmp (cur2->name, (const xmlChar *) ario_cover_size_text))) {
                                         /* A possible cover uri has been found, we add it to the list*/
                                         key = xmlNodeListGetString (doc, cur2->xmlChildrenNode, 1);
-                                        cover_uris = g_list_append (cover_uris, key);
+                                        ario_cover_uris = g_list_append (ario_cover_uris, key);
                                         if (operation == GET_FIRST_COVER) {
                                                 /* If we only want one cover, we now stop to parse the file */
                                                 xmlFreeDoc (doc);
-                                                return cover_uris;
+                                                return ario_cover_uris;
                                         }
                                 }
                                 cur2 = cur2->next;
@@ -235,14 +198,14 @@ cover_parse_amazon_xml_file (char *xmldata,
 
         xmlFreeDoc (doc);
 
-        return cover_uris;
+        return ario_cover_uris;
 }
 
 static char *
-cover_make_amazon_xml_uri (const char *artist,
-                           const char *album)
+ario_cover_make_amazon_xml_uri (const char *artist,
+                                const char *album)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         char *xml_uri;
         char *keywords;
         char *locale;
@@ -250,28 +213,34 @@ cover_make_amazon_xml_uri (const char *artist,
         const char *ext;
         char *tmp;
         int i;
+        int length;
 
         /* This is the key used to send requests on the amazon WebServices */
         const char *mykey = "1BDCAEREYT743R9SXE02";
 
         /* List of modifications done on the keuword used for the search */
         const gchar *to_replace[] = {"é", "è", "ê", "à", "ù", "ç", "#", "/", "?", "'", "-", "\"", "&", ":", "*", "(", ")", NULL};
-        const gchar *replace_to[] = {"e", "e", "e", "a", "u", "c", " " , " " , " " , " ", " ", " ",  " ", " ", " ", " ", " ", NULL};
+        const gchar *replace_to[] = {"e", "e", "e", "a", "u", "c", " ", " ", " ", " ", " ", " ",  " ", " ", " ", " ", " ", NULL};
         const gchar *to_remove[] = {"cd 1", "cd 2", "cd 3", "cd 4", "CD 5", "disc", "disk", "disque", NULL};
 
         if (!album || !artist)
                 return NULL;
 
         /* If the artist in unknown, we don't search for a cover */
-        if (!strcmp (artist, MPD_UNKNOWN))
+        if (!strcmp (artist, ARIO_MPD_UNKNOWN))
                 return NULL;
 
         /* If the album is unknown, we only use the artist to search for the cover */
-        if (!strcmp (album, MPD_UNKNOWN))
+        if (!strcmp (album, ARIO_MPD_UNKNOWN))
                 keywords = g_strdup (artist);
         else
                 keywords = g_strdup_printf ("%s %s", artist, album);
 
+        /* Normalize keywords */
+        tmp = g_utf8_normalize(keywords, -1, G_NORMALIZE_ALL);
+        g_free(keywords);
+        keywords = tmp;
+        
         /* Converts all upper case ASCII letters to lower case ASCII letters */
         tmp = g_ascii_strdown(keywords, -1);
         g_free(keywords);
@@ -280,18 +249,31 @@ cover_make_amazon_xml_uri (const char *artist,
         /* We replace some special characters to make more accurate requests */
         for (i = 0; to_replace[i]; i++) {
                 if (replace_to[i])
-                        keywords = strnrepl (keywords, strlen (keywords) + 1, to_replace[i], replace_to[i]);
+                        ario_util_string_replace (&keywords, to_replace[i], replace_to[i]);
         }
 
         /* We remove some useless words to make more accurate requests */
         for (i = 0; to_remove[i]; i++) {
-                keywords =  strnrepl (keywords, strlen (keywords) + 1, to_remove[i], " ");
+                ario_util_string_replace (&keywords, to_remove[i], " ");
         }
 
         /* We escape the other special characters */
+        length = g_utf8_strlen(keywords, -1);
+	for(i = 0; i < length;i++)
+	{
+		if (!g_unichar_isalnum(keywords[i])) {
+		        keywords[i]=' ';
+		}
+	}
+	
+        /* We escape spaces */
+        ario_util_string_replace (&keywords, " ", "%20");
+        
+        /*
         tmp = gnome_vfs_escape_string (keywords);
         g_free (keywords);
         keywords = tmp;
+        */
 
         /* What is the amazon country choosen in the preferences? */
         locale = eel_gconf_get_string (CONF_COVER_AMAZON_COUNTRY);
@@ -329,106 +311,109 @@ cover_make_amazon_xml_uri (const char *artist,
         return xml_uri;
 }
 
-int
-cover_load_amazon_covers (const char *artist,
-                             const char *album,
-                             GList **cover_uris,
-                             GArray **file_size,
-                             GList **file_contents,
-                             CoverAmazonOperation operation,
-                             CoverAmazonCoversSize cover_size)
+gboolean
+ario_cover_load_amazon_covers (const char *artist,
+                               const char *album,
+                               GList **ario_cover_uris,
+                               GArray **file_size,
+                               GList **file_contents,
+                               ArioCoverAmazonOperation operation,
+                               ArioCoverAmazonCoversSize ario_cover_size)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         char *xml_uri;
         int xml_size;
         char *xml_data;
         GList *temp;
         int temp_size;
         char *temp_contents;
-        int result;
+        gboolean ret;
 
         /* We construct the uri to make a request on the amazon WebServices */
-        xml_uri = cover_make_amazon_xml_uri (artist,
-                                                album);
+        xml_uri = ario_cover_make_amazon_xml_uri (artist,
+                                                  album);
 
         if (!xml_uri)
-                return 1;
+                return FALSE;
 
         /* We laod the xml file in xml_data */
-        util_download_file (xml_uri,
-                            &xml_size,
-                            &xml_data);
+                
+        printf("xml_uri:%s\n", xml_uri);
+        ario_util_download_file (xml_uri,
+                                 &xml_size,
+                                 &xml_data);
         g_free (xml_uri);
 
         if (xml_size == 0) {
-                return 1;
+                return FALSE;
         }
+        /* TODO : detect "404 - Document Not Found" */
 
         /* We parse the xml file to extract the cover uris */
-        *cover_uris = cover_parse_amazon_xml_file (xml_data,
-                                                   xml_size,
-                                                   operation,
-                                                   cover_size);
+        *ario_cover_uris = ario_cover_parse_amazon_xml_file (xml_data,
+                                                             xml_size,
+                                                             operation,
+                                                             ario_cover_size);
 
         g_free (xml_data);
 
         /* By default, we return an error */
-        result = 1;
+        ret = FALSE;
 
-        for (temp = *cover_uris; temp; temp = temp->next) {
+        for (temp = *ario_cover_uris; temp; temp = temp->next) {
                 if (temp->data) {
                         /* For each cover uri, we load the image data in temp_contents */
-                        util_download_file (temp->data,
+                        ario_util_download_file (temp->data,
                                             &temp_size,
                                             &temp_contents);
-                        if (cover_size_is_valid (temp_size)) {
+                        if (ario_cover_size_is_valid (temp_size)) {
                                 /* If the cover is not too big and not too small (blank amazon image), we append it to file_contents */
                                 g_array_append_val (*file_size, temp_size);
                                 *file_contents = g_list_append (*file_contents, temp_contents);
                                 /* If at least one cover is found, we return OK */
-                                result = 0;
+                                ret = TRUE;
                         }
                 }
         }
 
-        return result;
+        return ret;
 }
 
 void
-cover_remove_cover (const gchar *artist,
-                       const gchar *album)
+ario_cover_remove_cover (const gchar *artist,
+                         const gchar *album)
 {
-        LOG_FUNCTION_START
-        gchar *small_cover_path;
-        gchar *cover_path;
+        ARIO_LOG_FUNCTION_START
+        gchar *small_ario_cover_path;
+        gchar *ario_cover_path;
 
-        if (!cover_cover_exists (artist, album))
+        if (!ario_cover_ario_cover_exists (artist, album))
                 return;
 
         /* Delete the small cover*/
-        small_cover_path = cover_make_cover_path (artist, album, SMALL_COVER);
-        if (util_uri_exists (small_cover_path))
-                gnome_vfs_unlink (small_cover_path);
-        g_free (small_cover_path);
+        small_ario_cover_path = ario_cover_make_ario_cover_path (artist, album, SMALL_COVER);
+        if (ario_util_uri_exists (small_ario_cover_path))
+                ario_util_unlink_uri (small_ario_cover_path);
+        g_free (small_ario_cover_path);
 
         /* Delete the normal cover*/
-        cover_path = cover_make_cover_path (artist, album, NORMAL_COVER);
-        if (util_uri_exists (cover_path))
-                gnome_vfs_unlink (cover_path);
-        g_free (cover_path);
+        ario_cover_path = ario_cover_make_ario_cover_path (artist, album, NORMAL_COVER);
+        if (ario_util_uri_exists (ario_cover_path))
+                ario_util_unlink_uri (ario_cover_path);
+        g_free (ario_cover_path);
 }
 
 static gboolean
-cover_can_overwrite_cover (const gchar *artist,
-                              const gchar *album,
-                              CoverOverwriteMode overwrite_mode)
+ario_cover_can_overwrite_cover (const gchar *artist,
+                                const gchar *album,
+                                ArioCoverOverwriteMode overwrite_mode)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GtkWidget *dialog;
         gint retval;
 
         /* If the cover already exists, we can ask, replace or skip depending of the overwrite_mode argument */
-        if (cover_cover_exists (artist, album)) {
+        if (ario_cover_ario_cover_exists (artist, album)) {
                 switch (overwrite_mode) {
                 case OVERWRITE_MODE_ASK:
                         dialog = gtk_message_dialog_new (NULL,
@@ -460,46 +445,44 @@ cover_can_overwrite_cover (const gchar *artist,
         return TRUE;
 }
 
-GnomeVFSResult
-cover_save_cover (const gchar *artist,
-                  const gchar *album,
-                  char *data,
-                  int size,
-                  CoverOverwriteMode overwrite_mode)
+gboolean
+ario_cover_save_cover (const gchar *artist,
+                       const gchar *album,
+                       char *data,
+                       int size,
+                       ArioCoverOverwriteMode overwrite_mode)
 {
-        LOG_FUNCTION_START
-        GnomeVFSResult result;
-        gchar *cover_path, *small_cover_path;
+        ARIO_LOG_FUNCTION_START
+        gboolean ret;
+        gchar *ario_cover_path, *small_ario_cover_path;
         GdkPixbufLoader *loader;
         GdkPixbuf *pixbuf, *small_pixbuf;
         int width, height;
 
         if (!artist || !album || !data)
-                return GNOME_VFS_ERROR_BAD_PARAMETERS;
+                return FALSE;
 
         /* If the cover directory doesn't exist, we create it */
-        result = cover_create_cover_dir ();
-        if (result != GNOME_VFS_OK)
-                return result;
+        ario_cover_create_ario_cover_dir ();
 
         /* If the cover already exists, can we overwrite it? */
-        if (!cover_can_overwrite_cover (artist, album, overwrite_mode))
-                return GNOME_VFS_OK;
+        if (!ario_cover_can_overwrite_cover (artist, album, overwrite_mode))
+                return FALSE;
 
         /* The path for the normal cover */
-        cover_path = cover_make_cover_path (artist,
+        ario_cover_path = ario_cover_make_ario_cover_path (artist,
                                                album,
                                                NORMAL_COVER);
 
         /* The path for the small cover */
-        small_cover_path = cover_make_cover_path (artist,
+        small_ario_cover_path = ario_cover_make_ario_cover_path (artist,
                                                      album,
                                                      SMALL_COVER);
 
         loader = gdk_pixbuf_loader_new ();
 
         /*By default, we return an error */
-        result = GNOME_VFS_ERROR_BAD_PARAMETERS;
+        ret = FALSE;
 
         if (gdk_pixbuf_loader_write (loader,
                                      (const guchar *)data,
@@ -527,17 +510,17 @@ cover_save_cover (const gchar *artist,
                 }
 
                 /* We save the normal and the small covers */
-                if (gdk_pixbuf_save (pixbuf, cover_path, "jpeg", NULL, NULL) &&
-                    gdk_pixbuf_save (small_pixbuf, small_cover_path, "jpeg", NULL, NULL)) {
-                        /* If we succeed in the 2 operations, we return GNOME_VFS_OK */
-                        result = GNOME_VFS_OK;
+                if (gdk_pixbuf_save (pixbuf, ario_cover_path, "jpeg", NULL, NULL) &&
+                    gdk_pixbuf_save (small_pixbuf, small_ario_cover_path, "jpeg", NULL, NULL)) {
+                        /* If we succeed in the 2 operations, we return OK */
+                        ret = TRUE;
                 }
                 g_object_unref (G_OBJECT (pixbuf));
                 g_object_unref (G_OBJECT (small_pixbuf));
         }
 
-        g_free (cover_path);
-        g_free (small_cover_path);
+        g_free (ario_cover_path);
+        g_free (small_ario_cover_path);
 
-        return result;
+        return ret;
 }

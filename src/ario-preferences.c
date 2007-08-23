@@ -18,43 +18,43 @@
  */
 
 #include <config.h>
-#include <i18n.h>
 #include <gtk/gtk.h>
 #include <glade/glade.h>
 #include <string.h>
 #include <time.h>
-
-#include "preferences.h"
 #include "rb-glade-helpers.h"
-#include "eel/eel-gconf-extensions.h"
+#include "eel-gconf-extensions.h"
 #include "libmpdclient.h"
-#include "debug.h"
+#include "ario-i18n.h"
+#include "ario-preferences.h"
+#include "ario-debug.h"
 
-static void preferences_class_init (PreferencesClass *klass);
-static void preferences_init (Preferences *preferences);
-static void preferences_finalize (GObject *object);
-static gboolean preferences_window_delete_cb (GtkWidget *window,
-                                                       GdkEventAny *event,
-                                                       Preferences *preferences);
-static void preferences_response_cb (GtkDialog *dialog,
-                                              int response_id,
-                                              Preferences *preferences);
-static void preferences_sync (Preferences *preferences);
-static void preferences_sync_cover (Preferences *preferences);
-static void preferences_set_property (GObject *object,
-                                      guint prop_id,
-                                      const GValue *value,
-                                      GParamSpec *pspec);
-static void preferences_get_property (GObject *object,
-                                      guint prop_id,
-                                      GValue *value,
-                                      GParamSpec *pspec);
-static void preferences_show_cb (GtkWidget *widget,
-                                 Preferences *preferences);
-void preferences_covertree_check_changed_cb (GtkCheckButton *butt,
-                                             Preferences *preferences);
-void preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
-                                            Preferences *preferences);
+static void ario_preferences_class_init (ArioPreferencesClass *klass);
+static void ario_preferences_init (ArioPreferences *preferences);
+static void ario_preferences_finalize (GObject *object);
+static gboolean ario_preferences_window_delete_cb (GtkWidget *window,
+                                                   GdkEventAny *event,
+                                                   ArioPreferences *preferences);
+static void ario_preferences_response_cb (GtkDialog *dialog,
+                                          int response_id,
+                                          ArioPreferences *preferences);
+static void ario_preferences_sync (ArioPreferences *preferences);
+static void ario_preferences_sync_cover (ArioPreferences *preferences);
+static void ario_preferences_set_property (GObject *object,
+                                           guint prop_id,
+                                           const GValue *value,
+                                           GParamSpec *pspec);
+static void ario_preferences_get_property (GObject *object,
+                                           guint prop_id,
+                                           GValue *value,
+                                           GParamSpec *pspec);
+static void ario_preferences_show_cb (GtkWidget *widget,
+                                      ArioPreferences *preferences);
+void ario_preferences_covertree_check_changed_cb (GtkCheckButton *butt,
+                                                  ArioPreferences *preferences);
+void ario_preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
+                                                 ArioPreferences *preferences);
+static gboolean ario_preferences_update_mpd (ArioPreferences *preferences);
 
 static const char *amazon_countries[] = {
         "com",
@@ -72,11 +72,11 @@ enum
         PROP_MPD
 };
 
-struct PreferencesPrivate
+struct ArioPreferencesPrivate
 {
         GtkWidget *notebook;
 
-        Mpd *mpd;
+        ArioMpd *mpd;
 
         GtkWidget *host_entry;
         GtkWidget *port_spinbutton;
@@ -107,73 +107,73 @@ struct PreferencesPrivate
 static GObjectClass *parent_class = NULL;
 
 GType
-preferences_get_type (void)
+ario_preferences_get_type (void)
 {
-        LOG_FUNCTION_START
-        static GType preferences_type = 0;
+        ARIO_LOG_FUNCTION_START
+        static GType ario_preferences_type = 0;
 
-        if (preferences_type == 0)
+        if (ario_preferences_type == 0)
         {
                 static const GTypeInfo our_info =
                 {
-                        sizeof (PreferencesClass),
+                        sizeof (ArioPreferencesClass),
                         NULL,
                         NULL,
-                        (GClassInitFunc) preferences_class_init,
+                        (GClassInitFunc) ario_preferences_class_init,
                         NULL,
                         NULL,
-                        sizeof (Preferences),
+                        sizeof (ArioPreferences),
                         0,
-                        (GInstanceInitFunc) preferences_init
+                        (GInstanceInitFunc) ario_preferences_init
                 };
 
-                preferences_type = g_type_register_static (GTK_TYPE_DIALOG,
-                                                           "Preferences",
+                ario_preferences_type = g_type_register_static (GTK_TYPE_DIALOG,
+                                                           "ArioPreferences",
                                                            &our_info, 0);
         }
 
-        return preferences_type;
+        return ario_preferences_type;
 }
 
 static void
-preferences_class_init (PreferencesClass *klass)
+ario_preferences_class_init (ArioPreferencesClass *klass)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
         parent_class = g_type_class_peek_parent (klass);
 
-        object_class->finalize = preferences_finalize;
-        object_class->set_property = preferences_set_property;
-        object_class->get_property = preferences_get_property;
+        object_class->finalize = ario_preferences_finalize;
+        object_class->set_property = ario_preferences_set_property;
+        object_class->get_property = ario_preferences_get_property;
 
         g_object_class_install_property (object_class,
                                          PROP_MPD,
                                          g_param_spec_object ("mpd",
                                                               "mpd",
                                                               "mpd",
-                                                              TYPE_MPD,
+                                                              TYPE_ARIO_MPD,
                                                               G_PARAM_READWRITE));
 }
 
 static void
-preferences_init (Preferences *preferences)
+ario_preferences_init (ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
-        preferences->priv = g_new0 (PreferencesPrivate, 1);
+        ARIO_LOG_FUNCTION_START
+        preferences->priv = g_new0 (ArioPreferencesPrivate, 1);
         preferences->priv->loading = FALSE;
 
         g_signal_connect_object (G_OBJECT (preferences),
                                  "delete_event",
-                                 G_CALLBACK (preferences_window_delete_cb),
+                                 G_CALLBACK (ario_preferences_window_delete_cb),
                                  preferences, 0);
         g_signal_connect_object (G_OBJECT (preferences),
                                  "response",
-                                 G_CALLBACK (preferences_response_cb),
+                                 G_CALLBACK (ario_preferences_response_cb),
                                  preferences, 0);
         g_signal_connect_object (G_OBJECT (preferences),
                                  "show",
-                                 G_CALLBACK (preferences_show_cb),
+                                 G_CALLBACK (ario_preferences_show_cb),
                                  preferences, 0);
 
         gtk_dialog_add_button (GTK_DIALOG (preferences),
@@ -200,15 +200,15 @@ preferences_init (Preferences *preferences)
 }
 
 static void
-preferences_finalize (GObject *object)
+ario_preferences_finalize (GObject *object)
 {
-        LOG_FUNCTION_START
-        Preferences *preferences;
+        ARIO_LOG_FUNCTION_START
+        ArioPreferences *preferences;
 
         g_return_if_fail (object != NULL);
-        g_return_if_fail (IS_PREFERENCES (object));
+        g_return_if_fail (IS_ARIO_PREFERENCES (object));
 
-        preferences = PREFERENCES (object);
+        preferences = ARIO_PREFERENCES (object);
 
         g_return_if_fail (preferences->priv != NULL);
 
@@ -218,13 +218,13 @@ preferences_finalize (GObject *object)
 }
 
 static void
-preferences_set_property (GObject *object,
-                             guint prop_id,
-                             const GValue *value,
-                             GParamSpec *pspec)
+ario_preferences_set_property (GObject *object,
+                               guint prop_id,
+                               const GValue *value,
+                               GParamSpec *pspec)
 {
-        LOG_FUNCTION_START
-        Preferences *preferences = PREFERENCES (object);
+        ARIO_LOG_FUNCTION_START
+        ArioPreferences *preferences = ARIO_PREFERENCES (object);
         
         switch (prop_id) {
         case PROP_MPD:
@@ -237,13 +237,13 @@ preferences_set_property (GObject *object,
 }
 
 static void 
-preferences_get_property (GObject *object,
-                        guint prop_id,
-                        GValue *value,
-                        GParamSpec *pspec)
+ario_preferences_get_property (GObject *object,
+                               guint prop_id,
+                               GValue *value,
+                               GParamSpec *pspec)
 {
-        LOG_FUNCTION_START
-        Preferences *preferences = PREFERENCES (object);
+        ARIO_LOG_FUNCTION_START
+        ArioPreferences *preferences = ARIO_PREFERENCES (object);
 
         switch (prop_id) {
         case PROP_MPD:
@@ -256,14 +256,14 @@ preferences_get_property (GObject *object,
 }
 
 static void
-preferences_append_connection_config (Preferences *preferences,
-                                      Mpd *mpd)
+ario_preferences_append_connection_config (ArioPreferences *preferences,
+                                           ArioMpd *mpd)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GladeXML *xml;
 
-        g_return_if_fail (IS_PREFERENCES (preferences));
-        g_return_if_fail (IS_MPD (mpd));
+        g_return_if_fail (IS_ARIO_PREFERENCES (preferences));
+        g_return_if_fail (IS_ARIO_MPD (mpd));
 
         xml = rb_glade_xml_new (GLADE_PATH "connection-prefs.glade",
                                 "vbox",
@@ -292,14 +292,14 @@ preferences_append_connection_config (Preferences *preferences,
 }
 
 static void
-preferences_append_server_config (Preferences *preferences,
-                                  Mpd *mpd)
+ario_preferences_append_server_config (ArioPreferences *preferences,
+                                       ArioMpd *mpd)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GladeXML *xml;
 
-        g_return_if_fail (IS_PREFERENCES (preferences));
-        g_return_if_fail (IS_MPD (mpd));
+        g_return_if_fail (IS_ARIO_PREFERENCES (preferences));
+        g_return_if_fail (IS_ARIO_MPD (mpd));
 
         xml = rb_glade_xml_new (GLADE_PATH "server-prefs.glade",
                                 "vbox",
@@ -322,16 +322,16 @@ preferences_append_server_config (Preferences *preferences,
 }
 
 static void
-preferences_append_cover_config (Preferences *preferences)
+ario_preferences_append_ario_cover_config (ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GladeXML *xml;
         GtkListStore *list_store;
         GtkCellRenderer *renderer;
         GtkTreeIter iter;
         int i;
 
-        g_return_if_fail (IS_PREFERENCES (preferences));
+        g_return_if_fail (IS_ARIO_PREFERENCES (preferences));
 
         xml = rb_glade_xml_new (GLADE_PATH "cover-prefs.glade",
                                 "covers_vbox",
@@ -367,7 +367,7 @@ preferences_append_cover_config (Preferences *preferences)
         gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (preferences->priv->amazon_country), renderer,
                                         "text", 0, NULL);
         
-        preferences_sync_cover (preferences);
+        ario_preferences_sync_cover (preferences);
 
         gtk_notebook_append_page (GTK_NOTEBOOK (preferences->priv->notebook),
                                   glade_xml_get_widget (xml, "covers_vbox"),
@@ -377,39 +377,39 @@ preferences_append_cover_config (Preferences *preferences)
 }
 
 GtkWidget *
-preferences_new (Mpd *mpd)
+ario_preferences_new (ArioMpd *mpd)
 {
-        LOG_FUNCTION_START
-        Preferences *preferences;
+        ARIO_LOG_FUNCTION_START
+        ArioPreferences *preferences;
 
-        preferences = g_object_new (TYPE_PREFERENCES,
+        preferences = g_object_new (TYPE_ARIO_PREFERENCES,
                                    "mpd", mpd,
                                    NULL);
 
         g_return_val_if_fail (preferences->priv != NULL, NULL);
 
-        preferences_append_connection_config (preferences,
+        ario_preferences_append_connection_config (preferences,
                                               mpd);
 
-        preferences_append_server_config (preferences,
+        ario_preferences_append_server_config (preferences,
                                           mpd);
 
-        preferences_append_cover_config (preferences);
+        ario_preferences_append_ario_cover_config (preferences);
 
-        preferences_sync (preferences);
-        preferences_update_mpd (preferences);
+        ario_preferences_sync (preferences);
+        ario_preferences_update_mpd (preferences);
 
-        g_timeout_add (1000, (GSourceFunc) preferences_update_mpd, preferences);
+        g_timeout_add (1000, (GSourceFunc) ario_preferences_update_mpd, preferences);
 
         return GTK_WIDGET (preferences);
 }
 
 static gboolean
-preferences_window_delete_cb (GtkWidget *window,
-                                       GdkEventAny *event,
-                                       Preferences *preferences)
+ario_preferences_window_delete_cb (GtkWidget *window,
+                                   GdkEventAny *event,
+                                   ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         preferences->priv->destroy = TRUE;
         gtk_widget_hide (GTK_WIDGET (preferences));
 
@@ -417,11 +417,11 @@ preferences_window_delete_cb (GtkWidget *window,
 }
 
 static void
-preferences_response_cb (GtkDialog *dialog,
-                                  int response_id,
-                                  Preferences *preferences)
+ario_preferences_response_cb (GtkDialog *dialog,
+                              int response_id,
+                              ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (response_id == GTK_RESPONSE_CLOSE) {
                 preferences->priv->destroy = TRUE;
                 gtk_widget_hide (GTK_WIDGET (preferences));
@@ -429,9 +429,9 @@ preferences_response_cb (GtkDialog *dialog,
 }
 
 static void
-preferences_sync (Preferences *preferences)
+ario_preferences_sync (ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gchar *host;
         gint port;
         gboolean autoconnect;
@@ -446,7 +446,7 @@ preferences_sync (Preferences *preferences)
         authentication = eel_gconf_get_boolean (CONF_AUTH);
         password = eel_gconf_get_string (CONF_PASSWORD);
 
-        if (mpd_is_connected (preferences->priv->mpd)) {
+        if (ario_mpd_is_connected (preferences->priv->mpd)) {
                 gtk_widget_set_sensitive (preferences->priv->connect_button, FALSE);
                 gtk_widget_set_sensitive (preferences->priv->disconnect_button, TRUE);
         } else {
@@ -468,40 +468,40 @@ preferences_sync (Preferences *preferences)
 }
 
 void
-preferences_host_changed_cb (GtkWidget *widget,
-                             Preferences *preferences)
+ario_preferences_host_changed_cb (GtkWidget *widget,
+                                  ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (!preferences->priv->loading)
                 eel_gconf_set_string (CONF_HOST,
                                       gtk_entry_get_text (GTK_ENTRY (preferences->priv->host_entry)));
 }
 
 void
-preferences_port_changed_cb (GtkWidget *widget,
-                             Preferences *preferences)
+ario_preferences_port_changed_cb (GtkWidget *widget,
+                                  ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (!preferences->priv->loading)
                 eel_gconf_set_integer (CONF_PORT,
                                        (int) gtk_spin_button_get_value (GTK_SPIN_BUTTON (preferences->priv->port_spinbutton)));
 }
 
 void
-preferences_autoconnect_changed_cb (GtkWidget *widget,
-                                    Preferences *preferences)
+ario_preferences_autoconnect_changed_cb (GtkWidget *widget,
+                                         ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (!preferences->priv->loading)
                 eel_gconf_set_boolean (CONF_AUTOCONNECT,
                                        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->autoconnect_checkbutton)));
 }
 
 void
-preferences_authentication_changed_cb (GtkWidget *widget,
-                                       Preferences *preferences)
+ario_preferences_authentication_changed_cb (GtkWidget *widget,
+                                            ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gboolean active;
 
         active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->authentication_checkbutton));
@@ -513,105 +513,105 @@ preferences_authentication_changed_cb (GtkWidget *widget,
 }
 
 void
-preferences_password_changed_cb (GtkWidget *widget,
-                                 Preferences *preferences)
+ario_preferences_password_changed_cb (GtkWidget *widget,
+                                      ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (!preferences->priv->loading)
                 eel_gconf_set_string (CONF_PASSWORD,
                                       gtk_entry_get_text (GTK_ENTRY (preferences->priv->password_entry)));
 }
 
 void
-preferences_connect_cb (GtkWidget *widget,
-                        Preferences *preferences)
+ario_preferences_connect_cb (GtkWidget *widget,
+                             ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
-        mpd_connect (preferences->priv->mpd);
-        preferences_sync (preferences);
+        ARIO_LOG_FUNCTION_START
+        ario_mpd_connect (preferences->priv->mpd);
+        ario_preferences_sync (preferences);
 }
 
 void
-preferences_disconnect_cb (GtkWidget *widget,
-                           Preferences *preferences)
+ario_preferences_disconnect_cb (GtkWidget *widget,
+                                ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
-        mpd_disconnect (preferences->priv->mpd);
-        preferences_sync (preferences);
+        ARIO_LOG_FUNCTION_START
+        ario_mpd_disconnect (preferences->priv->mpd);
+        ario_preferences_sync (preferences);
 }
 
 static void
-preferences_show_cb (GtkWidget *widget,
-                     Preferences *preferences)
+ario_preferences_show_cb (GtkWidget *widget,
+                          ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
-        preferences_sync (preferences);
+        ARIO_LOG_FUNCTION_START
+        ario_preferences_sync (preferences);
 }
 
 void
-preferences_crossfadetime_changed_cb (GtkWidget *widget,
-                                      Preferences *preferences)
+ario_preferences_crossfadetime_changed_cb (GtkWidget *widget,
+                                           ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (!preferences->priv->sync_mpd && !preferences->priv->loading) {
-                mpd_set_crossfadetime (preferences->priv->mpd,
+                ario_mpd_set_crossfadetime (preferences->priv->mpd,
                                        gtk_spin_button_get_value (GTK_SPIN_BUTTON (preferences->priv->crossfadetime_spinbutton)));
 
-                mpd_update_status (preferences->priv->mpd);
-                preferences_update_mpd (preferences);
+                ario_mpd_update_status (preferences->priv->mpd);
+                ario_preferences_update_mpd (preferences);
         }
 }
 
 void
-preferences_crossfade_changed_cb (GtkWidget *widget,
-                                  Preferences *preferences)
+ario_preferences_crossfade_changed_cb (GtkWidget *widget,
+                                       ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (!preferences->priv->sync_mpd && !preferences->priv->loading) {
                 if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->crossfade_checkbutton)))
-                        mpd_set_crossfadetime (preferences->priv->mpd,
+                        ario_mpd_set_crossfadetime (preferences->priv->mpd,
                                                1);
                 else
-                        mpd_set_crossfadetime (preferences->priv->mpd,
+                        ario_mpd_set_crossfadetime (preferences->priv->mpd,
                                                0);
 
-                mpd_update_status (preferences->priv->mpd);
-                preferences_update_mpd (preferences);
+                ario_mpd_update_status (preferences->priv->mpd);
+                ario_preferences_update_mpd (preferences);
         }
 }
 
 void
-preferences_updatedb_button_cb (GtkWidget *widget,
-                                Preferences *preferences)
+ario_preferences_updatedb_button_cb (GtkWidget *widget,
+                                     ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
-        mpd_update_db (preferences->priv->mpd);
+        ARIO_LOG_FUNCTION_START
+        ario_mpd_update_db (preferences->priv->mpd);
 }
 
 void
-preferences_proxy_address_changed_cb (GtkWidget *widget,
-                                     Preferences *preferences)
+ario_preferences_proxy_address_changed_cb (GtkWidget *widget,
+                                           ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (!preferences->priv->loading)
                 eel_gconf_set_string (CONF_PROXY_ADDRESS,
                                       gtk_entry_get_text (GTK_ENTRY (preferences->priv->proxy_address_entry)));
 }
 
 void
-preferences_proxy_port_changed_cb (GtkWidget *widget,
-                                   Preferences *preferences)
+ario_preferences_proxy_port_changed_cb (GtkWidget *widget,
+                                        ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if (!preferences->priv->loading)
                 eel_gconf_set_integer (CONF_PROXY_PORT,
                                        (int) gtk_spin_button_get_value (GTK_SPIN_BUTTON (preferences->priv->proxy_port_spinbutton)));
 }
 
 gboolean
-preferences_update_mpd (Preferences *preferences)
+ario_preferences_update_mpd (ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         int crossfadetime;
         int state;
         gboolean updating;
@@ -623,19 +623,19 @@ preferences_update_mpd (Preferences *preferences)
                 return FALSE;
         }
 
-        state = mpd_get_current_state (preferences->priv->mpd);
-        updating = mpd_get_updating (preferences->priv->mpd);
+        state = ario_mpd_get_current_state (preferences->priv->mpd);
+        updating = ario_mpd_get_updating (preferences->priv->mpd);
 
         if (state == MPD_STATUS_STATE_UNKNOWN) {
                 crossfadetime = 0;
                 last_update_char = _("Not connected");
         } else {
-                crossfadetime = mpd_get_crossfadetime (preferences->priv->mpd);
+                crossfadetime = ario_mpd_get_crossfadetime (preferences->priv->mpd);
 
                 if (updating) {
                         last_update_char = _("Updating...");
                 } else {
-                        last_update = (long) mpd_get_last_update (preferences->priv->mpd);
+                        last_update = (long) ario_mpd_get_last_update (preferences->priv->mpd);
                         last_update_char = ctime (&last_update);
                         /* Remove the new line */
                         last_update_char[strlen (last_update_char)-1] = '\0';
@@ -657,19 +657,19 @@ preferences_update_mpd (Preferences *preferences)
 }
 
 void
-preferences_covertree_check_changed_cb (GtkCheckButton *butt,
-                                        Preferences *preferences)
+ario_preferences_covertree_check_changed_cb (GtkCheckButton *butt,
+                                             ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         eel_gconf_set_boolean (CONF_COVER_TREE_HIDDEN,
                                !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->covertree_check)));
 }
 
 void
-preferences_proxy_check_changed_cb (GtkCheckButton *butt,
-                                    Preferences *preferences)
+ario_preferences_proxy_check_changed_cb (GtkCheckButton *butt,
+                                         ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gboolean active;
         active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (preferences->priv->proxy_check));
         eel_gconf_set_boolean (CONF_USE_PROXY,
@@ -680,10 +680,10 @@ preferences_proxy_check_changed_cb (GtkCheckButton *butt,
 }
 
 void
-preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
-                                       Preferences *preferences)
+ario_preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
+                                            ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         int i;
 
         i = gtk_combo_box_get_active (GTK_COMBO_BOX (preferences->priv->amazon_country));
@@ -693,9 +693,9 @@ preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
 }
 
 static void
-preferences_sync_cover (Preferences *preferences)
+ario_preferences_sync_cover (ArioPreferences *preferences)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         int i;
         char *current_country;
         char *proxy_address;
@@ -706,7 +706,7 @@ preferences_sync_cover (Preferences *preferences)
 
         current_country = eel_gconf_get_string (CONF_COVER_AMAZON_COUNTRY);
         if (!current_country)
-                current_country = "com";
+                current_country = g_strdup("com");
         for (i = 0; amazon_countries[i] != NULL; i++) {
                 if (!strcmp (amazon_countries[i], current_country)) {
                         gtk_combo_box_set_active (GTK_COMBO_BOX (preferences->priv->amazon_country), i);

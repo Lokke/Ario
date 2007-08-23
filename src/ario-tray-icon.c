@@ -26,37 +26,35 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <i18n.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-mime-utils.h>
 
-#include "tray-icon.h"
-#include "preferences.h"
-#include "eel/eel-gconf-extensions.h"
-#include "debug.h"
+#include "ario-i18n.h"
+#include "ario-tray-icon.h"
+#include "ario-preferences.h"
+#include "eel-gconf-extensions.h"
+#include "ario-debug.h"
 
-static void tray_icon_class_init (TrayIconClass *klass);
-static void tray_icon_init (TrayIcon *shell_player);
-static GObject *tray_icon_constructor (GType type, guint n_construct_properties,
-                                       GObjectConstructParam *construct_properties);
-static void tray_icon_finalize (GObject *object);
-static void tray_icon_set_property (GObject *object,
-                                    guint prop_id,
-                                    const GValue *value,
-                                    GParamSpec *pspec);
-static void tray_icon_get_property (GObject *object,
-                                    guint prop_id,
-                                    GValue *value,
-                                    GParamSpec *pspec);
-static void tray_icon_set_visibility (TrayIcon *tray, int state);
-static void tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
-                                             TrayIcon *icon);
-static void tray_icon_song_changed_cb (Mpd *mpd,
-                                       TrayIcon *icon);
-static void tray_icon_state_changed_cb (Mpd *mpd,
-                                        TrayIcon *icon);
+static void ario_tray_icon_class_init (ArioTrayIconClass *klass);
+static void ario_tray_icon_init (ArioTrayIcon *ario_shell_player);
+static GObject *ario_tray_icon_constructor (GType type, guint n_construct_properties,
+                                            GObjectConstructParam *construct_properties);
+static void ario_tray_icon_finalize (GObject *object);
+static void ario_tray_icon_set_property (GObject *object,
+                                         guint prop_id,
+                                         const GValue *value,
+                                         GParamSpec *pspec);
+static void ario_tray_icon_get_property (GObject *object,
+                                         guint prop_id,
+                                         GValue *value,
+                                         GParamSpec *pspec);
+static void ario_tray_icon_set_visibility (ArioTrayIcon *tray, int state);
+static void ario_tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
+                                                  ArioTrayIcon *icon);
+static void ario_tray_icon_song_changed_cb (ArioMpd *mpd,
+                                            ArioTrayIcon *icon);
+static void ario_tray_icon_state_changed_cb (ArioMpd *mpd,
+                                             ArioTrayIcon *icon);
 
-struct TrayIconPrivate
+struct ArioTrayIconPrivate
 {
         GtkTooltips *tooltips;
 
@@ -72,7 +70,7 @@ struct TrayIconPrivate
         int window_h;
         gboolean visible;
 
-        Mpd *mpd;
+        ArioMpd *mpd;
 };
 
 enum
@@ -98,47 +96,47 @@ enum
 static GObjectClass *parent_class = NULL;
 
 GType
-tray_icon_get_type (void)
+ario_tray_icon_get_type (void)
 {
-        LOG_FUNCTION_START
-        static GType tray_icon_type = 0;
+        ARIO_LOG_FUNCTION_START
+        static GType ario_tray_icon_type = 0;
 
-        if (tray_icon_type == 0)
+        if (ario_tray_icon_type == 0)
         {
                 static const GTypeInfo our_info =
                 {
-                        sizeof (TrayIconClass),
+                        sizeof (ArioTrayIconClass),
                         NULL,
                         NULL,
-                        (GClassInitFunc) tray_icon_class_init,
+                        (GClassInitFunc) ario_tray_icon_class_init,
                         NULL,
                         NULL,
-                        sizeof (TrayIcon),
+                        sizeof (ArioTrayIcon),
                         0,
-                        (GInstanceInitFunc) tray_icon_init
+                        (GInstanceInitFunc) ario_tray_icon_init
                 };
 
-                tray_icon_type = g_type_register_static (EGG_TYPE_TRAY_ICON,
-                                                         "TrayIcon",
+                ario_tray_icon_type = g_type_register_static (EGG_TYPE_TRAY_ICON,
+                                                         "ArioTrayIcon",
                                                          &our_info, 0);
         }
 
-        return tray_icon_type;
+        return ario_tray_icon_type;
 }
 
 static void
-tray_icon_class_init (TrayIconClass *klass)
+ario_tray_icon_class_init (ArioTrayIconClass *klass)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
         parent_class = g_type_class_peek_parent (klass);
 
-        object_class->finalize = tray_icon_finalize;
-        object_class->constructor = tray_icon_constructor;
+        object_class->finalize = ario_tray_icon_finalize;
+        object_class->constructor = ario_tray_icon_constructor;
 
-        object_class->set_property = tray_icon_set_property;
-        object_class->get_property = tray_icon_get_property;
+        object_class->set_property = ario_tray_icon_set_property;
+        object_class->get_property = ario_tray_icon_get_property;
 
         g_object_class_install_property (object_class,
                                          PROP_WINDOW,
@@ -159,17 +157,17 @@ tray_icon_class_init (TrayIconClass *klass)
                                          g_param_spec_object ("mpd",
                                                               "mpd",
                                                               "mpd",
-                                                              TYPE_MPD,
+                                                              TYPE_ARIO_MPD,
                                                               G_PARAM_READWRITE));
 }
 
 static void
-tray_icon_init (TrayIcon *icon)
+ario_tray_icon_init (ArioTrayIcon *icon)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GtkWidget *image;
 
-        icon->priv = g_new0 (TrayIconPrivate, 1);
+        icon->priv = g_new0 (ArioTrayIconPrivate, 1);
 
         icon->priv->tooltips = gtk_tooltips_new ();
 
@@ -179,7 +177,7 @@ tray_icon_init (TrayIcon *icon)
         icon->priv->ebox = gtk_event_box_new ();
         g_signal_connect_object (G_OBJECT (icon->priv->ebox),
                                  "button_press_event",
-                                 G_CALLBACK (tray_icon_button_press_event_cb),
+                                 G_CALLBACK (ario_tray_icon_button_press_event_cb),
                                  icon, 0);
 
         image = gtk_image_new_from_stock ("volume-max",
@@ -197,34 +195,34 @@ tray_icon_init (TrayIcon *icon)
 }
 
 static GObject *
-tray_icon_constructor (GType type, guint n_construct_properties,
-                          GObjectConstructParam *construct_properties)
+ario_tray_icon_constructor (GType type, guint n_construct_properties,
+                            GObjectConstructParam *construct_properties)
 {
-        LOG_FUNCTION_START
-        TrayIcon *tray;
-        TrayIconClass *klass;
+        ARIO_LOG_FUNCTION_START
+        ArioTrayIcon *tray;
+        ArioTrayIconClass *klass;
         GObjectClass *parent_class;  
 
-        klass = TRAY_ICON_CLASS (g_type_class_peek (TYPE_TRAY_ICON));
+        klass = ARIO_TRAY_ICON_CLASS (g_type_class_peek (TYPE_ARIO_TRAY_ICON));
 
         parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
-        tray = TRAY_ICON (parent_class->constructor (type, n_construct_properties,
+        tray = ARIO_TRAY_ICON (parent_class->constructor (type, n_construct_properties,
                                                         construct_properties));
 
-        tray_icon_set_visibility (tray, VISIBILITY_VISIBLE);
+        ario_tray_icon_set_visibility (tray, VISIBILITY_VISIBLE);
         return G_OBJECT (tray);
 }
 
 static void
-tray_icon_finalize (GObject *object)
+ario_tray_icon_finalize (GObject *object)
 {
-        LOG_FUNCTION_START
-        TrayIcon *tray;
+        ARIO_LOG_FUNCTION_START
+        ArioTrayIcon *tray;
 
         g_return_if_fail (object != NULL);
-        g_return_if_fail (IS_TRAY_ICON (object));
+        g_return_if_fail (IS_ARIO_TRAY_ICON (object));
 
-        tray = TRAY_ICON (object);
+        tray = ARIO_TRAY_ICON (object);
 
         g_return_if_fail (tray->priv != NULL);
         
@@ -236,13 +234,13 @@ tray_icon_finalize (GObject *object)
 }
 
 static void
-tray_icon_set_property (GObject *object,
-                              guint prop_id,
-                              const GValue *value,
-                              GParamSpec *pspec)
+ario_tray_icon_set_property (GObject *object,
+                             guint prop_id,
+                             const GValue *value,
+                             GParamSpec *pspec)
 {
-        LOG_FUNCTION_START
-        TrayIcon *tray = TRAY_ICON (object);
+        ARIO_LOG_FUNCTION_START
+        ArioTrayIcon *tray = ARIO_TRAY_ICON (object);
 
         switch (prop_id)
         {
@@ -255,10 +253,10 @@ tray_icon_set_property (GObject *object,
         case PROP_MPD:
                 tray->priv->mpd = g_value_get_object (value);
                 g_signal_connect_object (G_OBJECT (tray->priv->mpd),
-                                         "song_changed", G_CALLBACK (tray_icon_song_changed_cb),
+                                         "song_changed", G_CALLBACK (ario_tray_icon_song_changed_cb),
                                          tray, 0);
                 g_signal_connect_object (G_OBJECT (tray->priv->mpd),
-                                         "state_changed", G_CALLBACK (tray_icon_state_changed_cb),
+                                         "state_changed", G_CALLBACK (ario_tray_icon_state_changed_cb),
                                          tray, 0);
                 break;
         default:
@@ -268,13 +266,13 @@ tray_icon_set_property (GObject *object,
 }
 
 static void 
-tray_icon_get_property (GObject *object,
-                              guint prop_id,
-                              GValue *value,
-                              GParamSpec *pspec)
+ario_tray_icon_get_property (GObject *object,
+                             guint prop_id,
+                             GValue *value,
+                             GParamSpec *pspec)
 {
-        LOG_FUNCTION_START
-        TrayIcon *tray = TRAY_ICON (object);
+        ARIO_LOG_FUNCTION_START
+        ArioTrayIcon *tray = ARIO_TRAY_ICON (object);
 
         switch (prop_id)
         {
@@ -293,13 +291,13 @@ tray_icon_get_property (GObject *object,
         }
 }
 
-TrayIcon *
-tray_icon_new (GtkUIManager *mgr,
-               GtkWindow *window,
-               Mpd *mpd)
+ArioTrayIcon *
+ario_tray_icon_new (GtkUIManager *mgr,
+                    GtkWindow *window,
+                    ArioMpd *mpd)
 {
-        LOG_FUNCTION_START
-        return g_object_new (TYPE_TRAY_ICON,
+        ARIO_LOG_FUNCTION_START
+        return g_object_new (TYPE_ARIO_TRAY_ICON,
                              "title", _("Ario tray icon"),
                              "ui-manager", mgr,
                              "window", window,
@@ -308,17 +306,17 @@ tray_icon_new (GtkUIManager *mgr,
 }
 
 static void
-tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
-                                 TrayIcon *icon)
+ario_tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
+                                      ArioTrayIcon *icon)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         /* filter out double, triple clicks */
         if (event->type != GDK_BUTTON_PRESS)
                 return;
 
         switch (event->button) {
         case 1:
-                tray_icon_set_visibility (icon, VISIBILITY_TOGGLE);
+                ario_tray_icon_set_visibility (icon, VISIBILITY_TOGGLE);
                 break;
 
         case 3:
@@ -338,18 +336,18 @@ tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
 }
 
 static void
-tray_icon_sync_tooltip (TrayIcon *icon)
+ario_tray_icon_sync_tooltip (ArioTrayIcon *icon)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gchar *tooltip;
 
-        switch (mpd_get_current_state (icon->priv->mpd)) {
+        switch (ario_mpd_get_current_state (icon->priv->mpd)) {
         case MPD_STATUS_STATE_PLAY:
         case MPD_STATUS_STATE_PAUSE:
                 tooltip = g_strdup_printf (_("Artist: %s\nAlbum: %s\nTitle: %s"), 
-                                            mpd_get_current_artist (icon->priv->mpd),
-                                            mpd_get_current_album (icon->priv->mpd),
-                                            mpd_get_current_title (icon->priv->mpd));
+                                            ario_mpd_get_current_artist (icon->priv->mpd),
+                                            ario_mpd_get_current_album (icon->priv->mpd),
+                                            ario_mpd_get_current_title (icon->priv->mpd));
                 break;
         default:
                 tooltip = g_strdup (_("Not playing"));
@@ -364,25 +362,25 @@ tray_icon_sync_tooltip (TrayIcon *icon)
 }
 
 static void
-tray_icon_song_changed_cb (Mpd *mpd,
-                           TrayIcon *icon)
+ario_tray_icon_song_changed_cb (ArioMpd *mpd,
+                                ArioTrayIcon *icon)
 {
-        LOG_FUNCTION_START
-        tray_icon_sync_tooltip (icon);
+        ARIO_LOG_FUNCTION_START
+        ario_tray_icon_sync_tooltip (icon);
 }
 
 static void
-tray_icon_state_changed_cb (Mpd *mpd,
-                            TrayIcon *icon)
+ario_tray_icon_state_changed_cb (ArioMpd *mpd,
+                                 ArioTrayIcon *icon)
 {
-        LOG_FUNCTION_START
-        tray_icon_sync_tooltip (icon);
+        ARIO_LOG_FUNCTION_START
+        ario_tray_icon_sync_tooltip (icon);
 }
 
 static void
-tray_icon_restore_main_window (TrayIcon *icon)
+ario_tray_icon_restore_main_window (ArioTrayIcon *icon)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         if ((icon->priv->window_x >= 0 && icon->priv->window_y >= 0) || (icon->priv->window_h >= 0 && icon->priv->window_w >=0 )) {
                 gtk_widget_realize (GTK_WIDGET (icon->priv->main_window));
                 gdk_flush ();
@@ -404,21 +402,22 @@ tray_icon_restore_main_window (TrayIcon *icon)
 }
 
 static void
-tray_icon_set_visibility (TrayIcon *icon, int state)
+ario_tray_icon_set_visibility (ArioTrayIcon *icon,
+                               int state)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         switch (state)
         {
         case VISIBILITY_HIDDEN:
                case VISIBILITY_VISIBLE:
                 if (icon->priv->visible != state)
-                        tray_icon_set_visibility (icon, VISIBILITY_TOGGLE);
+                        ario_tray_icon_set_visibility (icon, VISIBILITY_TOGGLE);
                 break;
         case VISIBILITY_TOGGLE:
                 icon->priv->visible = !icon->priv->visible;
 
                 if (icon->priv->visible == TRUE) {
-                        tray_icon_restore_main_window (icon);
+                        ario_tray_icon_restore_main_window (icon);
                         gtk_widget_show (GTK_WIDGET (icon->priv->main_window));
                 } else {
                         icon->priv->maximized = eel_gconf_get_boolean (CONF_STATE_WINDOW_MAXIMIZED);

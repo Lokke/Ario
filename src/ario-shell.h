@@ -17,38 +17,38 @@
  *
  */
 
-#ifndef __SHELL_H
-#define __SHELL_H
+#ifndef __ARIO_SHELL_H
+#define __ARIO_SHELL_H
 
 G_BEGIN_DECLS
 
-#define TYPE_SHELL         (shell_get_type ())
-#define SHELL(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_SHELL, Shell))
-#define SHELL_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), TYPE_SHELL, ShellClass))
-#define IS_SHELL(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_SHELL))
-#define IS_SHELL_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_SHELL))
-#define SHELL_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_SHELL, ShellClass))
+#define TYPE_ARIO_SHELL         (ario_shell_get_type ())
+#define ARIO_SHELL(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_ARIO_SHELL, ArioShell))
+#define ARIO_SHELL_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), TYPE_ARIO_SHELL, ArioShellClass))
+#define IS_ARIO_SHELL(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_ARIO_SHELL))
+#define IS_ARIO_SHELL_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_ARIO_SHELL))
+#define ARIO_SHELL_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_ARIO_SHELL, ArioShellClass))
 
-typedef struct ShellPrivate ShellPrivate;
+typedef struct ArioShellPrivate ArioShellPrivate;
 
 typedef struct
 {
         GObject parent;
 
-        ShellPrivate *priv;
-} Shell;
+        ArioShellPrivate *priv;
+} ArioShell;
 
 typedef struct
 {
         GObjectClass parent_class;
-} ShellClass;
+} ArioShellClass;
 
-GType                shell_get_type                (void);
+GType           ario_shell_get_type     (void);
 
-Shell *                shell_new                (void);
+ArioShell *     ario_shell_new          (void);
 
-void                shell_construct                (Shell *shell);
+void            ario_shell_construct    (ArioShell *shell);
 
 G_END_DECLS
 
-#endif /* __SHELL_H */
+#endif /* __ARIO_SHELL_H */

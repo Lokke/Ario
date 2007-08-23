@@ -19,58 +19,58 @@
 
 #include <gtk/gtk.h>
 #include <config.h>
-#include <i18n.h>
 #include <string.h>
 
-#include "header.h"
-#include "util.h"
-#include "volume.h"
-#include "debug.h"
-#include "cover.h"
+#include "ario-i18n.h"
+#include "ario-header.h"
+#include "ario-util.h"
+#include "ario-volume.h"
+#include "ario-debug.h"
+#include "ario-cover.h"
 
-static void header_class_init (HeaderClass *klass);
-static void header_init (Header *header);
-static GObject *header_constructor (GType type, guint n_construct_properties,
-                                    GObjectConstructParam *construct_properties);
-static void header_finalize (GObject *object);
-static void header_set_property (GObject *object,
-                                 guint prop_id,
-                                 const GValue *value,
-                                 GParamSpec *pspec);
-static void header_get_property (GObject *object,
-                                 guint prop_id,
-                                 GValue *value,
-                                 GParamSpec *pspec);
+static void ario_header_class_init (ArioHeaderClass *klass);
+static void ario_header_init (ArioHeader *header);
+static GObject *ario_header_constructor (GType type, guint n_construct_properties,
+                                         GObjectConstructParam *construct_properties);
+static void ario_header_finalize (GObject *object);
+static void ario_header_set_property (GObject *object,
+                                      guint prop_id,
+                                      const GValue *value,
+                                      GParamSpec *pspec);
+static void ario_header_get_property (GObject *object,
+                                      guint prop_id,
+                                      GValue *value,
+                                      GParamSpec *pspec);
 static gboolean slider_press_callback (GtkWidget *widget,
                                        GdkEventButton *event,
-                                       Header *header);
+                                       ArioHeader *header);
 static gboolean slider_release_callback (GtkWidget *widget,
                                          GdkEventButton *event,
-                                         Header *header);
-static void header_song_changed_cb (Mpd *mpd,
-                                    Header *header);
-static void header_state_changed_cb (Mpd *mpd,
-                                     Header *header);
-static void header_elapsed_changed_cb (Mpd *mpd,
-                                       Header *header);
-static void header_random_changed_cb (Mpd *mpd,
-                                      Header *header);
-static void header_repeat_changed_cb (Mpd *mpd,
-                                      Header *header);
-static void header_do_random (Header *header);
-static void header_do_repeat (Header *header);
-static void header_cmd_playpause (GtkAction *action,
-                                   Header *header);
-static void header_cmd_stop (GtkAction *action,
-                             Header *header);
-static void header_cmd_next (GtkAction *action,
-                             Header *header);
-static void header_cmd_previous (GtkAction *action,
-                                 Header *header);
+                                         ArioHeader *header);
+static void ario_header_song_changed_cb (ArioMpd *mpd,
+                                         ArioHeader *header);
+static void ario_header_state_changed_cb (ArioMpd *mpd,
+                                          ArioHeader *header);
+static void ario_header_elapsed_changed_cb (ArioMpd *mpd,
+                                            ArioHeader *header);
+static void ario_header_random_changed_cb (ArioMpd *mpd,
+                                           ArioHeader *header);
+static void ario_header_repeat_changed_cb (ArioMpd *mpd,
+                                           ArioHeader *header);
+static void ario_header_do_random (ArioHeader *header);
+static void ario_header_do_repeat (ArioHeader *header);
+static void ario_header_cmd_playpause (GtkAction *action,
+                                       ArioHeader *header);
+static void ario_header_cmd_stop (GtkAction *action,
+                                  ArioHeader *header);
+static void ario_header_cmd_next (GtkAction *action,
+                                  ArioHeader *header);
+static void ario_header_cmd_previous (GtkAction *action,
+                                      ArioHeader *header);
 
-struct HeaderPrivate
+struct ArioHeaderPrivate
 {
-        Mpd *mpd;
+        ArioMpd *mpd;
 
         GtkTooltips *tooltips;
         GtkWidget *prev_button;
@@ -95,7 +95,7 @@ struct HeaderPrivate
         GtkWidget *elapsed;
         GtkWidget *total;
 
-        GtkWidget *volume_button;
+        GtkWidget *ario_volume_button;
 
         int total_time;
 
@@ -107,23 +107,23 @@ struct HeaderPrivate
         gint image_height;
 };
 
-static GtkActionEntry header_actions [] =
+static GtkActionEntry ario_header_actions [] =
 {
         { "ControlPlayPause", GTK_STOCK_MEDIA_PLAY, N_("_Play/Pause"), "<control>space",
           N_("Start playback"),
-          G_CALLBACK (header_cmd_playpause) },
+          G_CALLBACK (ario_header_cmd_playpause) },
         { "ControlStop", GTK_STOCK_MEDIA_STOP, N_("_Stop"), NULL,
           N_("Stop playback"),
-          G_CALLBACK (header_cmd_stop) },
+          G_CALLBACK (ario_header_cmd_stop) },
         { "ControlNext", GTK_STOCK_MEDIA_NEXT, N_("_Next"), "<control>Right",
           N_("Start playing the next song"),
-          G_CALLBACK (header_cmd_next) },
+          G_CALLBACK (ario_header_cmd_next) },
         { "ControlPrevious", GTK_STOCK_MEDIA_PREVIOUS, N_("P_revious"), "<control>Left",
           N_("Start playing the previous song"),
-          G_CALLBACK (header_cmd_previous) },
+          G_CALLBACK (ario_header_cmd_previous) },
 };
 
-static guint header_n_actions = G_N_ELEMENTS (header_actions);
+static guint ario_header_n_actions = G_N_ELEMENTS (ario_header_actions);
 
 enum
 {
@@ -138,52 +138,52 @@ static GObjectClass *parent_class = NULL;
 #define FROM_MARKUP(xALBUM, xARTIST) g_strdup_printf (_("from %s by %s"), xALBUM, xARTIST);
 
 GType
-header_get_type (void)
+ario_header_get_type (void)
 {
-        LOG_FUNCTION_START
-        static GType header_type = 0;
+        ARIO_LOG_FUNCTION_START
+        static GType ario_header_type = 0;
 
-        if (header_type == 0) {
+        if (ario_header_type == 0) {
                 static const GTypeInfo our_info =
                 {
-                        sizeof (HeaderClass),
+                        sizeof (ArioHeaderClass),
                         NULL,
                         NULL,
-                        (GClassInitFunc) header_class_init,
+                        (GClassInitFunc) ario_header_class_init,
                         NULL,
                         NULL,
-                        sizeof (Header),
+                        sizeof (ArioHeader),
                         0,
-                        (GInstanceInitFunc) header_init
+                        (GInstanceInitFunc) ario_header_init
                 };
 
-                header_type = g_type_register_static (GTK_TYPE_HBOX,
-                                                      "Header",
+                ario_header_type = g_type_register_static (GTK_TYPE_HBOX,
+                                                      "ArioHeader",
                                                       &our_info, 0);
         }
 
-        return header_type;
+        return ario_header_type;
 }
 
 static void
-header_class_init (HeaderClass *klass)
+ario_header_class_init (ArioHeaderClass *klass)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
         parent_class = g_type_class_peek_parent (klass);
 
-        object_class->finalize = header_finalize;
-        object_class->set_property = header_set_property;
-        object_class->get_property = header_get_property;
-        object_class->constructor = header_constructor;
+        object_class->finalize = ario_header_finalize;
+        object_class->set_property = ario_header_set_property;
+        object_class->get_property = ario_header_get_property;
+        object_class->constructor = ario_header_constructor;
 
         g_object_class_install_property (object_class,
                                          PROP_MPD,
                                          g_param_spec_object ("mpd",
-                                                              "Mpd",
-                                                              "Mpd object",
-                                                              TYPE_MPD,
+                                                              "ArioMpd",
+                                                              "ArioMpd object",
+                                                              TYPE_ARIO_MPD,
                                                               G_PARAM_READWRITE));
         g_object_class_install_property (object_class,
                                          PROP_ACTION_GROUP,
@@ -195,27 +195,27 @@ header_class_init (HeaderClass *klass)
 }
 
 static void
-header_init (Header *header)
+ario_header_init (ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        header->priv = g_new0 (HeaderPrivate, 1);
+        ARIO_LOG_FUNCTION_START
+        header->priv = g_new0 (ArioHeaderPrivate, 1);
 }
 
 static GObject *
-header_constructor (GType type, guint n_construct_properties,
-                    GObjectConstructParam *construct_properties)
+ario_header_constructor (GType type, guint n_construct_properties,
+                         GObjectConstructParam *construct_properties)
 {
-        LOG_FUNCTION_START
-        Header *header;
-        HeaderClass *klass;
+        ARIO_LOG_FUNCTION_START
+        ArioHeader *header;
+        ArioHeaderClass *klass;
         GObjectClass *parent_class;
 
         GtkWidget *image, *hbox, *vbox, *alignment, *label;
 
-        klass = HEADER_CLASS (g_type_class_peek (TYPE_HEADER));
+        klass = ARIO_HEADER_CLASS (g_type_class_peek (TYPE_ARIO_HEADER));
 
         parent_class = G_OBJECT_CLASS (g_type_class_peek_parent (klass));
-        header = HEADER (parent_class->constructor (type, n_construct_properties,
+        header = ARIO_HEADER (parent_class->constructor (type, n_construct_properties,
                                                      construct_properties));
 
 
@@ -231,7 +231,7 @@ header_constructor (GType type, guint n_construct_properties,
         header->priv->prev_button = gtk_button_new ();
         gtk_container_add (GTK_CONTAINER (header->priv->prev_button), image);
         g_signal_connect_swapped (G_OBJECT (header->priv->prev_button),
-                                  "clicked", G_CALLBACK (header_do_previous), header);
+                                  "clicked", G_CALLBACK (ario_header_do_previous), header);
         gtk_tooltips_set_tip (GTK_TOOLTIPS (header->priv->tooltips), 
                               GTK_WIDGET (header->priv->prev_button), 
                               _("Play previous song"), NULL);
@@ -251,7 +251,7 @@ header_constructor (GType type, guint n_construct_properties,
         gtk_container_add (GTK_CONTAINER (header->priv->play_pause_button), header->priv->pause_image);
 
         g_signal_connect_swapped (G_OBJECT (header->priv->play_pause_button),
-                                  "clicked", G_CALLBACK (header_playpause), header);
+                                  "clicked", G_CALLBACK (ario_header_playpause), header);
         gtk_tooltips_set_tip (GTK_TOOLTIPS (header->priv->tooltips), 
                               GTK_WIDGET (header->priv->play_pause_button), 
                               _("Play/Pause the music"), NULL);
@@ -262,7 +262,7 @@ header_constructor (GType type, guint n_construct_properties,
         header->priv->stop_button = gtk_button_new ();
         gtk_container_add (GTK_CONTAINER (header->priv->stop_button), image);
         g_signal_connect_swapped (G_OBJECT (header->priv->stop_button),
-                                  "clicked", G_CALLBACK (header_stop), header);
+                                  "clicked", G_CALLBACK (ario_header_stop), header);
         gtk_tooltips_set_tip (GTK_TOOLTIPS (header->priv->tooltips), 
                               GTK_WIDGET (header->priv->stop_button), 
                               _("Stop the music"), NULL);
@@ -273,7 +273,7 @@ header_constructor (GType type, guint n_construct_properties,
         header->priv->next_button = gtk_button_new ();
         gtk_container_add (GTK_CONTAINER (header->priv->next_button), image);
         g_signal_connect_swapped (G_OBJECT (header->priv->next_button),
-                                  "clicked", G_CALLBACK (header_do_next), header);
+                                  "clicked", G_CALLBACK (ario_header_do_next), header);
         gtk_tooltips_set_tip (GTK_TOOLTIPS (header->priv->tooltips), 
                               GTK_WIDGET (header->priv->next_button), 
                               _("Play next song"), NULL);
@@ -356,7 +356,7 @@ header_constructor (GType type, guint n_construct_properties,
         header->priv->random_button = gtk_toggle_button_new ();
         gtk_container_add (GTK_CONTAINER (header->priv->random_button), image);
         g_signal_connect_swapped (G_OBJECT (header->priv->random_button),
-                                  "clicked", G_CALLBACK (header_do_random), header);
+                                  "clicked", G_CALLBACK (ario_header_do_random), header);
         gtk_tooltips_set_tip (GTK_TOOLTIPS (header->priv->tooltips), 
                               GTK_WIDGET (header->priv->random_button), 
                               _("Toggle random on/off"), NULL);
@@ -367,7 +367,7 @@ header_constructor (GType type, guint n_construct_properties,
         header->priv->repeat_button = gtk_toggle_button_new ();
         gtk_container_add (GTK_CONTAINER (header->priv->repeat_button), image);
         g_signal_connect_swapped (G_OBJECT (header->priv->repeat_button),
-                                  "clicked", G_CALLBACK (header_do_repeat), header);
+                                  "clicked", G_CALLBACK (ario_header_do_repeat), header);
         gtk_tooltips_set_tip (GTK_TOOLTIPS (header->priv->tooltips), 
                               GTK_WIDGET (header->priv->repeat_button), 
                               _("Toggle repeat on/off"), NULL);
@@ -384,15 +384,15 @@ header_constructor (GType type, guint n_construct_properties,
 }
 
 static void
-header_finalize (GObject *object)
+ario_header_finalize (GObject *object)
 {
-        LOG_FUNCTION_START
-        Header *header;
+        ARIO_LOG_FUNCTION_START
+        ArioHeader *header;
 
         g_return_if_fail (object != NULL);
-        g_return_if_fail (IS_HEADER (object));
+        g_return_if_fail (IS_ARIO_HEADER (object));
 
-        header = HEADER (object);
+        header = ARIO_HEADER (object);
 
         g_return_if_fail (header->priv != NULL);
 
@@ -402,13 +402,13 @@ header_finalize (GObject *object)
 }
 
 static void
-header_set_property (GObject *object,
-                        guint prop_id,
-                        const GValue *value,
-                        GParamSpec *pspec)
+ario_header_set_property (GObject *object,
+                          guint prop_id,
+                          const GValue *value,
+                          GParamSpec *pspec)
 {
-        LOG_FUNCTION_START
-        Header *header = HEADER (object);
+        ARIO_LOG_FUNCTION_START
+        ArioHeader *header = ARIO_HEADER (object);
 
         switch (prop_id) {
         case PROP_MPD:
@@ -416,26 +416,26 @@ header_set_property (GObject *object,
 
                 /* Signals to synchronize the header with mpd */
                 g_signal_connect_object (G_OBJECT (header->priv->mpd),
-                                         "song_changed", G_CALLBACK (header_song_changed_cb),
+                                         "song_changed", G_CALLBACK (ario_header_song_changed_cb),
                                          header, 0);
                 g_signal_connect_object (G_OBJECT (header->priv->mpd),
-                                         "state_changed", G_CALLBACK (header_state_changed_cb),
+                                         "state_changed", G_CALLBACK (ario_header_state_changed_cb),
                                          header, 0);
                 g_signal_connect_object (G_OBJECT (header->priv->mpd),
-                                         "elapsed_changed", G_CALLBACK (header_elapsed_changed_cb),
+                                         "elapsed_changed", G_CALLBACK (ario_header_elapsed_changed_cb),
                                          header, 0);
                 g_signal_connect_object (G_OBJECT (header->priv->mpd),
-                                         "random_changed", G_CALLBACK (header_random_changed_cb),
+                                         "random_changed", G_CALLBACK (ario_header_random_changed_cb),
                                          header, 0);
                 g_signal_connect_object (G_OBJECT (header->priv->mpd),
-                                         "repeat_changed", G_CALLBACK (header_repeat_changed_cb),
+                                         "repeat_changed", G_CALLBACK (ario_header_repeat_changed_cb),
                                          header, 0);
                 break;
         case PROP_ACTION_GROUP:
                 header->priv->actiongroup = g_value_get_object (value);
                 gtk_action_group_add_actions (header->priv->actiongroup,
-                                              header_actions,
-                                              header_n_actions, header);
+                                              ario_header_actions,
+                                              ario_header_n_actions, header);
                 break;
         default:
                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -444,13 +444,13 @@ header_set_property (GObject *object,
 }
 
 static void
-header_get_property (GObject *object,
-                        guint prop_id,
-                        GValue *value,
-                        GParamSpec *pspec)
+ario_header_get_property (GObject *object,
+                          guint prop_id,
+                          GValue *value,
+                          GParamSpec *pspec)
 {
-        LOG_FUNCTION_START
-        Header *header = HEADER (object);
+        ARIO_LOG_FUNCTION_START
+        ArioHeader *header = ARIO_HEADER (object);
 
         switch (prop_id) {
         case PROP_MPD:
@@ -466,25 +466,25 @@ header_get_property (GObject *object,
 }
 
 GtkWidget *
-header_new (GtkActionGroup *group, Mpd *mpd)
+ario_header_new (GtkActionGroup *group, ArioMpd *mpd)
 {
-        LOG_FUNCTION_START
-        Header *header;
+        ARIO_LOG_FUNCTION_START
+        ArioHeader *header;
         GtkWidget *alignment;
 
-        header = HEADER (g_object_new (TYPE_HEADER,
+        header = ARIO_HEADER (g_object_new (TYPE_ARIO_HEADER,
                                        "action-group", group,
                                        "mpd", mpd,
                                        NULL));
 
         /* Construct the volume button */
-        header->priv->volume_button = GTK_WIDGET (volume_new (header->priv->mpd));
+        header->priv->ario_volume_button = GTK_WIDGET (ario_volume_new (header->priv->mpd));
         gtk_tooltips_set_tip (GTK_TOOLTIPS (header->priv->tooltips), 
-                              GTK_WIDGET (header->priv->volume_button), 
+                              GTK_WIDGET (header->priv->ario_volume_button), 
                               _("Change the music volume"), NULL);
 
         alignment = gtk_alignment_new (0.0, 0.5, 1.0, 0.0);
-        gtk_container_add (GTK_CONTAINER (alignment), header->priv->volume_button);
+        gtk_container_add (GTK_CONTAINER (alignment), header->priv->ario_volume_button);
         gtk_box_pack_end (GTK_BOX (header), alignment, FALSE, TRUE, 5);
 
         g_return_val_if_fail (header->priv != NULL, NULL);
@@ -493,17 +493,17 @@ header_new (GtkActionGroup *group, Mpd *mpd)
 }
 
 static void
-header_change_total_time (Header *header)
+ario_header_change_total_time (ArioHeader *header)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         char *tmp;
 
-        if (mpd_is_connected (header->priv->mpd))
-                header->priv->total_time = mpd_get_current_total_time (header->priv->mpd);
+        if (ario_mpd_is_connected (header->priv->mpd))
+                header->priv->total_time = ario_mpd_get_current_total_time (header->priv->mpd);
         else
                 header->priv->total_time = 0;
 
-        tmp = util_format_time (header->priv->total_time);
+        tmp = ario_util_format_time (header->priv->total_time);
         gtk_label_set_text (GTK_LABEL (header->priv->total), tmp);
         g_free (tmp);
 
@@ -511,22 +511,22 @@ header_change_total_time (Header *header)
 }
 
 static void
-header_change_labels (Header *header)
+ario_header_change_labels (ArioHeader *header)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         char *title;
         char *artist;
         char *album;
         char *tmp;
-        gchar *cover_path;
+        gchar *ario_cover_path;
         GdkPixbuf *cover;
 
-        switch (mpd_get_current_state (header->priv->mpd)) {
+        switch (ario_mpd_get_current_state (header->priv->mpd)) {
         case MPD_STATUS_STATE_PLAY:
         case MPD_STATUS_STATE_PAUSE:
-                title = mpd_get_current_title (header->priv->mpd);
-                artist = mpd_get_current_artist (header->priv->mpd);
-                album = mpd_get_current_album (header->priv->mpd);
+                title = ario_mpd_get_current_title (header->priv->mpd);
+                artist = ario_mpd_get_current_artist (header->priv->mpd);
+                album = ario_mpd_get_current_album (header->priv->mpd);
 
                 if (!title)
                         title = _("Unknown");
@@ -537,9 +537,9 @@ header_change_labels (Header *header)
                 if (!artist)
                         artist = _("Unknown");
 
-                cover_path = cover_make_cover_path (artist, album, SMALL_COVER);
-                cover = gdk_pixbuf_new_from_file_at_size (cover_path, header->priv->image_width, header->priv->image_height, NULL);
-                g_free (cover_path);
+                ario_cover_path = ario_cover_make_ario_cover_path (artist, album, SMALL_COVER);
+                cover = gdk_pixbuf_new_from_file_at_size (ario_cover_path, header->priv->image_width, header->priv->image_height, NULL);
+                g_free (ario_cover_path);
                 gtk_image_set_from_pixbuf(GTK_IMAGE(header->priv->image), cover);
 
                 tmp = SONG_MARKUP (title);
@@ -561,20 +561,20 @@ header_change_labels (Header *header)
 }
 
 static void
-header_song_changed_cb (Mpd *mpd,
-                        Header *header)
+ario_header_song_changed_cb (ArioMpd *mpd,
+                             ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        header_change_labels (header);
-        header_change_total_time (header);
+        ARIO_LOG_FUNCTION_START
+        ario_header_change_labels (header);
+        ario_header_change_total_time (header);
 }
 
 static void
-header_state_changed_cb (Mpd *mpd,
-                         Header *header)
+ario_header_state_changed_cb (ArioMpd *mpd,
+                              ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        if (!mpd_is_connected (mpd)) {
+        ARIO_LOG_FUNCTION_START
+        if (!ario_mpd_is_connected (mpd)) {
                 gtk_widget_set_sensitive (header->priv->prev_button, FALSE);
                 gtk_widget_set_sensitive (header->priv->play_pause_button, FALSE);
 
@@ -586,7 +586,7 @@ header_state_changed_cb (Mpd *mpd,
 
                 gtk_widget_set_sensitive (header->priv->scale, FALSE);
 
-                gtk_widget_set_sensitive (header->priv->volume_button, FALSE);
+                gtk_widget_set_sensitive (header->priv->ario_volume_button, FALSE);
         } else {
                 gtk_widget_set_sensitive (header->priv->prev_button, TRUE);
                 gtk_widget_set_sensitive (header->priv->play_pause_button, TRUE);
@@ -599,16 +599,16 @@ header_state_changed_cb (Mpd *mpd,
 
                 gtk_widget_set_sensitive (header->priv->scale, TRUE);
 
-                gtk_widget_set_sensitive (header->priv->volume_button, TRUE);
+                gtk_widget_set_sensitive (header->priv->ario_volume_button, TRUE);
         }
 
-        header_change_labels (header);
-        header_change_total_time (header);
+        ario_header_change_labels (header);
+        ario_header_change_total_time (header);
 
         gtk_container_remove (GTK_CONTAINER (header->priv->play_pause_button),
                               gtk_bin_get_child (GTK_BIN (header->priv->play_pause_button)));
 
-        if (mpd_is_paused (mpd))
+        if (ario_mpd_is_paused (mpd))
                 gtk_container_add (GTK_CONTAINER (header->priv->play_pause_button),
                                    header->priv->play_image);
         else
@@ -617,19 +617,19 @@ header_state_changed_cb (Mpd *mpd,
 }
 
 static void
-header_elapsed_changed_cb (Mpd *mpd,
-                        Header *header)
+ario_header_elapsed_changed_cb (ArioMpd *mpd,
+                                ArioHeader *header)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         int elapsed;
         char *tmp;
 
         if (header->priv->slider_dragging)
                 return;
 
-        elapsed = mpd_get_current_elapsed (mpd);
+        elapsed = ario_mpd_get_current_elapsed (mpd);
 
-        tmp = util_format_time (elapsed);
+        tmp = ario_util_format_time (elapsed);
         gtk_label_set_text (GTK_LABEL (header->priv->elapsed), tmp);
         g_free (tmp);
 
@@ -637,45 +637,45 @@ header_elapsed_changed_cb (Mpd *mpd,
 }
 
 static void
-header_random_changed_cb (Mpd *mpd,
-                          Header *header)
+ario_header_random_changed_cb (ArioMpd *mpd,
+                               ArioHeader *header)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gboolean random;
 
-        random = mpd_get_current_random (mpd);
+        random = ario_mpd_get_current_random (mpd);
         g_signal_handlers_disconnect_by_func (G_OBJECT (header->priv->random_button),
-                                              G_CALLBACK (header_do_random),
+                                              G_CALLBACK (ario_header_do_random),
                                               header);
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (header->priv->random_button),
                                       random);
         g_signal_connect_swapped (G_OBJECT (header->priv->random_button),
-                                  "clicked", G_CALLBACK (header_do_random), header);
+                                  "clicked", G_CALLBACK (ario_header_do_random), header);
 }
 
 static void
-header_repeat_changed_cb (Mpd *mpd,
-                          Header *header)
+ario_header_repeat_changed_cb (ArioMpd *mpd,
+                               ArioHeader *header)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         gboolean repeat;
 
-        repeat = mpd_get_current_repeat (mpd);
+        repeat = ario_mpd_get_current_repeat (mpd);
         g_signal_handlers_disconnect_by_func (G_OBJECT (header->priv->repeat_button),
-                                              G_CALLBACK (header_do_repeat),
+                                              G_CALLBACK (ario_header_do_repeat),
                                               header);
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (header->priv->repeat_button),
                                       repeat);
         g_signal_connect_swapped (G_OBJECT (header->priv->repeat_button),
-                                  "clicked", G_CALLBACK (header_do_repeat), header);
+                                  "clicked", G_CALLBACK (ario_header_do_repeat), header);
 }
 
 static gboolean
 slider_press_callback (GtkWidget *widget,
                        GdkEventButton *event,
-                       Header *header)
+                       ArioHeader *header)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         header->priv->slider_dragging = TRUE;
         return FALSE;
 }
@@ -683,94 +683,94 @@ slider_press_callback (GtkWidget *widget,
 static gboolean
 slider_release_callback (GtkWidget *widget,
                          GdkEventButton *event,
-                         Header *header)
+                         ArioHeader *header)
 {
-        LOG_FUNCTION_START
+        ARIO_LOG_FUNCTION_START
         header->priv->slider_dragging = FALSE;
-        mpd_set_current_elapsed (header->priv->mpd, 
+        ario_mpd_set_current_elapsed (header->priv->mpd, 
                                  (int) gtk_range_get_value (GTK_RANGE (header->priv->scale)));
         return FALSE;
 }
 
 void
-header_do_next (Header *header)
+ario_header_do_next (ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        g_return_if_fail (IS_HEADER (header));
-        mpd_do_next (header->priv->mpd);
+        ARIO_LOG_FUNCTION_START
+        g_return_if_fail (IS_ARIO_HEADER (header));
+        ario_mpd_do_next (header->priv->mpd);
 }
 
 void
-header_do_previous (Header *header)
+ario_header_do_previous (ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        g_return_if_fail (IS_HEADER (header));
-        mpd_do_prev (header->priv->mpd);
+        ARIO_LOG_FUNCTION_START
+        g_return_if_fail (IS_ARIO_HEADER (header));
+        ario_mpd_do_prev (header->priv->mpd);
 }
 
 void
-header_playpause (Header *header)
+ario_header_playpause (ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        g_return_if_fail (IS_HEADER (header));
-        if (mpd_is_paused (header->priv->mpd))
-                mpd_do_play (header->priv->mpd);
+        ARIO_LOG_FUNCTION_START
+        g_return_if_fail (IS_ARIO_HEADER (header));
+        if (ario_mpd_is_paused (header->priv->mpd))
+                ario_mpd_do_play (header->priv->mpd);
         else
-                mpd_do_pause (header->priv->mpd);
+                ario_mpd_do_pause (header->priv->mpd);
 }
 
 void
-header_stop (Header *header)
+ario_header_stop (ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        g_return_if_fail (IS_HEADER (header));
-        mpd_do_stop (header->priv->mpd);
+        ARIO_LOG_FUNCTION_START
+        g_return_if_fail (IS_ARIO_HEADER (header));
+        ario_mpd_do_stop (header->priv->mpd);
 }
 
 static void
-header_do_random (Header *header)
+ario_header_do_random (ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        g_return_if_fail (IS_HEADER (header));
-        mpd_set_current_random (header->priv->mpd, !mpd_get_current_random (header->priv->mpd));
+        ARIO_LOG_FUNCTION_START
+        g_return_if_fail (IS_ARIO_HEADER (header));
+        ario_mpd_set_current_random (header->priv->mpd, !ario_mpd_get_current_random (header->priv->mpd));
 }
 
 static void
-header_do_repeat (Header *header)
+ario_header_do_repeat (ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        g_return_if_fail (IS_HEADER (header));
-        mpd_set_current_repeat (header->priv->mpd, !mpd_get_current_repeat (header->priv->mpd));
+        ARIO_LOG_FUNCTION_START
+        g_return_if_fail (IS_ARIO_HEADER (header));
+        ario_mpd_set_current_repeat (header->priv->mpd, !ario_mpd_get_current_repeat (header->priv->mpd));
 }
 
 static void
-header_cmd_playpause (GtkAction *action,
-                      Header *header)
+ario_header_cmd_playpause (GtkAction *action,
+                           ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        header_playpause (header);
+        ARIO_LOG_FUNCTION_START
+        ario_header_playpause (header);
 }
 
 static void
-header_cmd_stop (GtkAction *action,
-                 Header *header)
+ario_header_cmd_stop (GtkAction *action,
+                      ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        header_stop (header);
+        ARIO_LOG_FUNCTION_START
+        ario_header_stop (header);
 }
 
 static void
-header_cmd_next (GtkAction *action,
-                      Header *header)
+ario_header_cmd_next (GtkAction *action,
+                      ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        header_do_next (header);
+        ARIO_LOG_FUNCTION_START
+        ario_header_do_next (header);
 }
 
 static void
-header_cmd_previous (GtkAction *action,
-                      Header *header)
+ario_header_cmd_previous (GtkAction *action,
+                          ArioHeader *header)
 {
-        LOG_FUNCTION_START
-        header_do_previous (header);
+        ARIO_LOG_FUNCTION_START
+        ario_header_do_previous (header);
 }
