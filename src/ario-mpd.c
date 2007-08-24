@@ -1049,9 +1049,10 @@ ario_mpd_set_current_volume (ArioMpd *mpd,
         /* check if there is a connection */
         if (!ario_mpd_is_connected (mpd))
                 return;
-        mpd->priv->volume = volume;
+
         mpd_sendSetvolCommand (mpd->priv->connection, volume);
         mpd_finishCommand (mpd->priv->connection);
+        ario_mpd_update_status (mpd);
 }
 
 void
