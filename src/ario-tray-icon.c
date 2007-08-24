@@ -49,6 +49,8 @@ static void ario_tray_icon_get_property (GObject *object,
 static void ario_tray_icon_set_visibility (ArioTrayIcon *tray, int state);
 static void ario_tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
                                                   ArioTrayIcon *icon);
+static gboolean ario_tray_icon_scroll_cb (GtkWidget *widget, GdkEvent *event,
+                                          ArioTrayIcon *icon);
 static void ario_tray_icon_song_changed_cb (ArioMpd *mpd,
                                             ArioTrayIcon *icon);
 static void ario_tray_icon_state_changed_cb (ArioMpd *mpd,
@@ -179,7 +181,10 @@ ario_tray_icon_init (ArioTrayIcon *icon)
                                  "button_press_event",
                                  G_CALLBACK (ario_tray_icon_button_press_event_cb),
                                  icon, 0);
-
+        g_signal_connect_object (G_OBJECT (icon->priv->ebox),
+                                 "scroll_event",
+                                 G_CALLBACK (ario_tray_icon_scroll_cb),
+                                 icon, 0);
         image = gtk_image_new_from_stock ("volume-max",
                                           GTK_ICON_SIZE_SMALL_TOOLBAR);
         gtk_container_add (GTK_CONTAINER (icon->priv->ebox), image);
@@ -333,6 +338,34 @@ ario_tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
         default:
                 break;
         }
+}
+
+static gboolean
+ario_tray_icon_scroll_cb (GtkWidget *widget, GdkEvent *event,
+                          ArioTrayIcon *icon)
+{
+        ARIO_LOG_FUNCTION_START
+        gint vol = ario_mpd_get_current_volume (icon->priv->mpd);
+
+        switch (event->scroll.direction) {
+        case GDK_SCROLL_UP:
+                vol += 10;
+                if (vol > 100)
+                        vol = 100;
+                break;
+        case GDK_SCROLL_DOWN:
+                vol -= 10;
+                if (vol < 0)
+                        vol = 0;
+                break;
+        case GDK_SCROLL_LEFT:
+        case GDK_SCROLL_RIGHT:
+                break;
+        }
+
+        ario_mpd_set_current_volume (icon->priv->mpd, vol);
+
+        return FALSE;
 }
 
 static void

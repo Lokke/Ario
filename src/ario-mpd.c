@@ -41,6 +41,27 @@ static void ario_mpd_get_property (GObject *object,
                                    guint prop_id,
                                    GValue *value,
                                    GParamSpec *pspec);
+mpd_Connection *ario_mpd_get_connection (ArioMpd *mpd);
+typedef enum
+{
+        ARIO_MPD_ACTION_ADD,
+        ARIO_MPD_ACTION_DELETE_ID,
+        ARIO_MPD_ACTION_DELETE_POS,
+        ARIO_MPD_ACTION_MOVE
+}ArioMpdActionType;
+
+typedef struct ArioMpdQueueAction {
+        ArioMpdActionType type;
+        union {
+                char *path;             // For ARIO_MPD_ACTION_ADD
+                int id;                 // For ARIO_MPD_ACTION_DELETE_ID
+                int pos;                // For ARIO_MPD_ACTION_DELETE_POS
+                struct {                // For ARIO_MPD_ACTION_MOVE
+                        int old_pos;
+                        int new_pos;
+                };
+        };
+} ArioMpdQueueAction;
 
 struct ArioMpdPrivate
 {        
@@ -55,7 +76,7 @@ struct ArioMpdPrivate
 
         int total_time;
 
-        mpd_Song *ario_mpd_song;
+        ArioMpdSong *ario_mpd_song;
         int playlist_id;
         int playlist_length;
 
@@ -63,6 +84,8 @@ struct ArioMpdPrivate
         gboolean repeat;
 
         unsigned long dbtime;
+        
+        GList *queue;
 };
 
 enum
@@ -649,6 +672,29 @@ ario_mpd_get_songs (ArioMpd *mpd,
         return songs;
 }
 
+GList *
+ario_mpd_get_playlist_changes (ArioMpd *mpd,
+                               int playlist_id)
+{
+        ARIO_LOG_FUNCTION_START
+        GList *songs = NULL;
+        mpd_InfoEntity *entity = NULL;
+
+        /* check if there is a connection */
+        if (!ario_mpd_is_connected (mpd))
+                return NULL;
+
+        mpd_sendPlChangesCommand (mpd->priv->connection, playlist_id);
+
+        while ((entity = mpd_getNextInfoEntity (mpd->priv->connection))) {
+                if (entity->info.song)
+                        songs = g_list_append (songs, mpd_songDup (entity->info.song));
+                mpd_freeInfoEntity (entity);
+        }
+
+        return songs;
+}
+
 mpd_Connection *
 ario_mpd_get_connection (ArioMpd *mpd)
 {
@@ -827,7 +873,7 @@ ario_mpd_get_current_playlist_total_time (ArioMpd *mpd)
 {
         ARIO_LOG_FUNCTION_START
         int total_time = 0;
-        mpd_Song *song;
+        ArioMpdSong *song;
         mpd_Connection *connection;
         mpd_InfoEntity *ent = NULL;
 
@@ -1003,7 +1049,7 @@ ario_mpd_set_current_volume (ArioMpd *mpd,
         /* check if there is a connection */
         if (!ario_mpd_is_connected (mpd))
                 return;
-
+        mpd->priv->volume = volume;
         mpd_sendSetvolCommand (mpd->priv->connection, volume);
         mpd_finishCommand (mpd->priv->connection);
 }
@@ -1079,3 +1125,99 @@ ario_mpd_remove (ArioMpd *mpd,
         mpd_sendCommandListEnd (mpd->priv->connection);
         mpd_finishCommand (mpd->priv->connection);
 }
+
+void
+ario_mpd_queue_add (ArioMpd *mpd,
+                    char* path)
+{
+        ARIO_LOG_FUNCTION_START
+
+        ArioMpdQueueAction *queue_action = (ArioMpdQueueAction *) g_malloc (sizeof (ArioMpdQueueAction));
+        queue_action->type = ARIO_MPD_ACTION_ADD;
+        queue_action->path = g_strdup(path);
+        
+        mpd->priv->queue = g_list_append (mpd->priv->queue, queue_action);
+}
+
+void
+ario_mpd_queue_delete_id (ArioMpd *mpd,
+                          int id)
+{
+        ArioMpdQueueAction *queue_action = (ArioMpdQueueAction *) g_malloc (sizeof (ArioMpdQueueAction));
+        queue_action->type = ARIO_MPD_ACTION_DELETE_ID;
+        queue_action->id = id;
+        
+        mpd->priv->queue = g_list_append (mpd->priv->queue, queue_action);
+}
+
+void
+ario_mpd_queue_delete_pos (ArioMpd *mpd,
+                           int pos)
+{
+        ARIO_LOG_FUNCTION_START
+        ArioMpdQueueAction *queue_action = (ArioMpdQueueAction *) g_malloc (sizeof (ArioMpdQueueAction));
+        queue_action->type = ARIO_MPD_ACTION_DELETE_POS;
+        queue_action->pos = pos;
+        
+        mpd->priv->queue = g_list_append (mpd->priv->queue, queue_action);
+}
+                    
+void
+ario_mpd_queue_move (ArioMpd *mpd,
+                     int old_pos,
+                     int new_pos)
+{
+        ARIO_LOG_FUNCTION_START
+        ArioMpdQueueAction *queue_action = (ArioMpdQueueAction *) g_malloc (sizeof (ArioMpdQueueAction));
+        queue_action->type = ARIO_MPD_ACTION_MOVE;
+        queue_action->old_pos = old_pos;
+        queue_action->new_pos = new_pos;
+     
+        mpd->priv->queue = g_list_append (mpd->priv->queue, queue_action);
+}
+
+void
+ario_mpd_queue_commit (ArioMpd *mpd)
+{
+        ARIO_LOG_FUNCTION_START
+        GList *temp;
+        
+        /* check if there is a connection */
+        if (!ario_mpd_is_connected (mpd))
+                return;
+                
+	mpd_sendCommandListBegin(mpd->priv->connection);
+	/* get first item */
+	temp = mpd->priv->queue;
+	while (temp) {
+	        ArioMpdQueueAction *queue_action = (ArioMpdQueueAction *) temp->data;
+		if(queue_action->type == ARIO_MPD_ACTION_ADD) {
+			if(queue_action->path != NULL) {
+				mpd_sendAddCommand(mpd->priv->connection, queue_action->path);
+			}
+		} else if (queue_action->type == ARIO_MPD_ACTION_DELETE_ID) {
+			if(queue_action->id >= 0) {
+				mpd_sendDeleteIdCommand(mpd->priv->connection, queue_action->id);
+			}
+		} else if (queue_action->type == ARIO_MPD_ACTION_DELETE_POS) {                                                                      		
+			if(queue_action->id >= 0) {
+				mpd_sendDeleteCommand(mpd->priv->connection, queue_action->pos);
+			}
+		} else if (queue_action->type == ARIO_MPD_ACTION_MOVE) {
+			if(queue_action->id >= 0) {
+				mpd_sendMoveCommand(mpd->priv->connection, queue_action->old_pos, queue_action->new_pos);
+			}
+		}
+
+		temp = g_list_next (temp);
+	}
+	mpd_sendCommandListEnd(mpd->priv->connection);
+	mpd_finishCommand(mpd->priv->connection);
+	ario_mpd_update_status (mpd);
+	
+        // g_list_foreach(artists, (GFunc) TODO, NULL);
+        g_list_free (mpd->priv->queue);
+        mpd->priv->queue = NULL;
+}
+
+

@@ -1,5 +1,14 @@
 bin_PROGRAMS = ario
 
+INCLUDES = -Wcomment -Wformat -Wnonnull -Wimplicit-int -Wimplicit \
+	   -Wmain -Wmissing-braces -Wparentheses -Wsequence-point \
+	   -Wreturn-type -Wswitch -Wtrigraphs -Wunused-function \
+	   -Wunused-label -Wunused-value \
+	   -Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
+	   -Wnested-externs -Wpointer-arith \
+	   -Wcast-align -Wall \
+	   -Werror
+
 ario_SOURCES = \
 	ario-main.c\
 	ario-shell.c\

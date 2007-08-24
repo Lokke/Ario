@@ -370,8 +370,8 @@ clicked_cb (GtkButton *button,
         gint spacing = 5;
         gint max_y;
 
-        gint ario_volume_slider_x;
-        gint ario_volume_slider_y;
+        gint volume_slider_x;
+        gint volume_slider_y;
         
 
 /*         if (GTK_WIDGET_VISIBLE (GTK_WIDGET (volume->priv->window))) */
@@ -394,19 +394,19 @@ clicked_cb (GtkButton *button,
         gtk_widget_show_all (volume->priv->window);
         gdk_drawable_get_size (gtk_widget_get_parent_window (GTK_BIN (volume->priv->window)->child), &window_width, &window_height);
         
-        ario_volume_slider_x = x + (button_width - window_width) / 2;
+        volume_slider_x = x + (button_width - window_width) / 2;
         
         if (y + button_width + window_height + spacing < max_y) {
                 /* if volume slider will fit on the screen, display it under
                  * the volume button
                  */
-                ario_volume_slider_y = y + button_width + spacing;
+                volume_slider_y = y + button_width + spacing;
         } else {
                 /* otherwise display it above the volume button */
-                ario_volume_slider_y = y - window_height - spacing;
+                volume_slider_y = y - window_height - spacing;
         }
         
-        gtk_window_move (GTK_WINDOW (volume->priv->window), ario_volume_slider_x, ario_volume_slider_y);
+        gtk_window_move (GTK_WINDOW (volume->priv->window), volume_slider_x, volume_slider_y);
 
         /*
          * Grab focus and pointer.

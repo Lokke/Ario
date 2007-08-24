@@ -80,6 +80,7 @@ static void ario_browser_cmd_add_albums (GtkAction *action,
 static void ario_browser_cmd_add_songs (GtkAction *action,
                                         ArioBrowser *browser);
 static void ario_browser_add_in_playlist (ArioBrowser *browser);
+void ario_browser_refresh_albumview (ArioBrowser *browser);
 static void ario_browser_cmd_get_artist_ario_cover_amazon (GtkAction *action,
                                                            ArioBrowser *browser);
 static void ario_browser_cmd_remove_artist_cover (GtkAction *action,
@@ -732,7 +733,7 @@ ario_browser_albums_selection_foreach (GtkTreeModel *model,
         ArioBrowser *browser = ARIO_BROWSER (userdata);
         gchar *artist = NULL, *album = NULL;
         GList *songs = NULL, *temp;
-        mpd_Song *song;
+        ArioMpdSong *song;
         GtkTreeIter songs_iter;
         gchar *track;
 

@@ -55,6 +55,32 @@ void ario_preferences_covertree_check_changed_cb (GtkCheckButton *butt,
 void ario_preferences_amazon_country_changed_cb (GtkComboBoxEntry *combobox,
                                                  ArioPreferences *preferences);
 static gboolean ario_preferences_update_mpd (ArioPreferences *preferences);
+void ario_preferences_host_changed_cb (GtkWidget *widget,
+                                       ArioPreferences *preferences);
+void ario_preferences_port_changed_cb (GtkWidget *widget,
+                                       ArioPreferences *preferences);
+void ario_preferences_autoconnect_changed_cb (GtkWidget *widget,
+                                              ArioPreferences *preferences);
+void ario_preferences_authentication_changed_cb (GtkWidget *widget,
+                                                 ArioPreferences *preferences);
+void ario_preferences_password_changed_cb (GtkWidget *widget,
+                                           ArioPreferences *preferences);
+void ario_preferences_connect_cb (GtkWidget *widget,
+                                  ArioPreferences *preferences);
+void ario_preferences_disconnect_cb (GtkWidget *widget,
+                                     ArioPreferences *preferences);
+void ario_preferences_crossfadetime_changed_cb (GtkWidget *widget,
+                                                ArioPreferences *preferences);
+void ario_preferences_crossfade_changed_cb (GtkWidget *widget,
+                                            ArioPreferences *preferences);
+void ario_preferences_updatedb_button_cb (GtkWidget *widget,
+                                          ArioPreferences *preferences);
+void ario_preferences_proxy_address_changed_cb (GtkWidget *widget,
+                                                ArioPreferences *preferences);
+void ario_preferences_proxy_port_changed_cb (GtkWidget *widget,
+                                             ArioPreferences *preferences);
+void ario_preferences_proxy_check_changed_cb (GtkCheckButton *butt,
+                                              ArioPreferences *preferences);
 
 static const char *amazon_countries[] = {
         "com",

@@ -49,6 +49,8 @@ typedef struct ArioMpdAlbum
         gchar *album;
 } ArioMpdAlbum;
 
+typedef mpd_Song ArioMpdSong;
+
 typedef struct
 {
         GObjectClass parent;
@@ -57,7 +59,7 @@ typedef struct
 
         void (*state_changed)           (ArioMpd *mpd);
 
-        void (*volume_changed)     (ArioMpd *mpd);
+        void (*volume_changed)          (ArioMpd *mpd);
 
         void (*elapsed_changed)         (ArioMpd *mpd);
 
@@ -91,8 +93,8 @@ GList *                 ario_mpd_get_albums                             (ArioMpd
 GList *                 ario_mpd_get_songs                              (ArioMpd *mpd,
                                                                          const char *artist,
                                                                          const char *album);
-mpd_Connection *        ario_mpd_get_connection                         (ArioMpd *mpd);
-
+GList *                 ario_mpd_get_playlist_changes                   (ArioMpd *mpd,
+                                                                         int playlist_id);
 char *                  ario_mpd_get_current_title                      (ArioMpd *mpd);
 
 char *                  ario_mpd_get_current_artist                     (ArioMpd *mpd);
@@ -155,6 +157,16 @@ void                    ario_mpd_clear                                  (ArioMpd
 
 void                    ario_mpd_remove                                 (ArioMpd *mpd,
                                                                          GArray *songs);
+void                    ario_mpd_queue_add                              (ArioMpd *mpd,
+                                                                         char* path);
+void                    ario_mpd_queue_delete_id                        (ArioMpd *mpd,
+                                                                         int id);
+void                    ario_mpd_queue_delete_pos                       (ArioMpd *mpd,
+                                                                         int pos);
+void                    ario_mpd_queue_move                             (ArioMpd *mpd,
+                                                                         int old_pos,
+                                                                         int new_pos);
+void                    ario_mpd_queue_commit                           (ArioMpd *mpd);
 
 G_END_DECLS
 

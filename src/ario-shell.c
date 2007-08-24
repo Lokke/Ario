@@ -249,7 +249,6 @@ ario_shell_construct (ArioShell *shell)
         GtkWindow *win;
         GtkWidget *menubar;
         GtkWidget *vbox;
-        GtkWidget *icon;
         GdkPixbuf *pixbuf;
         GError *error = NULL;
 
