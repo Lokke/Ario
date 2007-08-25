@@ -6,8 +6,7 @@ INCLUDES = -Wcomment -Wformat -Wnonnull -Wimplicit-int -Wimplicit \
 	   -Wunused-label -Wunused-value \
 	   -Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
 	   -Wnested-externs -Wpointer-arith \
-	   -Wcast-align -Wall \
-	   -Werror
+	   -Wcast-align -Wall
 
 ario_SOURCES = \
 	ario-main.c\
@@ -15,6 +14,10 @@ ario_SOURCES = \
 	ario-shell.h\
 	ario-browser.c\
 	ario-browser.h\
+	ario-radio.c\
+	ario-radio.h\
+	ario-source.c\
+	ario-source.h\
 	ario-mpd.c\
 	ario-mpd.h\
 	libmpdclient.c\
@@ -49,5 +52,9 @@ ario_SOURCES = \
 ario_LDADD = $(DEPS_LIBS)
 
 AM_CPPFLAGS = $(DEPS_CFLAGS) \
-              -DLOCALE_DIR=\""$(datadir)/locale"\" -DPIXMAP_PATH=\""$(pkgdatadir)/art/"\" -DUI_PATH=\""$(pkgdatadir)/ui/"\" -DGLADE_PATH=\""$(pkgdatadir)/glade/"\"
+                -DLOCALE_DIR=\""$(pkgdatadir)/locale"\"\
+                -DPIXMAP_PATH=\""$(pkgdatadir)/ario/art/"\"\
+                -DDATA_PATH=\""$(pkgdatadir)/ario/data/"\"\
+                -DUI_PATH=\""$(pkgdatadir)/ario/ui/"\"\
+                -DGLADE_PATH=\""$(pkgdatadir)/ario/glade/"\"
 

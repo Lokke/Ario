@@ -47,7 +47,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_ario_OBJECTS = ario-main.$(OBJEXT) ario-shell.$(OBJEXT) \
-	ario-browser.$(OBJEXT) ario-mpd.$(OBJEXT) \
+	ario-browser.$(OBJEXT) ario-radio.$(OBJEXT) \
+	ario-source.$(OBJEXT) ario-mpd.$(OBJEXT) \
 	libmpdclient.$(OBJEXT) ario-header.$(OBJEXT) \
 	eggtrayicon.$(OBJEXT) eel-gconf-extensions.$(OBJEXT) \
 	ario-tray-icon.$(OBJEXT) ario-playlist.$(OBJEXT) \
@@ -218,8 +219,7 @@ INCLUDES = -Wcomment -Wformat -Wnonnull -Wimplicit-int -Wimplicit \
 	   -Wunused-label -Wunused-value \
 	   -Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes \
 	   -Wnested-externs -Wpointer-arith \
-	   -Wcast-align -Wall \
-	   -Werror
+	   -Wcast-align -Wall
 
 ario_SOURCES = \
 	ario-main.c\
@@ -227,6 +227,10 @@ ario_SOURCES = \
 	ario-shell.h\
 	ario-browser.c\
 	ario-browser.h\
+	ario-radio.c\
+	ario-radio.h\
+	ario-source.c\
+	ario-source.h\
 	ario-mpd.c\
 	ario-mpd.h\
 	libmpdclient.c\
@@ -260,7 +264,11 @@ ario_SOURCES = \
 
 ario_LDADD = $(DEPS_LIBS)
 AM_CPPFLAGS = $(DEPS_CFLAGS) \
-              -DLOCALE_DIR=\""$(datadir)/locale"\" -DPIXMAP_PATH=\""$(pkgdatadir)/art/"\" -DUI_PATH=\""$(pkgdatadir)/ui/"\" -DGLADE_PATH=\""$(pkgdatadir)/glade/"\"
+                -DLOCALE_DIR=\""$(pkgdatadir)/locale"\"\
+                -DPIXMAP_PATH=\""$(pkgdatadir)/ario/art/"\"\
+                -DDATA_PATH=\""$(pkgdatadir)/ario/data/"\"\
+                -DUI_PATH=\""$(pkgdatadir)/ario/ui/"\"\
+                -DGLADE_PATH=\""$(pkgdatadir)/ario/glade/"\"
 
 all: all-am
 
@@ -335,9 +343,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-mpd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-playlist.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-preferences.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-radio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-shell-coverdownloader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-shell-coverselect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-shell.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-source.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-status-bar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-tray-icon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ario-util.Po@am__quote@

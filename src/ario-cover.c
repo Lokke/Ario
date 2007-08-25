@@ -110,10 +110,9 @@ ario_cover_create_ario_cover_dir (void)
         ARIO_LOG_FUNCTION_START
         gchar *ario_cover_dir;
 
-        /* The ario_cover_dir is ~/.gnome2/ario/covers/ */
         ario_cover_dir = g_build_filename (ario_util_config_dir (), "covers", NULL);
 
-        /* If the cover directory doesn't exist, we create it with permission 744 */
+        /* If the cover directory doesn't exist, we create it */
         if (!ario_util_uri_exists (ario_cover_dir))
                 ario_util_mkdir (ario_cover_dir);
 }

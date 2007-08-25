@@ -138,6 +138,7 @@ static const GtkTargetEntry targets  [] = {
         { "text/artists-list", 0, 20 },
         { "text/albums-list", 0, 30 },
         { "text/songs-list", 0, 40 },
+        { "text/radios-list", 0, 40 },
 };
 
 static const GtkTargetEntry internal_targets  [] = {
@@ -515,7 +516,13 @@ ario_playlist_changed_cb (ArioMpd *mpd,
                                 track = ario_util_format_track (song->track);
                                 artist = song->artist ? song->artist : ARIO_MPD_UNKNOWN;
                                 album = song->album ? song->album : ARIO_MPD_UNKNOWN;
-                                title = song->title ? song->title : ARIO_MPD_UNKNOWN;
+                                if (song->title) {
+                                        title = song->title;
+                                } else if (song->name) {
+                                        title = song->name;
+                                } else {
+                                        title = ARIO_MPD_UNKNOWN;
+                                }
                                 gtk_list_store_set (playlist->priv->model, &iter,
                                                     TRACK_COLUMN, track,
                                                     TITLE_COLUMN, title,
@@ -534,7 +541,13 @@ ario_playlist_changed_cb (ArioMpd *mpd,
                         track = ario_util_format_track (song->track);
                         artist = song->artist ? song->artist : ARIO_MPD_UNKNOWN;
                         album = song->album ? song->album : ARIO_MPD_UNKNOWN;
-                        title = song->title ? song->title : ARIO_MPD_UNKNOWN;
+                        if (song->title) {
+                                title = song->title;
+                        } else if (song->name) {
+                                title = song->name;
+                        } else {
+                                title = ARIO_MPD_UNKNOWN;
+                        }
                         gtk_list_store_set (playlist->priv->model, &iter,
                                             TRACK_COLUMN, track,
                                             TITLE_COLUMN, title,
@@ -808,6 +821,30 @@ ario_playlist_add_artists (ArioPlaylist *playlist,
 }
 
 static void
+ario_playlist_drop_radios (ArioPlaylist *playlist,
+                           int x, int y,
+                           GtkSelectionData *data)
+{
+        ARIO_LOG_FUNCTION_START
+        gchar **radios;
+        GList *radio_urls = NULL;
+        int i;
+
+        radios = g_strsplit ((const gchar *) data->data, "\n", 0);
+
+        /* For each radio url :*/
+        for (i=0; radios[i]!=NULL && g_utf8_collate (radios[i], ""); i++)
+                radio_urls = g_list_append (radio_urls, radios[i]);
+
+        ario_playlist_add_songs (playlist,
+                                 radio_urls,
+                                 x, y);
+
+        g_strfreev (radios);
+        g_list_free (radio_urls);
+}
+
+static void
 ario_playlist_drop_songs (ArioPlaylist *playlist,
                           int x, int y,
                           GtkSelectionData *data)
@@ -932,6 +969,8 @@ ario_playlist_drag_leave_cb (GtkWidget *widget,
                 ario_playlist_drop_albums (playlist, x, y, data);
         else if (data->type == gdk_atom_intern ("text/songs-list", TRUE))
                 ario_playlist_drop_songs (playlist, x, y, data);
+        else if (data->type == gdk_atom_intern ("text/radios-list", TRUE))
+                ario_playlist_drop_radios (playlist, x, y, data);
 
         /* finish the drag */
         gtk_drag_finish (context, TRUE, FALSE, time);

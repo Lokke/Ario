@@ -512,7 +512,7 @@ ario_shell_coverselect_save_cover (ArioShellCoverselect *ario_shell_coverselect)
         gint *indice;
         gchar *data;
         const gchar *local_file;
-        guint size;
+        gsize size;
         gboolean ret;
 
         switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (ario_shell_coverselect->priv->notebook))) {

@@ -37,6 +37,9 @@ ario_util_format_time (int time)
 {
         ARIO_LOG_FUNCTION_START
         int sec, min;
+        
+        if (time < 0)
+                return g_strdup_printf (_("n/a"));
 
         min = (int)(time / 60);
         sec = (time % 60);
@@ -52,6 +55,9 @@ ario_util_format_total_time (int time)
         gchar *temp1, *temp2;
         int temp_time;
         int sec, min, hours, days;
+
+        if (time < 0)
+                return g_strdup_printf (_("n/a"));
 
         days = (int)(time / 86400);
         temp_time = (time % 86400);
@@ -231,6 +237,26 @@ void
 ario_util_mkdir (const char *uri)
 {
         g_mkdir (uri, 0750);
+}
+
+void
+ario_util_copy_file (const char *src_uri,
+                     const char *dest_uri)
+{
+        gchar *contents;
+        gsize length;
+
+        if (! g_file_get_contents (src_uri,
+                                   &contents,
+                                   &length,
+                                   NULL)) {
+                return;
+        }
+
+        g_file_set_contents (dest_uri,
+                             contents,
+                             length,
+                             NULL);
 }
 
 typedef struct _download_struct{

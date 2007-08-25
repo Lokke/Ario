@@ -44,6 +44,7 @@ G_BEGIN_DECLS
 #define CONF_STATE_WINDOW_HEIGHT        "/apps/ario/state/window_height"
 #define CONF_STATE_WINDOW_MAXIMIZED     "/apps/ario/state/window_maximized"
 #define STATE_VPANED_POSITION           "/apps/ario/state/vpaned_position"
+#define CONF_STATE_SOURCE               "/apps/ario/state/source"
 #define CONF_USE_PROXY                  "/apps/ario/use_proxy"
 #define CONF_PROXY_ADDRESS              "/apps/ario/proxy_address"
 #define CONF_PROXY_PORT                 "/apps/ario/proxy_port"

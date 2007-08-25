@@ -19,7 +19,6 @@
 
 #include <gtk/gtk.h>
 #include <string.h>
-#include "libmpdclient.h"
 #include "eel-gconf-extensions.h"
 #include "ario-i18n.h"
 #include "ario-browser.h"
@@ -147,7 +146,6 @@ static GtkActionEntry ario_browser_actions [] =
           N_("Delete the selected covers"),
           G_CALLBACK (ario_browser_cmd_remove_album_cover) },
 };
-
 static guint ario_browser_n_actions = G_N_ELEMENTS (ario_browser_actions);
 
 enum

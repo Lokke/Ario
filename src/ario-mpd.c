@@ -774,8 +774,10 @@ ario_mpd_update_status (ArioMpd *mpd)
         if (mpd->priv->elapsed != mpd->priv->status->elapsedTime)
                 g_object_set (G_OBJECT (mpd), "elapsed", mpd->priv->status->elapsedTime, NULL);
 
-        if (mpd->priv->playlist_id != (int) mpd->priv->status->playlist)
+        if (mpd->priv->playlist_id != (int) mpd->priv->status->playlist) {
+                g_object_set (G_OBJECT (mpd), "song_id", mpd->priv->status->songid, NULL);
                 g_object_set (G_OBJECT (mpd), "playlist_id", mpd->priv->status->playlist, NULL);
+        }
 
         if (mpd->priv->random != (gboolean) mpd->priv->status->random)
                 g_object_set (G_OBJECT (mpd), "random", mpd->priv->status->random, NULL);
@@ -795,6 +797,16 @@ ario_mpd_get_current_title (ArioMpd *mpd)
         ARIO_LOG_FUNCTION_START
         if (mpd->priv->ario_mpd_song)
                 return mpd->priv->ario_mpd_song->title;
+        else
+                return NULL;
+}
+
+char *
+ario_mpd_get_current_name (ArioMpd *mpd)
+{
+        ARIO_LOG_FUNCTION_START
+        if (mpd->priv->ario_mpd_song)
+                return mpd->priv->ario_mpd_song->name;
         else
                 return NULL;
 }

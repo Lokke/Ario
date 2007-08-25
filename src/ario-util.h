@@ -39,6 +39,8 @@ void                    ario_util_unlink_uri                 (const char *uri);
 
 void                    ario_util_mkdir                      (const char *uri);
 
+void                    ario_util_copy_file                  (const char *src_uri,
+                                                              const char *dest_uri);
 void                    ario_util_download_file              (const char *uri,
                                                               int* size,
                                                               char** data);

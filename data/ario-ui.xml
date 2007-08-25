@@ -9,6 +9,11 @@
 			<menuitem name="EditPreferencesMenu" action="EditPreferences"/> 
 		</menu>
 
+		<menu name="ViewMenu" action="View">
+			<menuitem name="BrowserViewMenu" action="BrowserView"/>
+			<menuitem name="RadioViewMenu" action="RadioView"/> 
+		</menu>
+
 		<menu name="ToolMenu" action="Tool">
 			<menuitem name="ToolCoverMenu" action="ToolCover"/>
 		</menu>
@@ -52,4 +57,9 @@
 		<menuitem name="BrowserAddSongs" action="BrowserAddSongs"/>
 	</popup>
 
+	<popup name="RadioPopup">
+		<menuitem name="RadioAddRadios" action="RadioAddRadios"/>
+		<menuitem name="RadioAddRadios" action="RadioAddRadios"/>
+		<menuitem name="RadioAddRadios" action="RadioAddRadios"/>
+	</popup>
 </ui>

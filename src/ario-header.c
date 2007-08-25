@@ -529,6 +529,9 @@ ario_header_change_labels (ArioHeader *header)
                 album = ario_mpd_get_current_album (header->priv->mpd);
 
                 if (!title)
+                        title = ario_mpd_get_current_name (header->priv->mpd);
+
+                if (!title)
                         title = _("Unknown");
 
                 if (!album)

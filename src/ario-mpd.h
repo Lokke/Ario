@@ -97,6 +97,8 @@ GList *                 ario_mpd_get_playlist_changes                   (ArioMpd
                                                                          int playlist_id);
 char *                  ario_mpd_get_current_title                      (ArioMpd *mpd);
 
+char *                  ario_mpd_get_current_name                       (ArioMpd *mpd);
+
 char *                  ario_mpd_get_current_artist                     (ArioMpd *mpd);
 
 char *                  ario_mpd_get_current_album                      (ArioMpd *mpd);

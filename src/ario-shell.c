@@ -20,11 +20,12 @@
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <config.h>
+#include <string.h>
 #include "eel-gconf-extensions.h"
 #include "ario-i18n.h"
 #include "ario-shell.h"
+#include "ario-source.h"
 #include "ario-mpd.h"
-#include "ario-browser.h"
 #include "ario-playlist.h"
 #include "ario-header.h"
 #include "ario-tray-icon.h"
@@ -48,6 +49,11 @@ static void ario_shell_cmd_quit (GtkAction *action,
                                  ArioShell *shell);
 static void ario_shell_cmd_preferences (GtkAction *action,
                                         ArioShell *shell);
+#ifdef ENABLE_RADIOS
+static void ario_shell_cmd_radio_view (GtkRadioAction *action,
+                		       GtkRadioAction *current,
+                		       ArioShell *shell);
+#endif  /* ENABLE_RADIOS */
 static void ario_shell_cmd_covers (GtkAction *action,
                                    ArioShell *shell);
 static void ario_shell_cmd_about (GtkAction *action,
@@ -59,11 +65,16 @@ static void ario_shell_paned_changed_cb (GConfClient *client,
                                          guint cnxn_id,
                                          GConfEntry *entry,
                                          ArioShell *shell);
+static void ario_shell_source_changed_cb (GConfClient *client,
+                                          guint cnxn_id,
+                                          GConfEntry *entry,
+                                          ArioShell *shell);
 static gboolean ario_shell_window_state_cb (GtkWidget *widget,
                                             GdkEvent *event,
                                             ArioShell *shell);
 static void ario_shell_sync_window_state (ArioShell *shell);
 static void ario_shell_sync_paned (ArioShell *shell);
+static void ario_shell_sync_source (ArioShell *shell);
 
 enum
 {
@@ -78,7 +89,7 @@ struct ArioShellPrivate
         ArioMpd *mpd;
         GtkWidget *header;
         GtkWidget *vpaned;
-        GtkWidget *browser;
+        GtkWidget *source;
         GtkWidget *playlist;
         GtkWidget *status_bar;
 
@@ -92,6 +103,7 @@ static GtkActionEntry ario_shell_actions [] =
 {
         { "File", NULL, N_("_File") },
         { "Edit", NULL, N_("_Edit") },
+        { "View", NULL, N_("_View") },
         { "Tool", NULL, N_("_Tool") },
         { "Help", NULL, N_("_Help") },
 
@@ -108,9 +120,19 @@ static GtkActionEntry ario_shell_actions [] =
           N_("Show information about the music player"),
           G_CALLBACK (ario_shell_cmd_about) }
 };
-
 static guint ario_shell_n_actions = G_N_ELEMENTS (ario_shell_actions);
-
+#ifdef ENABLE_RADIOS
+static GtkRadioActionEntry ario_shell_radio [] =
+{
+        { "BrowserView", NULL, N_("_Browser View"), NULL,
+          N_("Browser view"),
+          ARIO_SOURCE_BROWSER },
+        { "RadioView", NULL, N_("_Radio View"), NULL,
+          N_("Radio view"),
+          ARIO_SOURCE_RADIO }
+};
+static guint ario_shell_n_radio = G_N_ELEMENTS (ario_shell_radio);
+#endif  /* ENABLE_RADIOS */
 static GObjectClass *parent_class;
 
 GType
@@ -257,7 +279,7 @@ ario_shell_construct (ArioShell *shell)
         /* initialize UI */
         win = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
         gtk_window_set_title (win, "Ario");
-        pixbuf = gdk_pixbuf_new_from_file (PIXMAP_PATH "icon.png", NULL);
+        pixbuf = gdk_pixbuf_new_from_file (PIXMAP_PATH "ario.png", NULL);
         gtk_window_set_default_icon (pixbuf);
 
         shell->priv->window = GTK_WIDGET (win);
@@ -278,11 +300,18 @@ ario_shell_construct (ArioShell *shell)
         shell->priv->mpd = ario_mpd_new ();
         shell->priv->header = ario_header_new (shell->priv->actiongroup, shell->priv->mpd);
         shell->priv->playlist = ario_playlist_new (shell->priv->ui_manager, shell->priv->actiongroup, shell->priv->mpd);
-        shell->priv->browser = ario_browser_new (shell->priv->ui_manager, shell->priv->actiongroup, shell->priv->mpd, ARIO_PLAYLIST (shell->priv->playlist));
+        shell->priv->source = ario_source_new (shell->priv->ui_manager, shell->priv->actiongroup, shell->priv->mpd, ARIO_PLAYLIST (shell->priv->playlist));
 
         gtk_action_group_add_actions (shell->priv->actiongroup,
                                       ario_shell_actions,
                                       ario_shell_n_actions, shell);
+#ifdef ENABLE_RADIOS
+	gtk_action_group_add_radio_actions (shell->priv->actiongroup,
+					    ario_shell_radio,
+					    ario_shell_n_radio,
+                                            0, G_CALLBACK (ario_shell_cmd_radio_view),
+					    shell);
+#endif  /* ENABLE_RADIOS */
         gtk_ui_manager_insert_action_group (shell->priv->ui_manager,
                                             shell->priv->actiongroup, 0);
         gtk_ui_manager_add_ui_from_file (shell->priv->ui_manager,
@@ -296,7 +325,7 @@ ario_shell_construct (ArioShell *shell)
 
 
         gtk_paned_add1 (GTK_PANED (shell->priv->vpaned),
-                        shell->priv->browser);
+                        shell->priv->source);
 
         gtk_paned_add2 (GTK_PANED (shell->priv->vpaned),
                         shell->priv->playlist);
@@ -322,6 +351,7 @@ ario_shell_construct (ArioShell *shell)
         ario_shell_sync_window_state (shell);
         gtk_widget_show_all (GTK_WIDGET (win));
         ario_shell_sync_paned (shell);
+        ario_shell_sync_source (shell);
 
         /* initialize tray icon */
         shell->priv->tray_icon = ario_tray_icon_new (shell->priv->ui_manager,
@@ -331,6 +361,10 @@ ario_shell_construct (ArioShell *shell)
 
         eel_gconf_notification_add (STATE_VPANED_POSITION,
                                     (GConfClientNotifyFunc) ario_shell_paned_changed_cb,
+                                    shell);
+
+        eel_gconf_notification_add (CONF_STATE_SOURCE,
+                                    (GConfClientNotifyFunc) ario_shell_source_changed_cb,
                                     shell);
 
         g_signal_connect_object (G_OBJECT (win), "window-state-event",
@@ -371,7 +405,16 @@ ario_shell_cmd_preferences (GtkAction *action,
 
         gtk_widget_show_all (prefs);
 }
-
+#ifdef ENABLE_RADIOS
+static void
+ario_shell_cmd_radio_view (GtkRadioAction *action,
+		           GtkRadioAction *current,
+		           ArioShell *shell)
+{
+        eel_gconf_set_integer (CONF_STATE_SOURCE,
+                               gtk_radio_action_get_current_value(current));
+}
+#endif  /* ENABLE_RADIOS */
 static void
 ario_shell_cmd_about (GtkAction *action,
                       ArioShell *shell)
@@ -403,7 +446,7 @@ ario_shell_cmd_covers (GtkAction *action,
         coverdownloader = ario_shell_coverdownloader_new (shell->priv->mpd);
 
         ario_shell_coverdownloader_get_covers (ARIO_SHELL_COVERDOWNLOADER (coverdownloader),
-                                          GET_AMAZON_COVERS);
+                                               GET_AMAZON_COVERS);
 
         gtk_widget_destroy (coverdownloader);
 }
@@ -428,6 +471,42 @@ ario_shell_paned_changed_cb (GConfClient *client,
 {
         ARIO_LOG_FUNCTION_START
         ario_shell_sync_paned (shell);
+}
+
+static void
+ario_shell_sync_source (ArioShell *shell)
+{
+#ifdef ENABLE_RADIOS
+        ARIO_LOG_FUNCTION_START
+        ArioSourceType source_type;
+        GtkAction *action;
+
+        source_type = eel_gconf_get_integer (CONF_STATE_SOURCE);
+
+        ario_source_set_source (ARIO_SOURCE (shell->priv->source),
+                                source_type);
+
+        action = gtk_action_group_get_action (shell->priv->actiongroup,
+                                              "BrowserView");
+
+        if (source_type == ARIO_SOURCE_RADIO) {
+                gtk_radio_action_set_current_value (GTK_RADIO_ACTION (action),
+                                                    ARIO_SOURCE_RADIO);
+        } else {
+                gtk_radio_action_set_current_value (GTK_RADIO_ACTION (action),
+                                                    ARIO_SOURCE_BROWSER);
+        }
+#endif  /* ENABLE_RADIOS */
+}
+
+static void
+ario_shell_source_changed_cb (GConfClient *client,
+                              guint cnxn_id,
+                              GConfEntry *entry,
+                              ArioShell *shell)
+{
+        ARIO_LOG_FUNCTION_START
+        ario_shell_sync_source (shell);
 }
 
 static void

@@ -11,6 +11,10 @@ data/cover-select.glade
 data/server-prefs.glade
 src/ario-browser.c
 src/ario-browser.h
+src/ario-radio.c
+src/ario-radio.h
+src/ario-source.c
+src/ario-source.h
 src/ario-cover.c
 src/ario-cover.h
 src/eggtrayicon.c

@@ -6,6 +6,9 @@
 /* always defined to indicate that i18n is enabled */
 #undef ENABLE_NLS
 
+/* Add support of internet radios */
+#undef ENABLE_RADIOS
+
 /* Gettext package */
 #undef GETTEXT_PACKAGE
 

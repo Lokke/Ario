@@ -180,5 +180,17 @@
         </locale>
       </schema>
 
+      <schema>
+        <key>/schemas/apps/ario/state/source</key>
+        <applyto>/apps/ario/state/source</applyto>
+        <owner>ario</owner>
+        <type>int</type>
+        <default>0</default>
+        <locale name="C">
+	<short>Define the source used in Ario</short>
+	<long>0 for the browser, 1 for the radios</long>
+        </locale>
+      </schema>
+
     </schemalist>
 </gconfschemafile>

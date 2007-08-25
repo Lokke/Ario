@@ -315,6 +315,8 @@ ario_tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
                                       ArioTrayIcon *icon)
 {
         ARIO_LOG_FUNCTION_START
+        GtkWidget *popup;
+
         /* filter out double, triple clicks */
         if (event->type != GDK_BUTTON_PRESS)
                 return;
@@ -324,17 +326,21 @@ ario_tray_icon_button_press_event_cb (GtkWidget *ebox, GdkEventButton *event,
                 ario_tray_icon_set_visibility (icon, VISIBILITY_TOGGLE);
                 break;
 
+        case 2:
+                if (ario_mpd_is_paused (icon->priv->mpd))
+                        ario_mpd_do_play (icon->priv->mpd);
+                else
+                        ario_mpd_do_pause (icon->priv->mpd);
+                break;
+
         case 3:
-        {
-                GtkWidget *popup;
                 popup = gtk_ui_manager_get_widget (GTK_UI_MANAGER (icon->priv->ui_manager),
                                                    "/TrayPopup");
                 gtk_menu_set_screen (GTK_MENU (popup), gtk_widget_get_screen (GTK_WIDGET (icon)));
                 gtk_menu_popup (GTK_MENU (popup), NULL, NULL,
                                 NULL, NULL, 2,
                                 gtk_get_current_event_time ());
-        }
-        break;
+                break;
         default:
                 break;
         }

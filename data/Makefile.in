@@ -51,17 +51,19 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(appicondir)" "$(DESTDIR)$(artdir)" \
-	"$(DESTDIR)$(desktopdir)" "$(DESTDIR)$(gladedir)" \
-	"$(DESTDIR)$(schemasdir)" "$(DESTDIR)$(uidir)"
+am__installdirs = "$(DESTDIR)$(alldatadir)" "$(DESTDIR)$(appicondir)" \
+	"$(DESTDIR)$(artdir)" "$(DESTDIR)$(desktopdir)" \
+	"$(DESTDIR)$(gladedir)" "$(DESTDIR)$(schemasdir)" \
+	"$(DESTDIR)$(uidir)"
+alldataDATA_INSTALL = $(INSTALL_DATA)
 appiconDATA_INSTALL = $(INSTALL_DATA)
 artDATA_INSTALL = $(INSTALL_DATA)
 desktopDATA_INSTALL = $(INSTALL_DATA)
 gladeDATA_INSTALL = $(INSTALL_DATA)
 schemasDATA_INSTALL = $(INSTALL_DATA)
 uiDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(appicon_DATA) $(art_DATA) $(desktop_DATA) $(glade_DATA) \
-	$(schemas_DATA) $(ui_DATA)
+DATA = $(alldata_DATA) $(appicon_DATA) $(art_DATA) $(desktop_DATA) \
+	$(glade_DATA) $(schemas_DATA) $(ui_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALL_LINGUAS = @ALL_LINGUAS@
@@ -211,7 +213,7 @@ desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 schemasdir = $(GCONF_SCHEMA_FILE_DIR)
 schemas_in_files = ario.schemas.in
 schemas_DATA = $(schemas_in_files:.schemas.in=.schemas)
-artdir = $(pkgdatadir)/art
+artdir = $(pkgdatadir)/ario/art
 art_DATA = ario.png		\
 	   play.png		\
 	   shuffle.png		\
@@ -221,7 +223,7 @@ art_DATA = ario.png		\
 	   volume-max.png	\
 	   volume-min.png
 
-gladedir = $(pkgdatadir)/glade
+gladedir = $(pkgdatadir)/ario/glade
 glade_DATA = connection-prefs.glade	\
 	     cover-prefs.glade		\
 	     server-prefs.glade		\
@@ -230,14 +232,17 @@ glade_DATA = connection-prefs.glade	\
 
 appicon_DATA = ario.png
 appicondir = $(datadir)/icons/hicolor/48x48/apps
-uidir = $(pkgdatadir)/ui
+uidir = $(pkgdatadir)/ario/ui
 ui_DATA = ario-ui.xml
+alldatadir = $(pkgdatadir)/ario/data
+alldata_DATA = radios.xml.default
 EXTRA_DIST = \
 	$(desktop_in_files)		\
 	$(schemas_in_files)		\
 	$(art_DATA)	\
 	$(appicon_DATA)	\
 	$(glade_DATA)	\
+	$(alldata_DATA)	\
 	$(ui_DATA)
 
 all: all-am
@@ -274,6 +279,23 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 ario.desktop.in: $(top_builddir)/config.status $(srcdir)/ario.desktop.in.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+install-alldataDATA: $(alldata_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(alldatadir)" || $(MKDIR_P) "$(DESTDIR)$(alldatadir)"
+	@list='$(alldata_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(alldataDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(alldatadir)/$$f'"; \
+	  $(alldataDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(alldatadir)/$$f"; \
+	done
+
+uninstall-alldataDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(alldata_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(alldatadir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(alldatadir)/$$f"; \
+	done
 install-appiconDATA: $(appicon_DATA)
 	@$(NORMAL_INSTALL)
 	test -z "$(appicondir)" || $(MKDIR_P) "$(DESTDIR)$(appicondir)"
@@ -413,7 +435,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(appicondir)" "$(DESTDIR)$(artdir)" "$(DESTDIR)$(desktopdir)" "$(DESTDIR)$(gladedir)" "$(DESTDIR)$(schemasdir)" "$(DESTDIR)$(uidir)"; do \
+	for dir in "$(DESTDIR)$(alldatadir)" "$(DESTDIR)$(appicondir)" "$(DESTDIR)$(artdir)" "$(DESTDIR)$(desktopdir)" "$(DESTDIR)$(gladedir)" "$(DESTDIR)$(schemasdir)" "$(DESTDIR)$(uidir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -458,9 +480,9 @@ info: info-am
 
 info-am:
 
-install-data-am: install-appiconDATA install-artDATA \
-	install-data-local install-desktopDATA install-gladeDATA \
-	install-schemasDATA install-uiDATA
+install-data-am: install-alldataDATA install-appiconDATA \
+	install-artDATA install-data-local install-desktopDATA \
+	install-gladeDATA install-schemasDATA install-uiDATA
 
 install-dvi: install-dvi-am
 
@@ -494,26 +516,26 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-appiconDATA uninstall-artDATA \
-	uninstall-desktopDATA uninstall-gladeDATA \
+uninstall-am: uninstall-alldataDATA uninstall-appiconDATA \
+	uninstall-artDATA uninstall-desktopDATA uninstall-gladeDATA \
 	uninstall-schemasDATA uninstall-uiDATA
 
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic distclean \
 	distclean-generic distdir dvi dvi-am html html-am info info-am \
-	install install-am install-appiconDATA install-artDATA \
-	install-data install-data-am install-data-local \
-	install-desktopDATA install-dvi install-dvi-am install-exec \
-	install-exec-am install-gladeDATA install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-schemasDATA \
-	install-strip install-uiDATA installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am uninstall \
-	uninstall-am uninstall-appiconDATA uninstall-artDATA \
-	uninstall-desktopDATA uninstall-gladeDATA \
-	uninstall-schemasDATA uninstall-uiDATA
+	install install-alldataDATA install-am install-appiconDATA \
+	install-artDATA install-data install-data-am \
+	install-data-local install-desktopDATA install-dvi \
+	install-dvi-am install-exec install-exec-am install-gladeDATA \
+	install-html install-html-am install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-schemasDATA install-strip install-uiDATA \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
+	pdf-am ps ps-am uninstall uninstall-alldataDATA uninstall-am \
+	uninstall-appiconDATA uninstall-artDATA uninstall-desktopDATA \
+	uninstall-gladeDATA uninstall-schemasDATA uninstall-uiDATA
 
 @INTLTOOL_DESKTOP_RULE@
 @INTLTOOL_SCHEMAS_RULE@

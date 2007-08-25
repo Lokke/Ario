@@ -32,14 +32,19 @@ AM_GCONF_SOURCE_2
 
 dnl Debugging information
 AC_ARG_ENABLE(debug,
-	      AC_HELP_STRING([--enable-debug],
-			     [Add runtime debugging information (slower)]))
+              AC_HELP_STRING([--enable-debug],
+                             [Add runtime debugging information (slower)]))
 if test x"$enable_debug" = xyes; then
    AC_DEFINE(DEBUG, 1, [Add runtime debugging information (slower)])
 fi
 
-
-
+dnl Radios
+AC_ARG_ENABLE(radios,
+              AC_HELP_STRING([--enable-radios],
+                             [Add support of internet radios]))
+if test x"$enable_radios" = xyes; then
+   AC_DEFINE(ENABLE_RADIOS, 1, [Add support of internet radios])
+fi
 
 AC_OUTPUT([
 Makefile
@@ -48,4 +53,16 @@ data/Makefile
 po/Makefile.in
 data/ario.desktop.in
 ])
-
+echo ""
+echo ""
+echo "-------------- Options --------------"
+if test x${enable_debug} = xyes; then
+        echo "Debug information is:                     ENABLED"
+else
+        echo "Debug information is:                     DISABLED"
+fi
+if test x${enable_radios} = xyes; then
+        echo "Internet radios support is:               ENABLED"
+else
+        echo "Internet radios support is:               DISABLED"
+fi
