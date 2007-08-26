@@ -20,7 +20,7 @@
 #ifndef __ARIO_SOURCE_H
 #define __ARIO_SOURCE_H
 
-#include <gtk/gtkhbox.h>
+#include <gtk/gtknotebook.h>
 #include "ario-mpd.h"
 #include "ario-playlist.h"
 
@@ -37,14 +37,14 @@ typedef struct ArioSourcePrivate ArioSourcePrivate;
 
 typedef struct
 {
-        GtkHBox parent;
+        GtkNotebook parent;
 
         ArioSourcePrivate *priv;
 } ArioSource;
 
 typedef struct
 {
-        GtkHBoxClass parent;
+        GtkNotebookClass parent;
 } ArioSourceClass;
 
 typedef enum

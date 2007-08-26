@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ario 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-26 18:17+0200\n"
+"POT-Creation-Date: 2007-08-26 19:04+0200\n"
 "PO-Revision-Date: 2007-08-15 18:47+0200\n"
 "Last-Translator: marc <>\n"
 "Language-Team: French\n"
@@ -18,8 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../data/ario.schemas.in.h:1
-msgid "0 for the browser, 1 for the radios"
-msgstr ""
+msgid "0 for the library, 1 for the radios"
+msgstr "0 pour la bibliothèque, 1 pour les radios"
 
 #: ../data/ario.schemas.in.h:2
 msgid "Define if Ario must autoconnect to mpd or not"
@@ -394,12 +394,21 @@ msgstr "URL : "
 
 #: ../src/ario-radio.c:891 ../src/ario-radio.c:1131
 msgid "Bad parameters. You must specify a name and a URL for the radio."
-msgstr "Mauvais paramètres. Vous devez spécifier un nom et une URL pour la radio."
+msgstr ""
+"Mauvais paramètres. Vous devez spécifier un nom et une URL pour la radio."
 
 #. Create the widgets
 #: ../src/ario-radio.c:1070
 msgid "Edit a WebRadio"
 msgstr "Éditer une WebRadio"
+
+#: ../src/ario-source.c:130
+msgid "Library"
+msgstr "Bibliothèque"
+
+#: ../src/ario-source.c:138
+msgid "Web Radios"
+msgstr "Web Radios"
 
 #: ../src/ario-cover.c:422
 msgid "The cover already exists. Do you want to replace it?"
@@ -482,15 +491,13 @@ msgstr "Activer/désactiver le repeat"
 msgid "Change the music volume"
 msgstr "Change le volume de la musique"
 
-#: ../src/ario-header.c:532 ../src/ario-header.c:535 ../src/ario-mpd.h:28
-#: ../src/ario-tray-icon.c:393 ../src/ario-tray-icon.c:394
-#: ../src/ario-util.c:128 ../src/ario-util.c:153
-msgid "Unknown"
-msgstr "Inconnu"
-
 #: ../src/ario-mpd.c:494
 msgid "Impossible to connect to mpd. Check the connection options."
 msgstr "Impossible de se connecter à MPD. Vérifiez vos options de connexion."
+
+#: ../src/ario-mpd.h:28
+msgid "Unknown"
+msgstr "Inconnu"
 
 #: ../src/ario-playlist.c:106
 msgid "_Clear"
@@ -617,20 +624,20 @@ msgid "Show information about the music player"
 msgstr "Affichier des informations sur le lecteur de musique"
 
 #: ../src/ario-shell.c:127
-msgid "_Browser View"
-msgstr ""
+msgid "_Library"
+msgstr "_Bibliothèque"
 
 #: ../src/ario-shell.c:128
-msgid "Browser view"
-msgstr ""
+msgid "Library view"
+msgstr "Affichage de la bibliothèque"
 
 #: ../src/ario-shell.c:130
-msgid "_Radio View"
-msgstr ""
+msgid "_Web Radios"
+msgstr "_Web Radios"
 
 #: ../src/ario-shell.c:131
-msgid "Radio view"
-msgstr ""
+msgid "Web Radios view"
+msgstr "Affichage des Web Radios"
 
 #: ../src/ario-status-bar.c:204
 #, c-format

@@ -263,12 +263,12 @@
         <default>0</default>
         <locale name="C">
 	<short>Define the source used in Ario</short>
-	<long>0 for the browser, 1 for the radios</long>
+	<long>0 for the library, 1 for the radios</long>
         </locale>
 
         <locale name="fr">
 	<short>Definit la utilisée par Ario</short>
-	
+	<long>0 pour la bibliothèque, 1 pour les radios</long>
         </locale>
       </schema>
 

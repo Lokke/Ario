@@ -124,11 +124,11 @@ static guint ario_shell_n_actions = G_N_ELEMENTS (ario_shell_actions);
 #ifdef ENABLE_RADIOS
 static GtkRadioActionEntry ario_shell_radio [] =
 {
-        { "BrowserView", NULL, N_("_Browser View"), NULL,
-          N_("Browser view"),
+        { "LibraryView", NULL, N_("_Library"), NULL,
+          N_("Library view"),
           ARIO_SOURCE_BROWSER },
-        { "RadioView", NULL, N_("_Radio View"), NULL,
-          N_("Radio view"),
+        { "RadioView", NULL, N_("_Web Radios"), NULL,
+          N_("Web Radios view"),
           ARIO_SOURCE_RADIO }
 };
 static guint ario_shell_n_radio = G_N_ELEMENTS (ario_shell_radio);
@@ -487,7 +487,7 @@ ario_shell_sync_source (ArioShell *shell)
                                 source_type);
 
         action = gtk_action_group_get_action (shell->priv->actiongroup,
-                                              "BrowserView");
+                                              "LibraryView");
 
         if (source_type == ARIO_SOURCE_RADIO) {
                 gtk_radio_action_set_current_value (GTK_RADIO_ACTION (action),

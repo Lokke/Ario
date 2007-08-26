@@ -10,7 +10,7 @@
 		</menu>
 
 		<menu name="ViewMenu" action="View">
-			<menuitem name="BrowserViewMenu" action="BrowserView"/>
+			<menuitem name="LibraryViewMenu" action="LibraryView"/>
 			<menuitem name="RadioViewMenu" action="RadioView"/> 
 		</menu>
 

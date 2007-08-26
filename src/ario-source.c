@@ -20,7 +20,9 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <config.h>
+#include "eel-gconf-extensions.h"
 #include "ario-source.h"
+#include "ario-i18n.h"
 #include "ario-browser.h"
 #include "ario-radio.h"
 #include "ario-preferences.h"
@@ -29,9 +31,13 @@
 static void ario_source_class_init (ArioSourceClass *klass);
 static void ario_source_init (ArioSource *source);
 static void ario_source_finalize (GObject *object);
+gboolean ario_source_page_changed_cb (GtkNotebook *notebook,
+                                      GtkNotebookPage *page,
+                                      gint page_nb,
+                                      ArioSource *source);
 
 struct ArioSourcePrivate
-{        
+{
         GtkWidget *browser;
         GtkWidget *radio;
 };
@@ -58,7 +64,7 @@ ario_source_get_type (void)
                         (GInstanceInitFunc) ario_source_init
                 };
 
-                type = g_type_register_static (GTK_TYPE_HBOX,
+                type = g_type_register_static (GTK_TYPE_NOTEBOOK,
                                                "ArioSource",
                                                 &our_info, 0);
         }
@@ -119,14 +125,23 @@ ario_source_new (GtkUIManager *mgr,
                                                   group,
                                                   mpd,
                                                   playlist);
-        gtk_box_pack_start (GTK_BOX (source), source->priv->browser, TRUE, TRUE, 0);
+        gtk_notebook_append_page (GTK_NOTEBOOK (source),
+                                  source->priv->browser,
+                                  gtk_label_new (_("Library")));
 #ifdef ENABLE_RADIOS
         source->priv->radio = ario_radio_new (mgr,
                                               group,
                                               mpd,
                                               playlist);
-        gtk_box_pack_start (GTK_BOX (source), source->priv->radio, TRUE, TRUE, 0);
+        gtk_notebook_append_page (GTK_NOTEBOOK (source),
+                                  source->priv->radio,
+                                  gtk_label_new (_("Web Radios")));
 #endif  /* ENABLE_RADIOS */
+        g_signal_connect_object (G_OBJECT (source),
+                                 "switch_page",
+                                 G_CALLBACK (ario_source_page_changed_cb),
+                                 source, 0);
+
         g_return_val_if_fail (source->priv != NULL, NULL);
 
         return GTK_WIDGET (source);
@@ -139,13 +154,29 @@ ario_source_set_source (ArioSource *source,
         ARIO_LOG_FUNCTION_START
 #ifdef ENABLE_RADIOS
         if (source_type == ARIO_SOURCE_RADIO) {
-                gtk_widget_show_all (GTK_WIDGET (source->priv->radio));
-                gtk_widget_hide_all (GTK_WIDGET (source->priv->browser));
+                gtk_notebook_set_current_page (GTK_NOTEBOOK (source), 1);
         } else {
-                gtk_widget_show_all (GTK_WIDGET (source->priv->browser));
-                gtk_widget_hide_all (GTK_WIDGET (source->priv->radio));
+                gtk_notebook_set_current_page (GTK_NOTEBOOK (source), 0);
         }
 #endif  /* ENABLE_RADIOS */
 }
 
+gboolean
+ario_source_page_changed_cb (GtkNotebook *notebook,
+                             GtkNotebookPage *page,
+                             gint page_nb,
+                             ArioSource *source)
+{
+        ARIO_LOG_FUNCTION_START
+
+        if (page_nb == 1) {
+                eel_gconf_set_integer (CONF_STATE_SOURCE,
+                                       ARIO_SOURCE_RADIO);
+        } else {
+                eel_gconf_set_integer (CONF_STATE_SOURCE,
+                                       ARIO_SOURCE_BROWSER);
+        }
+
+        return TRUE;
+}
 
