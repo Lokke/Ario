@@ -105,7 +105,7 @@ ario_util_format_track (gchar *track)
         gchar *res;
 
         if (!track)
-                return g_strdup ("00");
+                return NULL;
 
         /* Some tracks are x/y, we only want to display x */
         splited_track = g_strsplit (track, "/", 0);
@@ -125,7 +125,7 @@ ario_util_format_title (ArioMpdSong *mpd_song)
         gchar *res;
 
         if (!mpd_song)
-                return g_strdup (_("Unknown"));
+                return g_strdup (ARIO_MPD_UNKNOWN);
         if (mpd_song->title) {
                 return g_strdup(mpd_song->title);
         } else if (mpd_song->name) {
@@ -150,7 +150,7 @@ ario_util_format_title (ArioMpdSong *mpd_song)
                                 res = g_strdup (*splited_filenames);
                                 g_strfreev (splited_filenames);
                         } else {
-                                res = g_strdup (_("Unknown"));
+                                res = g_strdup (ARIO_MPD_UNKNOWN);
                         }
 
                         g_strfreev (splited_titles);

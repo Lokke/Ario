@@ -484,7 +484,7 @@ ario_playlist_changed_cb (ArioMpd *mpd,
         gint old_length;
         GtkTreeIter iter;
         gchar *time, *track;
-        gchar *artist, *album, *title;
+        gchar *title;
         GList *songs = NULL, *temp;
         ArioMpdSong *song;
 
@@ -514,14 +514,12 @@ ario_playlist_changed_cb (ArioMpd *mpd,
                         if (gtk_tree_model_get_iter_from_string (GTK_TREE_MODEL (playlist->priv->model), &iter, path)) {
                                 time = ario_util_format_time (song->time);
                                 track = ario_util_format_track (song->track);
-                                artist = song->artist ? song->artist : ARIO_MPD_UNKNOWN;
-                                album = song->album ? song->album : ARIO_MPD_UNKNOWN;
                                 title = ario_util_format_title(song);
                                 gtk_list_store_set (playlist->priv->model, &iter,
                                                     TRACK_COLUMN, track,
                                                     TITLE_COLUMN, title,
-                                                    ARTIST_COLUMN, artist,
-                                                    ALBUM_COLUMN, album,
+                                                    ARTIST_COLUMN, song->artist,
+                                                    ALBUM_COLUMN, song->album,
                                                     DURATION_COLUMN, time,
                                                     ID_COLUMN, song->id,
                                                     -1);
@@ -534,14 +532,12 @@ ario_playlist_changed_cb (ArioMpd *mpd,
                         gtk_list_store_append (playlist->priv->model, &iter);
                         time = ario_util_format_time (song->time);
                         track = ario_util_format_track (song->track);
-                        artist = song->artist ? song->artist : ARIO_MPD_UNKNOWN;
-                        album = song->album ? song->album : ARIO_MPD_UNKNOWN;
                         title = ario_util_format_title(song);
                         gtk_list_store_set (playlist->priv->model, &iter,
                                             TRACK_COLUMN, track,
                                             TITLE_COLUMN, title,
-                                            ARTIST_COLUMN, artist,
-                                            ALBUM_COLUMN, album,
+                                            ARTIST_COLUMN, song->artist,
+                                            ALBUM_COLUMN, song->album,
                                             DURATION_COLUMN, time,
                                             ID_COLUMN, song->id,
                                             -1);

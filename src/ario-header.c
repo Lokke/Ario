@@ -529,10 +529,10 @@ ario_header_change_labels (ArioHeader *header)
                 title = ario_util_format_title(ario_mpd_get_current_song (header->priv->mpd));
 
                 if (!album)
-                        album = _("Unknown");
+                        album = ARIO_MPD_UNKNOWN;
 
                 if (!artist)
-                        artist = _("Unknown");
+                        artist = ARIO_MPD_UNKNOWN;
 
                 ario_cover_path = ario_cover_make_ario_cover_path (artist, album, SMALL_COVER);
                 cover = gdk_pixbuf_new_from_file_at_size (ario_cover_path, header->priv->image_width, header->priv->image_height, NULL);
