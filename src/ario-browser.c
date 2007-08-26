@@ -734,6 +734,7 @@ ario_browser_albums_selection_foreach (GtkTreeModel *model,
         ArioMpdSong *song;
         GtkTreeIter songs_iter;
         gchar *track;
+        gchar *title;
 
         g_return_if_fail (IS_ARIO_BROWSER (browser));
 
@@ -754,21 +755,13 @@ ario_browser_albums_selection_foreach (GtkTreeModel *model,
                 gtk_list_store_append (browser->priv->songs_model, &songs_iter);
 
                 track = ario_util_format_track (song->track);
-                if (song->title)
-                        gtk_list_store_set (browser->priv->songs_model, &songs_iter,
-                                            TRACK_COLUMN, track,
-                                            TITLE_COLUMN, song->title,
-                                            FILENAME_COLUMN, song->file,
-                                            -1);
-                else {
-                        gchar *title = ario_util_format_title (song->file);
-                        gtk_list_store_set (browser->priv->songs_model, &songs_iter,
-                                            TRACK_COLUMN, track,
-                                            TITLE_COLUMN, title,
-                                            FILENAME_COLUMN, song->file,
-                                            -1);
-                        g_free (title);
-                }
+                title = ario_util_format_title (song);
+                gtk_list_store_set (browser->priv->songs_model, &songs_iter,
+                                        TRACK_COLUMN, track,
+                                        TITLE_COLUMN, title,
+                                        FILENAME_COLUMN, song->file,
+                                        -1);
+                g_free (title);
                 g_free (track);
                 temp = g_list_next (temp);
         }

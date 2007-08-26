@@ -115,29 +115,48 @@ ario_util_format_track (gchar *track)
 }
 
 gchar *
-ario_util_format_title (gchar *title)
+ario_util_format_title (ArioMpdSong *mpd_song)
 {
         ARIO_LOG_FUNCTION_START
+        gchar **splited_titles;
         gchar **splited_title;
-        gchar **splited_filename;
+        gchar **next_splited_title;
+        gchar **splited_filenames;
         gchar *res;
 
-        if (!title)
-                return g_strdup ("Unknown");
+        if (!mpd_song)
+                return g_strdup (_("Unknown"));
+        if (mpd_song->title) {
+                return g_strdup(mpd_song->title);
+        } else if (mpd_song->name) {
+                return g_strdup(mpd_song->name);
+        } else {
+                /* Original format is : "path/to/filename.extension" or http://path/to/address:port
+                 * We only want to display filename or http address */
+                if (!g_ascii_strncasecmp (mpd_song->file, "http://", 7)) {
+                        return g_strdup (mpd_song->file);
+                } else {
+                        splited_titles = g_strsplit (mpd_song->file, "/", -1);
 
-        /* Original format is : "artist - album/filename.extension" 
-         * We only want to display filename */
-        splited_title = g_strsplit (title, "/", 2);
+                        splited_title = splited_titles;
+                        next_splited_title = splited_title + 1;
+                        while  (*next_splited_title) {
+                                splited_title = next_splited_title;
+                                next_splited_title = splited_title + 1;
+                        }
+                        
+                        if (*splited_title) {
+                                splited_filenames = g_strsplit (*splited_title, ".", 2);
+                                res = g_strdup (*splited_filenames);
+                                g_strfreev (splited_filenames);
+                        } else {
+                                res = g_strdup (_("Unknown"));
+                        }
 
-        if (splited_title[1]) {
-                splited_filename = g_strsplit (splited_title[1], ".", 2);
-                res = g_strdup (splited_filename[0]);
-                g_strfreev (splited_filename);
-        } else
-                res = g_strdup ("Unknown");
-
-        g_strfreev (splited_title);
-        return res;
+                        g_strfreev (splited_titles);
+                        return res;
+                }
+        }
 }
 
 void

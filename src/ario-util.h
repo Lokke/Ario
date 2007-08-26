@@ -17,7 +17,7 @@
  *
  */
 
-
+#include "ario-mpd.h"
 
 char*                   ario_util_format_time                (int time);
 
@@ -25,7 +25,7 @@ char*                   ario_util_format_total_time          (int time);
 
 gchar*                  ario_util_format_track               (gchar *track);
 
-gchar*                  ario_util_format_title               (gchar *title);
+gchar*                  ario_util_format_title               (ArioMpdSong *mpd_song);
  
 void                    ario_util_init_stock_icons           (void);
 

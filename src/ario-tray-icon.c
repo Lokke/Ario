@@ -29,6 +29,7 @@
 
 #include "ario-i18n.h"
 #include "ario-tray-icon.h"
+#include "ario-util.h"
 #include "ario-preferences.h"
 #include "eel-gconf-extensions.h"
 #include "ario-debug.h"
@@ -263,6 +264,9 @@ ario_tray_icon_set_property (GObject *object,
                 g_signal_connect_object (G_OBJECT (tray->priv->mpd),
                                          "state_changed", G_CALLBACK (ario_tray_icon_state_changed_cb),
                                          tray, 0);
+                g_signal_connect_object (G_OBJECT (tray->priv->mpd),
+                                         "playlist_changed", G_CALLBACK (ario_tray_icon_state_changed_cb),
+                                         tray, 0);
                 break;
         default:
                 G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -379,14 +383,17 @@ ario_tray_icon_sync_tooltip (ArioTrayIcon *icon)
 {
         ARIO_LOG_FUNCTION_START
         gchar *tooltip;
+        gchar *title;
 
         switch (ario_mpd_get_current_state (icon->priv->mpd)) {
         case MPD_STATUS_STATE_PLAY:
         case MPD_STATUS_STATE_PAUSE:
+                title = ario_util_format_title(ario_mpd_get_current_song (icon->priv->mpd));
                 tooltip = g_strdup_printf (_("Artist: %s\nAlbum: %s\nTitle: %s"), 
-                                            ario_mpd_get_current_artist (icon->priv->mpd),
-                                            ario_mpd_get_current_album (icon->priv->mpd),
-                                            ario_mpd_get_current_title (icon->priv->mpd));
+                                            ario_mpd_get_current_artist (icon->priv->mpd) ? ario_mpd_get_current_artist (icon->priv->mpd) : _("Unknown"),
+                                            ario_mpd_get_current_album (icon->priv->mpd) ? ario_mpd_get_current_album (icon->priv->mpd) : _("Unknown"),
+                                            title);
+                g_free (title);
                 break;
         default:
                 tooltip = g_strdup (_("Not playing"));

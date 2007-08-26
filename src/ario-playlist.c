@@ -516,13 +516,7 @@ ario_playlist_changed_cb (ArioMpd *mpd,
                                 track = ario_util_format_track (song->track);
                                 artist = song->artist ? song->artist : ARIO_MPD_UNKNOWN;
                                 album = song->album ? song->album : ARIO_MPD_UNKNOWN;
-                                if (song->title) {
-                                        title = song->title;
-                                } else if (song->name) {
-                                        title = song->name;
-                                } else {
-                                        title = ARIO_MPD_UNKNOWN;
-                                }
+                                title = ario_util_format_title(song);
                                 gtk_list_store_set (playlist->priv->model, &iter,
                                                     TRACK_COLUMN, track,
                                                     TITLE_COLUMN, title,
@@ -531,6 +525,7 @@ ario_playlist_changed_cb (ArioMpd *mpd,
                                                     DURATION_COLUMN, time,
                                                     ID_COLUMN, song->id,
                                                     -1);
+                                g_free (title);
                                 g_free (time);
                                 g_free (track);
                         }
@@ -541,13 +536,7 @@ ario_playlist_changed_cb (ArioMpd *mpd,
                         track = ario_util_format_track (song->track);
                         artist = song->artist ? song->artist : ARIO_MPD_UNKNOWN;
                         album = song->album ? song->album : ARIO_MPD_UNKNOWN;
-                        if (song->title) {
-                                title = song->title;
-                        } else if (song->name) {
-                                title = song->name;
-                        } else {
-                                title = ARIO_MPD_UNKNOWN;
-                        }
+                        title = ario_util_format_title(song);
                         gtk_list_store_set (playlist->priv->model, &iter,
                                             TRACK_COLUMN, track,
                                             TITLE_COLUMN, title,
@@ -556,6 +545,7 @@ ario_playlist_changed_cb (ArioMpd *mpd,
                                             DURATION_COLUMN, time,
                                             ID_COLUMN, song->id,
                                             -1);
+                        g_free (title);
                         g_free (time);
                         g_free (track);
                 }

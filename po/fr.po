@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ario 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-25 23:30+0200\n"
+"POT-Creation-Date: 2007-08-26 18:17+0200\n"
 "PO-Revision-Date: 2007-08-15 18:47+0200\n"
 "Last-Translator: marc <>\n"
 "Language-Team: French\n"
@@ -294,12 +294,12 @@ msgid "n/a"
 msgstr "n/a"
 
 #: ../src/ario-browser.c:125 ../src/ario-browser.c:128
-#: ../src/ario-browser.c:131 ../src/ario-radio.c:102
+#: ../src/ario-browser.c:131 ../src/ario-radio.c:108
 msgid "_Add to playlist"
 msgstr "_Ajouter à la playlist"
 
 #: ../src/ario-browser.c:126 ../src/ario-browser.c:129
-#: ../src/ario-browser.c:132 ../src/ario-radio.c:103
+#: ../src/ario-browser.c:132 ../src/ario-radio.c:109
 msgid "Add to the playlist"
 msgstr "_Ajouter à la playlist"
 
@@ -339,23 +339,69 @@ msgstr "Piste"
 msgid "Title"
 msgstr "Titre"
 
-#: ../src/ario-browser.c:1279
+#: ../src/ario-browser.c:1272
 msgid ""
 "Are you sure that you want to remove all the covers of the selected artists?"
 msgstr ""
 "Êtes-vous sur de vouloir effacer les pochettes des artites sélectionnés?"
 
-#: ../src/ario-browser.c:1346
+#: ../src/ario-browser.c:1339
 msgid ""
 "Are you sure that you want to remove all the covers of the selected albums?"
 msgstr ""
 "Êtes-vous sur de vouloir effacer les pochettes des albums sélectionnés?"
 
-#: ../src/ario-radio.c:220
+#: ../src/ario-radio.c:111
+msgid "Add a _new radio"
+msgstr "Ajouter une nouvelle radio"
+
+#: ../src/ario-radio.c:112
+msgid "Add a new radio"
+msgstr "Ajouter une nouvelle radio"
+
+#: ../src/ario-radio.c:114
+msgid "_Delete this radios"
+msgstr "_Supprimer les radios"
+
+#: ../src/ario-radio.c:115
+msgid "Delete this radios"
+msgstr "Supprimer les radios"
+
+#: ../src/ario-radio.c:117
+msgid "_Properties"
+msgstr "Propriétés"
+
+#: ../src/ario-radio.c:118
+msgid "Change properties of this radio"
+msgstr "Changer les propriétés de cette radio"
+
+#: ../src/ario-radio.c:235
 msgid "Internet Radios"
 msgstr "Radios Internet"
 
-#: ../src/ario-cover.c:423
+#. Create the widgets
+#: ../src/ario-radio.c:832
+msgid "Add a WebRadio"
+msgstr "Ajouter une WebRadio"
+
+#: ../src/ario-radio.c:842 ../src/ario-radio.c:1080
+msgid "Name : "
+msgstr "Nom : "
+
+#: ../src/ario-radio.c:843 ../src/ario-radio.c:1081
+msgid "URL : "
+msgstr "URL : "
+
+#: ../src/ario-radio.c:891 ../src/ario-radio.c:1131
+msgid "Bad parameters. You must specify a name and a URL for the radio."
+msgstr "Mauvais paramètres. Vous devez spécifier un nom et une URL pour la radio."
+
+#. Create the widgets
+#: ../src/ario-radio.c:1070
+msgid "Edit a WebRadio"
+msgstr "Éditer une WebRadio"
+
+#: ../src/ario-cover.c:422
 msgid "The cover already exists. Do you want to replace it?"
 msgstr "La pochette existe déjà. Voulez-vous la remplacer?"
 
@@ -436,8 +482,9 @@ msgstr "Activer/désactiver le repeat"
 msgid "Change the music volume"
 msgstr "Change le volume de la musique"
 
-#: ../src/ario-header.c:535 ../src/ario-header.c:538 ../src/ario-header.c:541
-#: ../src/ario-mpd.h:28
+#: ../src/ario-header.c:532 ../src/ario-header.c:535 ../src/ario-mpd.h:28
+#: ../src/ario-tray-icon.c:393 ../src/ario-tray-icon.c:394
+#: ../src/ario-util.c:128 ../src/ario-util.c:153
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -508,6 +555,14 @@ msgstr ""
 "%i pochettes trouvées\n"
 "%i pochettes introuvables\n"
 "%i pochettes déjà existantes"
+
+#: ../src/ario-shell-coverselect.c:554
+msgid "Error reading file"
+msgstr "Erreur lors de la lecture du fichier"
+
+#: ../src/ario-shell-coverselect.c:577
+msgid "Error saving file"
+msgstr "Erreur lors de l'écriture du fichier"
 
 #: ../src/ario-shell.c:104
 msgid "_File"
@@ -582,15 +637,15 @@ msgstr ""
 msgid "%d Songs - %s"
 msgstr "%d Titres - %s"
 
-#: ../src/ario-tray-icon.c:177 ../src/ario-tray-icon.c:392
+#: ../src/ario-tray-icon.c:178 ../src/ario-tray-icon.c:399
 msgid "Not playing"
 msgstr "Ne joue pas"
 
-#: ../src/ario-tray-icon.c:306
+#: ../src/ario-tray-icon.c:310
 msgid "Ario tray icon"
 msgstr "Ario - Icône de notification"
 
-#: ../src/ario-tray-icon.c:386
+#: ../src/ario-tray-icon.c:392
 #, c-format
 msgid ""
 "Artist: %s\n"

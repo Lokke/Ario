@@ -99,6 +99,8 @@ char *                  ario_mpd_get_current_title                      (ArioMpd
 
 char *                  ario_mpd_get_current_name                       (ArioMpd *mpd);
 
+ArioMpdSong *           ario_mpd_get_current_song                       (ArioMpd *mpd);
+
 char *                  ario_mpd_get_current_artist                     (ArioMpd *mpd);
 
 char *                  ario_mpd_get_current_album                      (ArioMpd *mpd);

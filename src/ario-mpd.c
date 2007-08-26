@@ -811,6 +811,16 @@ ario_mpd_get_current_name (ArioMpd *mpd)
                 return NULL;
 }
 
+ArioMpdSong *
+ario_mpd_get_current_song (ArioMpd *mpd)
+{
+        ARIO_LOG_FUNCTION_START
+        if (mpd->priv->ario_mpd_song)
+                return mpd->priv->ario_mpd_song;
+        else
+                return NULL;
+}
+
 char *
 ario_mpd_get_current_artist (ArioMpd *mpd)
 {

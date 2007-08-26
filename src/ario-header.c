@@ -524,15 +524,9 @@ ario_header_change_labels (ArioHeader *header)
         switch (ario_mpd_get_current_state (header->priv->mpd)) {
         case MPD_STATUS_STATE_PLAY:
         case MPD_STATUS_STATE_PAUSE:
-                title = ario_mpd_get_current_title (header->priv->mpd);
                 artist = ario_mpd_get_current_artist (header->priv->mpd);
                 album = ario_mpd_get_current_album (header->priv->mpd);
-
-                if (!title)
-                        title = ario_mpd_get_current_name (header->priv->mpd);
-
-                if (!title)
-                        title = _("Unknown");
+                title = ario_util_format_title(ario_mpd_get_current_song (header->priv->mpd));
 
                 if (!album)
                         album = _("Unknown");
@@ -546,6 +540,7 @@ ario_header_change_labels (ArioHeader *header)
                 gtk_image_set_from_pixbuf(GTK_IMAGE(header->priv->image), cover);
 
                 tmp = SONG_MARKUP (title);
+                g_free (title);
                 gtk_label_set_markup (GTK_LABEL (header->priv->song), tmp);
                 g_free (tmp);
 
