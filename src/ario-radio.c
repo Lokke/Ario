@@ -54,6 +54,12 @@ static void ario_radio_state_changed_cb (ArioMpd *mpd,
 static void ario_radio_add_in_playlist (ArioRadio *radio);
 static void ario_radio_cmd_add_radios (GtkAction *action,
                                        ArioRadio *radio);
+static void ario_radio_cmd_new_radio (GtkAction *action,
+                                      ArioRadio *radio);
+static void ario_radio_cmd_delete_radios (GtkAction *action,
+                                          ArioRadio *radio);
+static void ario_radio_cmd_radio_properties (GtkAction *action,
+                                             ArioRadio *radio);
 static void ario_radio_popup_menu (ArioRadio *radio);
 static gboolean ario_radio_button_press_cb (GtkWidget *widget,
                                             GdkEventButton *event,
@@ -101,7 +107,16 @@ static GtkActionEntry ario_radio_actions [] =
 {
         { "RadioAddRadios", GTK_STOCK_ADD, N_("_Add to playlist"), NULL,
           N_("Add to the playlist"),
-          G_CALLBACK (ario_radio_cmd_add_radios) }
+          G_CALLBACK (ario_radio_cmd_add_radios) },
+        { "RadioNewRadio", GTK_STOCK_ADD, N_("Add a _new radio"), NULL,
+          N_("Add a new radio"),
+          G_CALLBACK (ario_radio_cmd_new_radio) },
+        { "RadioDeleteRadios", GTK_STOCK_DELETE, N_("_Delete this radios"), NULL,
+          N_("Delete this radios"),
+          G_CALLBACK (ario_radio_cmd_delete_radios) },
+        { "RadioProperties", GTK_STOCK_PROPERTIES, N_("_Properties"), NULL,
+          N_("Change properties of this radio"),
+          G_CALLBACK (ario_radio_cmd_radio_properties) }
 };
 static guint ario_radio_n_actions = G_N_ELEMENTS (ario_radio_actions);
 
@@ -385,9 +400,9 @@ ario_radio_create_xml_file (char *xml_filename)
 {
         gchar *radios_dir;
 
-	/* if the file exists, we do nothing */
-	if (ario_util_uri_exists (xml_filename))
-		return;
+        /* if the file exists, we do nothing */
+        if (ario_util_uri_exists (xml_filename))
+                return;
 
         radios_dir = g_build_filename (ario_util_config_dir (), "radios", NULL);
 
@@ -402,11 +417,11 @@ ario_radio_create_xml_file (char *xml_filename)
 static char*
 ario_radio_get_xml_filename (void)
 {
-	char *xml_filename;
+        char *xml_filename;
 
-	xml_filename = g_build_filename (ario_util_config_dir (), "radios" , "radios.xml", NULL);
+        xml_filename = g_build_filename (ario_util_config_dir (), "radios" , "radios.xml", NULL);
 
-	return xml_filename;
+        return xml_filename;
 }
 
 static GList*
@@ -414,8 +429,8 @@ ario_radio_get_radios (ArioRadio *radio)
 {
         GList* radios = NULL;
         ArioInternetRadio *internet_radio;
-	xmlDocPtr doc;
-	xmlNodePtr cur;
+        xmlDocPtr doc;
+        xmlNodePtr cur;
         char *xml_filename;
         xmlChar *xml_name;
         xmlChar *xml_url;
@@ -425,30 +440,30 @@ ario_radio_get_radios (ArioRadio *radio)
         /* If radios.xml file doesn't exist, we create it */
         ario_radio_create_xml_file (xml_filename);
 
-	/* This option is necessary to save a well formated xml file */
-	xmlKeepBlanksDefault (0);
+        /* This option is necessary to save a well formated xml file */
+        xmlKeepBlanksDefault (0);
 
-	doc = xmlParseFile (xml_filename);
+        doc = xmlParseFile (xml_filename);
         g_free (xml_filename);
-	if (doc == NULL )
-		return radios;
+        if (doc == NULL )
+                return radios;
 
-	cur = xmlDocGetRootElement(doc);
-	if (cur == NULL) {
-		xmlFreeDoc (doc);
-		return radios;
-	}
+        cur = xmlDocGetRootElement(doc);
+        if (cur == NULL) {
+                xmlFreeDoc (doc);
+                return radios;
+        }
 
-	/* We check that the root node has the right name */
-	if (xmlStrcmp(cur->name, (const xmlChar *) XML_ROOT_NAME)) {
-		xmlFreeDoc (doc);
-		return radios;
-	}
+        /* We check that the root node has the right name */
+        if (xmlStrcmp(cur->name, (const xmlChar *) XML_ROOT_NAME)) {
+                xmlFreeDoc (doc);
+                return radios;
+        }
 
-	cur = cur->children;
-	while (cur != NULL) {
-		/* For each "radio" entry */
-		if (!xmlStrcmp (cur->name, (const xmlChar *)"radio")){
+        cur = cur->children;
+        while (cur != NULL) {
+                /* For each "radio" entry */
+                if (!xmlStrcmp (cur->name, (const xmlChar *)"radio")){
                         internet_radio = (ArioInternetRadio *) g_malloc (sizeof (ArioInternetRadio));
 
 
@@ -461,12 +476,26 @@ ario_radio_get_radios (ArioRadio *radio)
                         xmlFree(xml_url);
 
                         radios = g_list_append (radios, internet_radio);
-		}
-		cur = cur->next;
-	}
-	xmlFreeDoc (doc);
+                }
+                cur = cur->next;
+        }
+        xmlFreeDoc (doc);
 
         return radios;
+}
+
+static void
+ario_radio_append_radio (ArioRadio *radio,
+                         ArioInternetRadio *internet_radio)
+{
+        ARIO_LOG_FUNCTION_START
+        GtkTreeIter radio_iter;
+
+        gtk_list_store_append (radio->priv->radios_model, &radio_iter);
+        gtk_list_store_set (radio->priv->radios_model, &radio_iter,
+                            RADIO_NAME_COLUMN, internet_radio->name,
+                            RADIO_URL_COLUMN, internet_radio->url,
+                            -1);
 }
 
 static void
@@ -484,11 +513,7 @@ ario_radio_fill_radios (ArioRadio *radio)
         temp = radios;
         while (temp) {
                 ArioInternetRadio *internet_radio = (ArioInternetRadio *) temp->data;
-                gtk_list_store_append (radio->priv->radios_model, &radio_iter);
-                gtk_list_store_set (radio->priv->radios_model, &radio_iter,
-                                    RADIO_NAME_COLUMN, internet_radio->name,
-                                    RADIO_URL_COLUMN, internet_radio->url,
-                                    -1);
+                ario_radio_append_radio (radio, internet_radio);
                 temp = g_list_next (temp);
         }
         g_list_foreach(radios, (GFunc) ario_radio_free_internet_radio, NULL);
@@ -512,9 +537,9 @@ ario_radio_state_changed_cb (ArioMpd *mpd,
 
 static void
 radios_foreach (GtkTreeModel *model,
-               GtkTreePath *path,
-               GtkTreeIter *iter,
-               gpointer userdata)
+                GtkTreePath *path,
+                GtkTreeIter *iter,
+                gpointer userdata)
 {
         ARIO_LOG_FUNCTION_START
         GList **radios = (GList **) userdata;
@@ -523,6 +548,22 @@ radios_foreach (GtkTreeModel *model,
         gtk_tree_model_get (model, iter, RADIO_URL_COLUMN, &val, -1);
 
         *radios = g_list_append (*radios, val);
+}
+
+static void
+radios_foreach2 (GtkTreeModel *model,
+                 GtkTreePath *path,
+                 GtkTreeIter *iter,
+                 gpointer userdata)
+{
+        ARIO_LOG_FUNCTION_START
+        GList **internet_radios = (GList **) userdata;
+        ArioInternetRadio *internet_radio = (ArioInternetRadio *) g_malloc (sizeof (ArioInternetRadio));
+
+        gtk_tree_model_get (model, iter, RADIO_NAME_COLUMN, &internet_radio->name, -1);
+        gtk_tree_model_get (model, iter, RADIO_URL_COLUMN, &internet_radio->url, -1);
+
+        *internet_radios = g_list_append (*internet_radios, internet_radio);
 }
 
 static void
@@ -554,7 +595,12 @@ ario_radio_popup_menu (ArioRadio *radio)
         ARIO_LOG_FUNCTION_START
         GtkWidget *menu;
 
-        menu = gtk_ui_manager_get_widget (radio->priv->ui_manager, "/RadioPopup");
+        if (gtk_tree_selection_count_selected_rows (radio->priv->radios_selection) == 1) {
+                menu = gtk_ui_manager_get_widget (radio->priv->ui_manager, "/RadioPopupSingle");
+        } else {
+                menu = gtk_ui_manager_get_widget (radio->priv->ui_manager, "/RadioPopupMultiple");
+        }
+
         gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, 3, 
                         gtk_get_current_event_time ());
 }
@@ -717,6 +763,411 @@ ario_radio_drag_data_get_cb (GtkWidget * widget,
                                 strlen (radios->str) * sizeof(guchar));
         
         g_string_free (radios, TRUE);
+}
+
+static void
+ario_radio_add_new_radio (ArioRadio *radio,
+                          ArioInternetRadio *internet_radio)
+{
+        xmlDocPtr doc;
+        xmlNodePtr cur, cur2;
+        char *xml_filename;
+
+        xml_filename = ario_radio_get_xml_filename();
+
+        /* If radios.xml file doesn't exist, we create it */
+        ario_radio_create_xml_file (xml_filename);
+
+        /* This option is necessary to save a well formated xml file */
+        xmlKeepBlanksDefault (0);
+
+        doc = xmlParseFile (xml_filename);
+        if (doc == NULL ) {
+                g_free (xml_filename);
+                return;
+        }
+
+        cur = xmlDocGetRootElement(doc);
+        if (cur == NULL) {
+                g_free (xml_filename);
+                xmlFreeDoc (doc);
+                return;
+        }
+
+        /* We check that the root node has the right name */
+        if (xmlStrcmp(cur->name, (const xmlChar *) XML_ROOT_NAME)) {
+                g_free (xml_filename);
+                xmlFreeDoc (doc);
+                return;
+        }
+
+        /* We add a new "radio" entry */
+        cur2 = xmlNewChild (cur, NULL, (const xmlChar *)"radio", NULL);
+        xmlSetProp (cur2, (const xmlChar *)"url", (const xmlChar *) internet_radio->url);
+        xmlNodeAddContent (cur2, (const xmlChar *) internet_radio->name);
+
+
+        /* We save the xml file */
+        xmlSaveFormatFile (xml_filename, doc, TRUE);
+        g_free (xml_filename);
+        xmlFreeDoc (doc);
+
+        ario_radio_append_radio (radio, internet_radio);
+}
+
+static void
+ario_radio_cmd_new_radio (GtkAction *action,
+                          ArioRadio *radio)
+{
+        ARIO_LOG_FUNCTION_START
+
+        GtkWidget *dialog, *error_dialog;
+        GtkWidget *table;
+        GtkWidget *label1, *label2;
+        GtkWidget *entry1, *entry2;
+        gint retval = GTK_RESPONSE_CANCEL;        
+        ArioInternetRadio internet_radio;
+
+        /* Create the widgets */
+        dialog = gtk_dialog_new_with_buttons (_("Add a WebRadio"),
+                                              NULL,
+                                              GTK_DIALOG_DESTROY_WITH_PARENT,
+                                              GTK_STOCK_CANCEL,
+                                              GTK_RESPONSE_CANCEL,
+                                              GTK_STOCK_OK,
+                                              GTK_RESPONSE_OK,
+                                              NULL);
+        gtk_dialog_set_default_response (GTK_DIALOG (dialog),
+                                         GTK_RESPONSE_OK);
+        label1 = gtk_label_new (_("Name : "));
+        label2 = gtk_label_new (_("URL : "));
+
+        entry1 = gtk_entry_new ();
+        entry2 = gtk_entry_new ();
+
+        table = gtk_table_new (2, 2 , FALSE);
+
+        gtk_table_attach_defaults (GTK_TABLE(table),
+                                   label1,
+                                   0, 1,
+                                   0, 1);
+
+        gtk_table_attach_defaults (GTK_TABLE(table),
+                                   label2,
+                                   0, 1,
+                                   1, 2);
+
+        gtk_table_attach_defaults (GTK_TABLE(table),
+                                   entry1,
+                                   1, 2,
+                                   0, 1);
+
+        gtk_table_attach_defaults (GTK_TABLE(table),
+                                   entry2,
+                                   1, 2,
+                                   1, 2);
+
+        gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), 
+                           table);
+        gtk_widget_show_all (dialog);
+
+        retval = gtk_dialog_run (GTK_DIALOG(dialog));
+        if (retval != GTK_RESPONSE_OK) {
+                gtk_widget_destroy (dialog);
+                return;
+        }
+
+        internet_radio.name = (char *) gtk_entry_get_text(GTK_ENTRY(entry1));
+        internet_radio.url = (char *) gtk_entry_get_text(GTK_ENTRY(entry2));
+
+        if (!internet_radio.name 
+            || !internet_radio.url
+            || !strcmp(internet_radio.name, "")
+            || !strcmp(internet_radio.url, "")) {
+                error_dialog = gtk_message_dialog_new(NULL,
+                                                      GTK_DIALOG_MODAL,
+                                                      GTK_MESSAGE_ERROR,
+                                                      GTK_BUTTONS_OK,
+                                                      _("Bad parameters. You must specify a name and a URL for the radio."));
+                gtk_dialog_run(GTK_DIALOG(error_dialog));
+                gtk_widget_destroy(error_dialog);
+                gtk_widget_destroy(dialog);
+                return;
+        }
+
+        ario_radio_add_new_radio(radio,
+                                 &internet_radio);
+
+        gtk_widget_destroy (dialog);
+}
+
+static void
+ario_radio_delete_radio (ArioInternetRadio *internet_radio,
+                         ArioRadio *radio)
+{
+        ARIO_LOG_FUNCTION_START
+        xmlDocPtr doc;
+        xmlNodePtr cur, next_cur;
+        char *xml_filename;
+        xmlChar *xml_name;
+        xmlChar *xml_url;
+
+        xml_filename = ario_radio_get_xml_filename();
+
+        /* If radios.xml file doesn't exist, we create it */
+        ario_radio_create_xml_file (xml_filename);
+
+        /* This option is necessary to save a well formated xml file */
+        xmlKeepBlanksDefault (0);
+
+        doc = xmlParseFile (xml_filename);
+        if (doc == NULL )
+                return;
+
+        cur = xmlDocGetRootElement(doc);
+        if (cur == NULL) {
+                g_free (xml_filename);
+                xmlFreeDoc (doc);
+                return;
+        }
+
+        /* We check that the root node has the right name */
+        if (xmlStrcmp(cur->name, (const xmlChar *) XML_ROOT_NAME)) {
+                g_free (xml_filename);
+                xmlFreeDoc (doc);
+                return;
+        }
+
+        cur = cur->children;
+        while (cur != NULL) {
+                next_cur = cur->next;
+                /* For each "radio" entry */
+                if (!xmlStrcmp (cur->name, (const xmlChar *)"radio")){
+                        xml_name = xmlNodeGetContent (cur);
+                        xml_url = xmlGetProp (cur, (const unsigned char *)"url");
+                        if (!xmlStrcmp (xml_name, (const xmlChar *)internet_radio->name)
+                            && !xmlStrcmp (xml_url, (const xmlChar *)internet_radio->url)) {
+                                xmlUnlinkNode(cur);
+                                xmlFreeNode(cur);
+                        }
+
+                        xmlFree(xml_name);
+                        xmlFree(xml_url);
+                }
+                cur = next_cur;
+        }
+
+        /* We save the xml file */
+        xmlSaveFormatFile (xml_filename, doc, TRUE);
+        g_free (xml_filename);
+        xmlFreeDoc (doc);
+
+        /* TODO : not very efficient */
+        ario_radio_fill_radios (radio);
+}
+
+static void
+ario_radio_cmd_delete_radios (GtkAction *action,
+                              ArioRadio *radio)
+{
+        ARIO_LOG_FUNCTION_START
+        GList *internet_radios = NULL;
+
+        gtk_tree_selection_selected_foreach (radio->priv->radios_selection,
+                                             radios_foreach2,
+                                             &internet_radios);
+
+        g_list_foreach (internet_radios, (GFunc) ario_radio_delete_radio, radio);
+        g_list_foreach (internet_radios, (GFunc) ario_radio_free_internet_radio, NULL);
+        g_list_free (internet_radios);
+}
+
+static void
+ario_radio_modify_radio (ArioRadio *radio,
+                         ArioInternetRadio *old_internet_radio,
+                         ArioInternetRadio *new_internet_radio)
+{
+        ARIO_LOG_FUNCTION_START
+
+        ARIO_LOG_FUNCTION_START
+        xmlDocPtr doc;
+        xmlNodePtr cur, next_cur;
+        char *xml_filename;
+        xmlChar *xml_name;
+        xmlChar *xml_url;
+        xmlChar *new_xml_name;
+
+        xml_filename = ario_radio_get_xml_filename();
+
+        /* If radios.xml file doesn't exist, we create it */
+        ario_radio_create_xml_file (xml_filename);
+
+        /* This option is necessary to save a well formated xml file */
+        xmlKeepBlanksDefault (0);
+
+        doc = xmlParseFile (xml_filename);
+        if (doc == NULL )
+                return;
+
+        cur = xmlDocGetRootElement(doc);
+        if (cur == NULL) {
+                g_free (xml_filename);
+                xmlFreeDoc (doc);
+                return;
+        }
+
+        /* We check that the root node has the right name */
+        if (xmlStrcmp(cur->name, (const xmlChar *) XML_ROOT_NAME)) {
+                g_free (xml_filename);
+                xmlFreeDoc (doc);
+                return;
+        }
+
+        cur = cur->children;
+        while (cur != NULL) {
+                next_cur = cur->next;
+                /* For each "radio" entry */
+                if (!xmlStrcmp (cur->name, (const xmlChar *)"radio")){
+                        xml_name = xmlNodeGetContent (cur);
+                        xml_url = xmlGetProp (cur, (const unsigned char *)"url");
+                        if (!xmlStrcmp (xml_name, (const xmlChar *)old_internet_radio->name)
+                            && !xmlStrcmp (xml_url, (const xmlChar *)old_internet_radio->url)) {
+                                xmlSetProp (cur, (const xmlChar *)"url", (const xmlChar *) new_internet_radio->url);
+                                new_xml_name = xmlEncodeEntitiesReentrant (doc, (const xmlChar *) new_internet_radio->name);
+                                xmlNodeSetContent (cur, new_xml_name);
+                                xmlFree(new_xml_name);
+                        }
+
+                        xmlFree(xml_name);
+                        xmlFree(xml_url);
+                }
+                cur = next_cur;
+        }
+
+        /* We save the xml file */
+        xmlSaveFormatFile (xml_filename, doc, TRUE);
+        g_free (xml_filename);
+        xmlFreeDoc (doc);
+
+        /* TODO : not very efficient */
+        ario_radio_fill_radios (radio);
+}
+
+static void
+ario_radio_edit_radio_properties (ArioRadio *radio,
+                                  ArioInternetRadio *internet_radio)
+{
+        ARIO_LOG_FUNCTION_START
+
+        GtkWidget *dialog, *error_dialog;
+        GtkWidget *table;
+        GtkWidget *label1, *label2;
+        GtkWidget *entry1, *entry2;
+        gint retval = GTK_RESPONSE_CANCEL;
+        ArioInternetRadio new_internet_radio;
+
+        /* Create the widgets */
+        dialog = gtk_dialog_new_with_buttons (_("Edit a WebRadio"),
+                                              NULL,
+                                              GTK_DIALOG_DESTROY_WITH_PARENT,
+                                              GTK_STOCK_CANCEL,
+                                              GTK_RESPONSE_CANCEL,
+                                              GTK_STOCK_OK,
+                                              GTK_RESPONSE_OK,
+                                              NULL);
+        gtk_dialog_set_default_response (GTK_DIALOG (dialog),
+                                         GTK_RESPONSE_OK);
+        label1 = gtk_label_new (_("Name : "));
+        label2 = gtk_label_new (_("URL : "));
+
+        entry1 = gtk_entry_new ();
+        gtk_entry_set_text (GTK_ENTRY (entry1), internet_radio->name);
+        entry2 = gtk_entry_new ();
+        gtk_entry_set_text (GTK_ENTRY (entry2), internet_radio->url);
+
+        table = gtk_table_new (2, 2 , FALSE);
+
+        gtk_table_attach_defaults (GTK_TABLE(table),
+                                   label1,
+                                   0, 1,
+                                   0, 1);
+
+        gtk_table_attach_defaults (GTK_TABLE(table),
+                                   label2,
+                                   0, 1,
+                                   1, 2);
+
+        gtk_table_attach_defaults (GTK_TABLE(table),
+                                   entry1,
+                                   1, 2,
+                                   0, 1);
+
+        gtk_table_attach_defaults (GTK_TABLE(table),
+                                   entry2,
+                                   1, 2,
+                                   1, 2);
+
+        gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), 
+                           table);
+        gtk_widget_show_all (dialog);
+
+        retval = gtk_dialog_run (GTK_DIALOG(dialog));
+        if (retval != GTK_RESPONSE_OK) {
+                gtk_widget_destroy (dialog);
+                return;
+        }
+
+        new_internet_radio.name = (char *) gtk_entry_get_text(GTK_ENTRY(entry1));
+        new_internet_radio.url = (char *) gtk_entry_get_text(GTK_ENTRY(entry2));
+
+        if (!new_internet_radio.name 
+            || !new_internet_radio.url
+            || !strcmp(new_internet_radio.name, "")
+            || !strcmp(new_internet_radio.url, "")) {
+                error_dialog = gtk_message_dialog_new(NULL,
+                                                      GTK_DIALOG_MODAL,
+                                                      GTK_MESSAGE_ERROR,
+                                                      GTK_BUTTONS_OK,
+                                                      _("Bad parameters. You must specify a name and a URL for the radio."));
+                gtk_dialog_run(GTK_DIALOG(error_dialog));
+                gtk_widget_destroy(error_dialog);
+                gtk_widget_destroy(dialog);
+                return;
+        }
+
+        ario_radio_modify_radio(radio,
+                                internet_radio,
+                                &new_internet_radio);
+
+        gtk_widget_destroy (dialog);
+}
+
+static void
+ario_radio_cmd_radio_properties (GtkAction *action,
+                                 ArioRadio *radio)
+{
+        ARIO_LOG_FUNCTION_START
+        GList* paths;
+        GtkTreeIter iter;
+        ArioInternetRadio internet_radio;
+        GtkTreeModel *tree_model = GTK_TREE_MODEL (radio->priv->radios_model);
+        GtkTreePath *path;
+
+        paths = gtk_tree_selection_get_selected_rows (radio->priv->radios_selection,
+                                                      &tree_model);
+
+        path = g_list_first(paths)->data;
+        gtk_tree_model_get_iter (tree_model,
+                                 &iter,
+                                 path);
+
+        gtk_tree_model_get (tree_model, &iter, RADIO_NAME_COLUMN, &internet_radio.name, -1);
+        gtk_tree_model_get (tree_model, &iter, RADIO_URL_COLUMN, &internet_radio.url, -1);
+
+        ario_radio_edit_radio_properties (radio, &internet_radio);
+
+        g_list_foreach (paths, (GFunc) gtk_tree_path_free, NULL);
+        g_list_free (paths);
 }
 
 #endif  /* ENABLE_RADIOS */

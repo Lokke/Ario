@@ -58,6 +58,8 @@ void            ario_playlist_append_albums     (ArioPlaylist *playlist, GList *
 
 void            ario_playlist_append_songs      (ArioPlaylist *playlist, GList *songs);
 
+void            ario_playlist_append_radio      (ArioPlaylist *playlist, GList *songs);
+
 G_END_DECLS
 
 #endif /* __ARIO_PLAYLIST_H */
