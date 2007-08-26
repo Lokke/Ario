@@ -270,6 +270,7 @@ ario_shell_construct (ArioShell *shell)
         ARIO_LOG_FUNCTION_START
         GtkWindow *win;
         GtkWidget *menubar;
+        GtkWidget *separator;
         GtkWidget *vbox;
         GdkPixbuf *pixbuf;
         GError *error = NULL;
@@ -299,6 +300,7 @@ ario_shell_construct (ArioShell *shell)
 
         shell->priv->mpd = ario_mpd_new ();
         shell->priv->header = ario_header_new (shell->priv->actiongroup, shell->priv->mpd);
+        separator = gtk_hseparator_new ();
         shell->priv->playlist = ario_playlist_new (shell->priv->ui_manager, shell->priv->actiongroup, shell->priv->mpd);
         shell->priv->source = ario_source_new (shell->priv->ui_manager, shell->priv->actiongroup, shell->priv->mpd, ARIO_PLAYLIST (shell->priv->playlist));
 
@@ -336,6 +338,10 @@ ario_shell_construct (ArioShell *shell)
 
         gtk_box_pack_start (GTK_BOX (vbox),
                             shell->priv->header,
+                            FALSE, FALSE, 0);
+
+        gtk_box_pack_start (GTK_BOX (vbox),
+                            separator,
                             FALSE, FALSE, 0);
 
         gtk_box_pack_start (GTK_BOX (vbox),
