@@ -50,7 +50,8 @@ typedef struct
 typedef enum
 {
         ARIO_SOURCE_BROWSER,
-        ARIO_SOURCE_RADIO
+        ARIO_SOURCE_RADIO,
+        ARIO_SOURCE_SEARCH
 }ArioSourceType;
 
 GType                   ario_source_get_type   (void);

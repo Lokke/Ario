@@ -11,7 +11,8 @@
 
 		<menu name="ViewMenu" action="View">
 			<menuitem name="LibraryViewMenu" action="LibraryView"/>
-			<menuitem name="RadioViewMenu" action="RadioView"/> 
+			<menuitem name="RadioViewMenu" action="RadioView"/>
+			<menuitem name="SearchViewMenu" action="SearchView"/>
 		</menu>
 
 		<menu name="ToolMenu" action="Tool">
@@ -71,5 +72,9 @@
 		<separator/>
 		<menuitem name="RadioNewRadio" action="RadioNewRadio"/>
 		<menuitem name="RadioDeleteRadios" action="RadioDeleteRadios"/>
+	</popup>
+
+	<popup name="SearchPopup">
+		<menuitem name="SearchAddSongs" action="SearchAddSongs"/>
 	</popup>
 </ui>

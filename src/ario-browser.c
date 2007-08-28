@@ -20,7 +20,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include "eel-gconf-extensions.h"
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-browser.h"
 #include "ario-util.h"
 #include "ario-cover.h"

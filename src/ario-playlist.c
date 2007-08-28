@@ -21,7 +21,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <string.h>
 
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-playlist.h"
 #include "ario-mpd.h"
 #include "ario-util.h"
@@ -628,7 +628,8 @@ ario_playlist_move_rows (ArioPlaylist *playlist,
         gint pos1, pos2;
         gint *indice;
         GtkTreeModel *model = GTK_TREE_MODEL (playlist->priv->model);
-        /* get drop location */
+
+        /* get drop location */
         gtk_tree_view_get_dest_row_at_pos (GTK_TREE_VIEW (playlist->priv->tree), x, y, &path, &pos);
 
         /* adjust position acording to drop after */
@@ -691,7 +692,8 @@ ario_playlist_add_songs (ArioPlaylist *playlist,
         int end, offset = 0, drop = 0;
         GtkTreePath *path = NULL;
         GtkTreeViewDropPosition pos;
-        gboolean do_not_move = FALSE;
+        gboolean do_not_move = FALSE;
+
         end = playlist->priv->playlist_length - 1;
 
         if (x < 0 || y < 0) {

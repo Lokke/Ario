@@ -1349,6 +1349,7 @@ Optional Features:
   --disable-schemas-install	Disable the schemas installation
   --enable-debug          Add runtime debugging information (slower)
   --enable-radios         Add support of internet radios
+  --enable-search         Add support of search view
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -6506,6 +6507,29 @@ cat >>confdefs.h <<\_ACEOF
 #define ENABLE_RADIOS 1
 _ACEOF
 
+
+cat >>confdefs.h <<\_ACEOF
+#define MULTIPLE_VIEW 1
+_ACEOF
+
+fi
+
+# Check whether --enable-search was given.
+if test "${enable_search+set}" = set; then
+  enableval=$enable_search;
+fi
+
+if test x"$enable_search" = xyes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_SEARCH 1
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define MULTIPLE_VIEW 1
+_ACEOF
+
 fi
 
 ac_config_files="$ac_config_files Makefile src/Makefile data/Makefile po/Makefile.in data/ario.desktop.in"
@@ -8010,10 +8034,15 @@ echo "-------------- Options --------------"
 if test x${enable_debug} = xyes; then
         echo "Debug information is:                     ENABLED"
 else
-        echo "Debug information is:                     DISABLED"
+        echo "Debug information is:                     DISABLED (--enable-debug)"
 fi
 if test x${enable_radios} = xyes; then
         echo "Internet radios support is:               ENABLED"
 else
-        echo "Internet radios support is:               DISABLED"
+        echo "Internet radios support is:               DISABLED (--enable-radios)"
+fi
+if test x${enable_search} = xyes; then
+        echo "Search view support is:                   ENABLED"
+else
+        echo "Search view support is:                   DISABLED (--enable-search)"
 fi

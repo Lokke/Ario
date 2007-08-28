@@ -49,6 +49,12 @@ typedef struct ArioMpdAlbum
         gchar *album;
 } ArioMpdAlbum;
 
+typedef struct ArioMpdSearchCriteria
+{
+        gint type;
+        const gchar *value;
+} ArioMpdSearchCriteria;
+
 typedef mpd_Song ArioMpdSong;
 
 typedef struct
@@ -79,6 +85,8 @@ ArioMpd *               ario_mpd_new                                    (void);
 void                    ario_mpd_connect                                (ArioMpd *mpd);
 
 void                    ario_mpd_disconnect                             (ArioMpd *mpd);
+
+mpd_Connection *        ario_mpd_get_connection                         (ArioMpd *mpd);
 
 gboolean                ario_mpd_is_connected                           (ArioMpd *mpd);
 
@@ -171,6 +179,9 @@ void                    ario_mpd_queue_move                             (ArioMpd
                                                                          int old_pos,
                                                                          int new_pos);
 void                    ario_mpd_queue_commit                           (ArioMpd *mpd);
+
+GList*                  ario_mpd_search                                 (ArioMpd *mpd,
+                                                                         GList *search_criterias);
 
 G_END_DECLS
 

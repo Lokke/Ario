@@ -20,7 +20,7 @@
 
 #include "ario-status-bar.h"
 #include "ario-util.h"
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-debug.h"
 
 static void ario_status_bar_class_init (ArioStatusBarClass *klass);

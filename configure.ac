@@ -44,6 +44,16 @@ AC_ARG_ENABLE(radios,
                              [Add support of internet radios]))
 if test x"$enable_radios" = xyes; then
    AC_DEFINE(ENABLE_RADIOS, 1, [Add support of internet radios])
+   AC_DEFINE(MULTIPLE_VIEW, 1, [Radio or search])
+fi
+
+dnl Search
+AC_ARG_ENABLE(search,
+              AC_HELP_STRING([--enable-search],
+                             [Add support of search view]))
+if test x"$enable_search" = xyes; then
+   AC_DEFINE(ENABLE_SEARCH, 1, [Add support of search view])
+   AC_DEFINE(MULTIPLE_VIEW, 1, [Radio or search])
 fi
 
 AC_OUTPUT([
@@ -59,10 +69,15 @@ echo "-------------- Options --------------"
 if test x${enable_debug} = xyes; then
         echo "Debug information is:                     ENABLED"
 else
-        echo "Debug information is:                     DISABLED"
+        echo "Debug information is:                     DISABLED (--enable-debug)"
 fi
 if test x${enable_radios} = xyes; then
         echo "Internet radios support is:               ENABLED"
 else
-        echo "Internet radios support is:               DISABLED"
+        echo "Internet radios support is:               DISABLED (--enable-radios)"
+fi
+if test x${enable_search} = xyes; then
+        echo "Search view support is:                   ENABLED"
+else
+        echo "Search view support is:                   DISABLED (--enable-search)"
 fi

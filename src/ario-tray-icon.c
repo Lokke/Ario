@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-tray-icon.h"
 #include "ario-util.h"
 #include "ario-preferences.h"

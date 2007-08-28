@@ -22,7 +22,7 @@
 #include <config.h>
 #include <string.h>
 #include "eel-gconf-extensions.h"
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-shell.h"
 #include "ario-source.h"
 #include "ario-mpd.h"
@@ -49,11 +49,11 @@ static void ario_shell_cmd_quit (GtkAction *action,
                                  ArioShell *shell);
 static void ario_shell_cmd_preferences (GtkAction *action,
                                         ArioShell *shell);
-#ifdef ENABLE_RADIOS
+#ifdef MULTIPLE_VIEW
 static void ario_shell_cmd_radio_view (GtkRadioAction *action,
                 		       GtkRadioAction *current,
                 		       ArioShell *shell);
-#endif  /* ENABLE_RADIOS */
+#endif  /* MULTIPLE_VIEW */
 static void ario_shell_cmd_covers (GtkAction *action,
                                    ArioShell *shell);
 static void ario_shell_cmd_about (GtkAction *action,
@@ -121,18 +121,27 @@ static GtkActionEntry ario_shell_actions [] =
           G_CALLBACK (ario_shell_cmd_about) }
 };
 static guint ario_shell_n_actions = G_N_ELEMENTS (ario_shell_actions);
-#ifdef ENABLE_RADIOS
+
 static GtkRadioActionEntry ario_shell_radio [] =
 {
         { "LibraryView", NULL, N_("_Library"), NULL,
           N_("Library view"),
-          ARIO_SOURCE_BROWSER },
+          ARIO_SOURCE_BROWSER }
+#ifdef ENABLE_RADIOS
+        ,
         { "RadioView", NULL, N_("_Web Radios"), NULL,
           N_("Web Radios view"),
           ARIO_SOURCE_RADIO }
+#endif  /* ENABLE_RADIOS */
+#ifdef ENABLE_SEARCH
+        ,
+        { "SearchView", NULL, N_("_Search"), NULL,
+          N_("Search view"),
+          ARIO_SOURCE_SEARCH }
+#endif  /* ENABLE_SEARCH */
 };
 static guint ario_shell_n_radio = G_N_ELEMENTS (ario_shell_radio);
-#endif  /* ENABLE_RADIOS */
+
 static GObjectClass *parent_class;
 
 GType
@@ -307,13 +316,13 @@ ario_shell_construct (ArioShell *shell)
         gtk_action_group_add_actions (shell->priv->actiongroup,
                                       ario_shell_actions,
                                       ario_shell_n_actions, shell);
-#ifdef ENABLE_RADIOS
+#ifdef MULTIPLE_VIEW
 	gtk_action_group_add_radio_actions (shell->priv->actiongroup,
 					    ario_shell_radio,
 					    ario_shell_n_radio,
                                             0, G_CALLBACK (ario_shell_cmd_radio_view),
 					    shell);
-#endif  /* ENABLE_RADIOS */
+#endif  /* MULTIPLE_VIEW */
         gtk_ui_manager_insert_action_group (shell->priv->ui_manager,
                                             shell->priv->actiongroup, 0);
         gtk_ui_manager_add_ui_from_file (shell->priv->ui_manager,
@@ -326,11 +335,13 @@ ario_shell_construct (ArioShell *shell)
         shell->priv->status_bar = ario_status_bar_new (shell->priv->mpd);
 
 
-        gtk_paned_add1 (GTK_PANED (shell->priv->vpaned),
-                        shell->priv->source);
+        gtk_paned_pack1 (GTK_PANED (shell->priv->vpaned),
+                         shell->priv->source,
+                         FALSE, FALSE);
 
-        gtk_paned_add2 (GTK_PANED (shell->priv->vpaned),
-                        shell->priv->playlist);
+        gtk_paned_pack2 (GTK_PANED (shell->priv->vpaned),
+                         shell->priv->playlist,
+                         TRUE, FALSE);
 
         gtk_box_pack_start (GTK_BOX (vbox),
                             menubar,
@@ -411,7 +422,7 @@ ario_shell_cmd_preferences (GtkAction *action,
 
         gtk_widget_show_all (prefs);
 }
-#ifdef ENABLE_RADIOS
+#ifdef MULTIPLE_VIEW
 static void
 ario_shell_cmd_radio_view (GtkRadioAction *action,
 		           GtkRadioAction *current,
@@ -420,7 +431,7 @@ ario_shell_cmd_radio_view (GtkRadioAction *action,
         eel_gconf_set_integer (CONF_STATE_SOURCE,
                                gtk_radio_action_get_current_value(current));
 }
-#endif  /* ENABLE_RADIOS */
+#endif  /* MULTIPLE_VIEW */
 static void
 ario_shell_cmd_about (GtkAction *action,
                       ArioShell *shell)
@@ -482,7 +493,7 @@ ario_shell_paned_changed_cb (GConfClient *client,
 static void
 ario_shell_sync_source (ArioShell *shell)
 {
-#ifdef ENABLE_RADIOS
+#ifdef MULTIPLE_VIEW
         ARIO_LOG_FUNCTION_START
         ArioSourceType source_type;
         GtkAction *action;
@@ -498,11 +509,14 @@ ario_shell_sync_source (ArioShell *shell)
         if (source_type == ARIO_SOURCE_RADIO) {
                 gtk_radio_action_set_current_value (GTK_RADIO_ACTION (action),
                                                     ARIO_SOURCE_RADIO);
+        } else if (source_type == ARIO_SOURCE_SEARCH) {
+                gtk_radio_action_set_current_value (GTK_RADIO_ACTION (action),
+                                                    ARIO_SOURCE_SEARCH);
         } else {
                 gtk_radio_action_set_current_value (GTK_RADIO_ACTION (action),
                                                     ARIO_SOURCE_BROWSER);
         }
-#endif  /* ENABLE_RADIOS */
+#endif  /* MULTIPLE_VIEW */
 }
 
 static void

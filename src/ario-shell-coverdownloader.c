@@ -20,7 +20,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-cover.h"
 #include "ario-shell-coverdownloader.h"
 #include "rb-glade-helpers.h"

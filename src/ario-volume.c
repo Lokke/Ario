@@ -24,7 +24,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <config.h>
 
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-volume.h"
 #include "ario-debug.h"
 #include "libmpdclient.h"

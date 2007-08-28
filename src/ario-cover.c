@@ -25,7 +25,7 @@
 #include <string.h>
 
 #include "eel-gconf-extensions.h"
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-cover.h"
 #include "ario-mpd.h"
 #include "ario-util.h"

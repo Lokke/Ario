@@ -22,9 +22,10 @@
 #include <config.h>
 #include "eel-gconf-extensions.h"
 #include "ario-source.h"
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-browser.h"
 #include "ario-radio.h"
+#include "ario-search.h"
 #include "ario-preferences.h"
 #include "ario-debug.h"
 
@@ -40,6 +41,7 @@ struct ArioSourcePrivate
 {
         GtkWidget *browser;
         GtkWidget *radio;
+        GtkWidget *search;
 };
 
 static GObjectClass *parent_class = NULL;
@@ -104,6 +106,7 @@ ario_source_finalize (GObject *object)
         g_return_if_fail (source->priv != NULL);
         g_free (source->priv->browser);
         g_free (source->priv->radio);
+        g_free (source->priv->search);
         g_free (source->priv);
 
         G_OBJECT_CLASS (parent_class)->finalize (object);
@@ -137,6 +140,15 @@ ario_source_new (GtkUIManager *mgr,
                                   source->priv->radio,
                                   gtk_label_new (_("Web Radios")));
 #endif  /* ENABLE_RADIOS */
+#ifdef ENABLE_SEARCH
+        source->priv->search = ario_search_new (mgr,
+                                                group,
+                                                mpd,
+                                                playlist);
+        gtk_notebook_append_page (GTK_NOTEBOOK (source),
+                                  source->priv->search,
+                                  gtk_label_new (_("Search")));
+#endif  /* ENABLE_SEARCH */
         g_signal_connect_object (G_OBJECT (source),
                                  "switch_page",
                                  G_CALLBACK (ario_source_page_changed_cb),
@@ -152,13 +164,15 @@ ario_source_set_source (ArioSource *source,
                         ArioSourceType source_type)
 {
         ARIO_LOG_FUNCTION_START
-#ifdef ENABLE_RADIOS
+#ifdef MULTIPLE_VIEW
         if (source_type == ARIO_SOURCE_RADIO) {
-                gtk_notebook_set_current_page (GTK_NOTEBOOK (source), 1);
+                gtk_notebook_set_current_page (GTK_NOTEBOOK (source), ARIO_SOURCE_RADIO);
+        } else if (source_type == ARIO_SOURCE_SEARCH) {
+                gtk_notebook_set_current_page (GTK_NOTEBOOK (source), ARIO_SOURCE_SEARCH);
         } else {
-                gtk_notebook_set_current_page (GTK_NOTEBOOK (source), 0);
+                gtk_notebook_set_current_page (GTK_NOTEBOOK (source), ARIO_SOURCE_BROWSER);
         }
-#endif  /* ENABLE_RADIOS */
+#endif  /* MULTIPLE_VIEW */
 }
 
 gboolean
@@ -169,9 +183,12 @@ ario_source_page_changed_cb (GtkNotebook *notebook,
 {
         ARIO_LOG_FUNCTION_START
 
-        if (page_nb == 1) {
+        if (page_nb == ARIO_SOURCE_RADIO) {
                 eel_gconf_set_integer (CONF_STATE_SOURCE,
                                        ARIO_SOURCE_RADIO);
+        } else if (page_nb == ARIO_SOURCE_SEARCH) {
+                eel_gconf_set_integer (CONF_STATE_SOURCE,
+                                       ARIO_SOURCE_SEARCH);
         } else {
                 eel_gconf_set_integer (CONF_STATE_SOURCE,
                                        ARIO_SOURCE_BROWSER);

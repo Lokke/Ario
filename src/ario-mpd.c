@@ -25,7 +25,7 @@
 #include "eel-gconf-extensions.h"
 #include "ario-mpd.h"
 #include "ario-preferences.h"
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-debug.h"
 
 static void ario_mpd_class_init (ArioMpdClass *klass);
@@ -41,7 +41,7 @@ static void ario_mpd_get_property (GObject *object,
                                    guint prop_id,
                                    GValue *value,
                                    GParamSpec *pspec);
-mpd_Connection *ario_mpd_get_connection (ArioMpd *mpd);
+
 typedef enum
 {
         ARIO_MPD_ACTION_ADD,
@@ -1198,7 +1198,8 @@ ario_mpd_queue_move (ArioMpd *mpd,
      
         mpd->priv->queue = g_list_append (mpd->priv->queue, queue_action);
 }
-
+
+
 void
 ario_mpd_queue_commit (ArioMpd *mpd)
 {
@@ -1209,38 +1210,71 @@ ario_mpd_queue_commit (ArioMpd *mpd)
         if (!ario_mpd_is_connected (mpd))
                 return;
                 
-	mpd_sendCommandListBegin(mpd->priv->connection);
-	/* get first item */
-	temp = mpd->priv->queue;
-	while (temp) {
-	        ArioMpdQueueAction *queue_action = (ArioMpdQueueAction *) temp->data;
-		if(queue_action->type == ARIO_MPD_ACTION_ADD) {
-			if(queue_action->path != NULL) {
-				mpd_sendAddCommand(mpd->priv->connection, queue_action->path);
-			}
-		} else if (queue_action->type == ARIO_MPD_ACTION_DELETE_ID) {
-			if(queue_action->id >= 0) {
-				mpd_sendDeleteIdCommand(mpd->priv->connection, queue_action->id);
-			}
-		} else if (queue_action->type == ARIO_MPD_ACTION_DELETE_POS) {                                                                      		
-			if(queue_action->id >= 0) {
-				mpd_sendDeleteCommand(mpd->priv->connection, queue_action->pos);
-			}
-		} else if (queue_action->type == ARIO_MPD_ACTION_MOVE) {
-			if(queue_action->id >= 0) {
-				mpd_sendMoveCommand(mpd->priv->connection, queue_action->old_pos, queue_action->new_pos);
-			}
-		}
+        mpd_sendCommandListBegin(mpd->priv->connection);
+        /* get first item */
+        temp = mpd->priv->queue;
+        while (temp) {
+                ArioMpdQueueAction *queue_action = (ArioMpdQueueAction *) temp->data;
+                if(queue_action->type == ARIO_MPD_ACTION_ADD) {
+                        if(queue_action->path != NULL) {
+                                mpd_sendAddCommand(mpd->priv->connection, queue_action->path);
+                        }
+                } else if (queue_action->type == ARIO_MPD_ACTION_DELETE_ID) {
+                        if(queue_action->id >= 0) {
+                                mpd_sendDeleteIdCommand(mpd->priv->connection, queue_action->id);
+                        }
+                } else if (queue_action->type == ARIO_MPD_ACTION_DELETE_POS) {                                                                                      
+                        if(queue_action->id >= 0) {
+                                mpd_sendDeleteCommand(mpd->priv->connection, queue_action->pos);
+                        }
+                } else if (queue_action->type == ARIO_MPD_ACTION_MOVE) {
+                        if(queue_action->id >= 0) {
+                                mpd_sendMoveCommand(mpd->priv->connection, queue_action->old_pos, queue_action->new_pos);
+                        }
+                }
 
-		temp = g_list_next (temp);
-	}
-	mpd_sendCommandListEnd(mpd->priv->connection);
-	mpd_finishCommand(mpd->priv->connection);
-	ario_mpd_update_status (mpd);
-	
+                temp = g_list_next (temp);
+        }
+        mpd_sendCommandListEnd(mpd->priv->connection);
+        mpd_finishCommand(mpd->priv->connection);
+        ario_mpd_update_status (mpd);
+        
         // g_list_foreach(artists, (GFunc) TODO, NULL);
         g_list_free (mpd->priv->queue);
         mpd->priv->queue = NULL;
 }
 
 
+GList*
+ario_mpd_search (ArioMpd *mpd,
+                 GList *search_criterias)
+{
+        ARIO_LOG_FUNCTION_START
+        mpd_Connection *connection;
+        mpd_InfoEntity *ent = NULL;
+        GList *tmp;
+        ArioMpdSearchCriteria *search_criteria;
+        GList *songs = NULL;
+
+        if (!ario_mpd_is_connected (mpd))
+                return NULL;
+
+        connection = ario_mpd_get_connection (mpd);
+
+        mpd_startSearch(connection, FALSE);
+
+        for (tmp = search_criterias; tmp; tmp = g_list_next (tmp)) {
+                search_criteria = tmp->data;
+                mpd_addConstraintSearch(connection,
+                                        search_criteria->type,
+                                        search_criteria->value);
+        }
+        mpd_commitSearch(connection);
+
+        while ((ent = mpd_getNextInfoEntity (connection)) != NULL) {
+                songs = g_list_append (songs, mpd_songDup (ent->info.song));
+                mpd_freeInfoEntity(ent);
+        }
+
+        return songs;
+}

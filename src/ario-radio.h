@@ -59,6 +59,6 @@ GtkWidget*              ario_radio_new        (GtkUIManager *mgr,
 
 G_END_DECLS
 
-#endif /* __ARIO_RADIO_H */
-
 #endif  /* ENABLE_RADIOS */
+
+#endif /* __ARIO_RADIO_H */

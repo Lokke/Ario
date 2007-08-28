@@ -20,7 +20,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <config.h>
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-radio.h"
 #include "ario-util.h"
 #include "ario-debug.h"
@@ -508,6 +508,9 @@ ario_radio_fill_radios (ArioRadio *radio)
 
         gtk_list_store_clear (radio->priv->radios_model);
 
+        if (!radio->priv->connected)
+                return;
+
         radios = ario_radio_get_radios (radio);
 
         temp = radios;
@@ -529,10 +532,10 @@ ario_radio_state_changed_cb (ArioMpd *mpd,
                              ArioRadio *radio)
 {
         ARIO_LOG_FUNCTION_START
-        if (radio->priv->connected != ario_mpd_is_connected (mpd))
+        if (radio->priv->connected != ario_mpd_is_connected (mpd)) {
+                radio->priv->connected = ario_mpd_is_connected (mpd);
                 ario_radio_fill_radios (radio);
-
-        radio->priv->connected = ario_mpd_is_connected (mpd);
+        }
 }
 
 static void

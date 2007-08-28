@@ -25,7 +25,7 @@
 #include "rb-glade-helpers.h"
 #include "eel-gconf-extensions.h"
 #include "libmpdclient.h"
-#include "ario-i18n.h"
+#include <glib/gi18n.h>
 #include "ario-preferences.h"
 #include "ario-debug.h"
 

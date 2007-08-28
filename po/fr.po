@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ario 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-26 19:04+0200\n"
+"POT-Creation-Date: 2007-08-28 21:16+0200\n"
 "PO-Revision-Date: 2007-08-15 18:47+0200\n"
 "Last-Translator: marc <>\n"
 "Language-Team: French\n"
@@ -294,12 +294,12 @@ msgid "n/a"
 msgstr "n/a"
 
 #: ../src/ario-browser.c:125 ../src/ario-browser.c:128
-#: ../src/ario-browser.c:131 ../src/ario-radio.c:108
+#: ../src/ario-browser.c:131 ../src/ario-radio.c:108 ../src/ario-search.c:130
 msgid "_Add to playlist"
 msgstr "_Ajouter à la playlist"
 
 #: ../src/ario-browser.c:126 ../src/ario-browser.c:129
-#: ../src/ario-browser.c:132 ../src/ario-radio.c:109
+#: ../src/ario-browser.c:132 ../src/ario-radio.c:109 ../src/ario-search.c:131
 msgid "Add to the playlist"
 msgstr "_Ajouter à la playlist"
 
@@ -319,11 +319,14 @@ msgstr "_Supprimer les pochettes"
 msgid "Delete the selected covers"
 msgstr "Supprimer les pochettes sélectionnées"
 
-#: ../src/ario-browser.c:282 ../src/ario-playlist.c:263
+#: ../src/ario-browser.c:282 ../src/ario-search.c:43 ../src/ario-search.c:324
+#: ../src/ario-playlist.c:263
 msgid "Artist"
 msgstr "Artiste"
 
-#: ../src/ario-browser.c:336 ../src/ario-playlist.c:272
+#. MPD_TAG_ITEM_ARTIST
+#: ../src/ario-browser.c:336 ../src/ario-search.c:44 ../src/ario-search.c:337
+#: ../src/ario-playlist.c:272
 msgid "Album"
 msgstr "Album"
 
@@ -331,11 +334,15 @@ msgstr "Album"
 msgid "Cover"
 msgstr "Pochette"
 
-#: ../src/ario-browser.c:410 ../src/ario-playlist.c:245
+#. MPD_TAG_ITEM_TITLE
+#: ../src/ario-browser.c:410 ../src/ario-search.c:46
+#: ../src/ario-playlist.c:245
 msgid "Track"
 msgstr "Piste"
 
-#: ../src/ario-browser.c:417 ../src/ario-playlist.c:254
+#. MPD_TAG_ITEM_ALBUM
+#: ../src/ario-browser.c:417 ../src/ario-search.c:45 ../src/ario-search.c:311
+#: ../src/ario-playlist.c:254
 msgid "Title"
 msgstr "Titre"
 
@@ -380,35 +387,64 @@ msgid "Internet Radios"
 msgstr "Radios Internet"
 
 #. Create the widgets
-#: ../src/ario-radio.c:832
+#: ../src/ario-radio.c:835
 msgid "Add a WebRadio"
 msgstr "Ajouter une WebRadio"
 
-#: ../src/ario-radio.c:842 ../src/ario-radio.c:1080
+#: ../src/ario-radio.c:845 ../src/ario-radio.c:1083
 msgid "Name : "
 msgstr "Nom : "
 
-#: ../src/ario-radio.c:843 ../src/ario-radio.c:1081
+#: ../src/ario-radio.c:846 ../src/ario-radio.c:1084
 msgid "URL : "
 msgstr "URL : "
 
-#: ../src/ario-radio.c:891 ../src/ario-radio.c:1131
+#: ../src/ario-radio.c:894 ../src/ario-radio.c:1134
 msgid "Bad parameters. You must specify a name and a URL for the radio."
 msgstr ""
 "Mauvais paramètres. Vous devez spécifier un nom et une URL pour la radio."
 
 #. Create the widgets
-#: ../src/ario-radio.c:1070
+#: ../src/ario-radio.c:1073
 msgid "Edit a WebRadio"
 msgstr "Éditer une WebRadio"
 
-#: ../src/ario-source.c:130
+#. MPD_TAG_ITEM_TRACK
+#. MPD_TAG_ITEM_NAME
+#. MPD_TAG_ITEM_GENRE
+#. MPD_TAG_ITEM_DATE
+#. MPD_TAG_ITEM_COMPOSER
+#. MPD_TAG_ITEM_PERFORMER
+#. MPD_TAG_ITEM_COMMENT
+#. MPD_TAG_ITEM_DISC
+#: ../src/ario-search.c:54
+msgid "Filename"
+msgstr "Fichier"
+
+#. MPD_TAG_ITEM_FILENAME
+#: ../src/ario-search.c:55
+msgid "Any"
+msgstr "Tous"
+
+#: ../src/ario-search.c:263 ../src/ario-search.c:743
+msgid "Add a search criteria"
+msgstr "Ajouter un critère de recherche"
+
+#: ../src/ario-search.c:270
+msgid "Search songs in the library"
+msgstr "Chercher une chanson dans la bibliothèque"
+
+#: ../src/ario-source.c:133
 msgid "Library"
 msgstr "Bibliothèque"
 
-#: ../src/ario-source.c:138
+#: ../src/ario-source.c:141
 msgid "Web Radios"
 msgstr "Web Radios"
+
+#: ../src/ario-source.c:150
+msgid "Search"
+msgstr "Recherche"
 
 #: ../src/ario-cover.c:422
 msgid "The cover already exists. Do you want to replace it?"
@@ -631,13 +667,21 @@ msgstr "_Bibliothèque"
 msgid "Library view"
 msgstr "Affichage de la bibliothèque"
 
-#: ../src/ario-shell.c:130
+#: ../src/ario-shell.c:132
 msgid "_Web Radios"
 msgstr "_Web Radios"
 
-#: ../src/ario-shell.c:131
+#: ../src/ario-shell.c:133
 msgid "Web Radios view"
 msgstr "Affichage des Web Radios"
+
+#: ../src/ario-shell.c:138
+msgid "_Search"
+msgstr "_Recherche"
+
+#: ../src/ario-shell.c:139
+msgid "Search view"
+msgstr "Chercher dans la bibliothèque"
 
 #: ../src/ario-status-bar.c:204
 #, c-format

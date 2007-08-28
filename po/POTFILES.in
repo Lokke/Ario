@@ -13,6 +13,8 @@ src/ario-browser.c
 src/ario-browser.h
 src/ario-radio.c
 src/ario-radio.h
+src/ario-search.c
+src/ario-search.h
 src/ario-source.c
 src/ario-source.h
 src/ario-cover.c
