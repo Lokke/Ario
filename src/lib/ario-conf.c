@@ -243,6 +243,15 @@ ario_conf_save_foreach (gchar *key,
         xmlNodeAddContent (cur, (const xmlChar *) value);
 }
 
+static gint 
+ario_conf_compare_keys (gconstpointer a,
+			gconstpointer b)
+{
+  const xmlChar * str1 = (const xmlChar *) a;
+  const xmlChar * str2 = (const xmlChar *) b;
+  return xmlStrcmp (str1, str2);
+}
+
 static gboolean
 ario_conf_save (G_GNUC_UNUSED gpointer data)
 {
@@ -250,6 +259,8 @@ ario_conf_save (G_GNUC_UNUSED gpointer data)
         xmlNodePtr cur;
         xmlDocPtr doc;
         char *xml_filename;
+	guint index;
+	GList* sorted_keys;
 
         if (!modified)
                 return TRUE;
@@ -259,9 +270,16 @@ ario_conf_save (G_GNUC_UNUSED gpointer data)
         cur = xmlNewNode (NULL, (const xmlChar *) XML_ROOT_NAME);
         xmlDocSetRootElement (doc, cur);
 
-        g_hash_table_foreach (hash,
-                              (GHFunc) ario_conf_save_foreach,
-                              cur);
+	/* We sort the keys before saving to avoid changing the
+	   configuration file if only the order changes */
+	sorted_keys = g_list_sort (g_hash_table_get_keys (hash), 
+				   ario_conf_compare_keys);
+
+	for (index = 0; index < g_list_length (sorted_keys); ++index) {
+	  gpointer  key = g_list_nth_data (sorted_keys, index);
+	  gpointer value = g_hash_table_lookup (hash, key);
+	  ario_conf_save_foreach ((gchar *) key, (gchar *) value, cur);
+	}
 
         xml_filename = g_build_filename (ario_util_config_dir (), "options.xml", NULL);
 
