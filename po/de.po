@@ -1,6 +1,7 @@
 # German translation for ario
 # Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
 # This file is distributed under the same license as the ario package.
+# Felix Pielok <kontakt@lokke.de>, 2015
 # Claudius Henrichs <claudius.h@gmx.de>, 2010.
 # Fabian Nowak <timystery@arcor.de>, 2010.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
@@ -1192,7 +1193,7 @@ msgstr "Informationen"
 
 #: ../plugins/information/information.ario-plugin.desktop.in.h:1
 msgid "Display various information about the playing song"
-msgstr "Zeigt erschiedene Informationen über das gerade gespielte Lied an"
+msgstr "Zeigt verschiedene Informationen über das gerade gespielte Lied an"
 
 #: ../plugins/information/information.ario-plugin.desktop.in.h:2
 msgid "Song Information"
